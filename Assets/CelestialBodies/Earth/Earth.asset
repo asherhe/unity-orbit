@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07107581ea2e0f64bbbe48cc26a49bf1, type: 3}
+  m_Name: Earth
+  m_EditorClassIdentifier: 
+  radius: 6371
+  surfaceG: 9.81
+  dayLength: 1
+  baseSprite: {fileID: 21300000, guid: 559eb836fc63ad144b00266cf32cc729, type: 3}
+  specularTex: {fileID: 2800000, guid: 217f065d5dd327341b9ef42184d85e7f, type: 3}
+  hasAtmosphere: 1
+  atmosphereHeight: 100
+  atmosphereSeaLevelPressure: 1
+  atmosphereScaleHeight: 8.5
+  atmosphereColor: {r: 1, g: 1, b: 1, a: 1}
