@@ -31,6 +31,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: 559eb836fc63ad144b00266cf32cc729, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _LightTex:
+        m_Texture: {fileID: 2800000, guid: 7a2c8ea6a89124a4a8a805d948a4abd3, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: 559eb836fc63ad144b00266cf32cc729, type: 3}
         m_Scale: {x: 1, y: 1}
@@ -40,7 +44,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 03aed97f6238c2441b14505598bfd7c9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalTex:
+        m_Texture: {fileID: 2800000, guid: 03aed97f6238c2441b14505598bfd7c9, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecularTex:
@@ -49,12 +57,21 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AtmHeight: 100000
+    - _AtmScaleHeight: 8500
+    - _AtmSeaLevelPressure: 1
     - _EnableExternalAlpha: 0
+    - _LightSamples: 24
+    - _PlanetRad: 6371000
+    - _SunIntensity: 20
     m_Colors:
-    - _AmbientColor: {r: 0.10694118, g: 0.110509805, b: 0.11764706, a: 1}
+    - _AmbientColor: {r: 0.08, g: 0.1, b: 0.1, a: 1}
+    - _AtmColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _LightColor: {r: 0.9831475, g: 1, b: 0.7528302, a: 0.21568628}
+    - _RayleighScatteringCoeff: {r: 0.000005804543, g: 0.000013562912, b: 0.000030265906, a: 0.000012619775}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SunDir: {r: -1, g: 0, b: -0.2, a: 0}
   m_BuildTextureStacks: []

@@ -43,6 +43,7 @@ Material:
     m_Floats:
     - _AtmHeight: 100000
     - _AtmScaleHeight: 8500
+    - _AtmSeaLevelPressure: 1
     - _EnableExternalAlpha: 0
     - _LightSamples: 8
     - _PlanetRad: 6371000
