@@ -857,7 +857,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &633689106
 Transform:
   m_ObjectHideFlags: 0
@@ -1546,7 +1546,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1825616307}
   - component: {fileID: 1825616309}
-  - component: {fileID: 1825616308}
   m_Layer: 6
   m_Name: Map Icon
   m_TagString: Untagged
@@ -1569,19 +1568,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1567317561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1825616308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825616306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 16624272acbcebc49808365fda8acdd0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  scale: 0.05
 --- !u!212 &1825616309
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1602,7 +1588,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 04710f83903ec434f9242dbad23007db, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

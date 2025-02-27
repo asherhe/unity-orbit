@@ -103,7 +103,6 @@ public class Orbit
         pos = pos.Rotate(-omega);
 
         double M;
-
         if (e == 1.0)
         {
             M = 0.0; // TODO: parabolic trajectories
@@ -121,7 +120,7 @@ public class Orbit
             }
             else
             {
-                double E = Math.Atanh(pos.y / pos.x);
+                double E = -Math.Atanh(pos.y / pos.x);
                 M = e * Math.Sinh(E) - E;
             }
         }

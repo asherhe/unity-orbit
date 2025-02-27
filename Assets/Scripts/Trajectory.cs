@@ -18,7 +18,6 @@ public class Trajectory : MonoBehaviour
         gameObject.layer = LayerMask.NameToLayer("Show in Map");
 
         lineRenderer = gameObject.AddComponent<LineRenderer>();
-        lineRenderer.loop = true;
         lineRenderer.useWorldSpace = false;
         lineRenderer.material = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/Trajectory.mat", typeof(Material));
     }
@@ -34,24 +33,28 @@ public class Trajectory : MonoBehaviour
         {
             theta0 = Math.Atan2(pos.y, pos.x);
             thetaMax = theta0 + 2 * Math.PI * (o.orbit.h > 0.0 ? 1 : -1);
+            lineRenderer.loop = true;
         }
         else
         {
             double asymptote = Math.Acos(-1.0 / o.orbit.e);
-            theta0 = o.orbit.omega - asymptote; thetaMax = o.orbit.omega+asymptote;
+            theta0 = o.orbit.omega - asymptote;
+            thetaMax = o.orbit.omega + asymptote;
+            lineRenderer.loop = false;
         }
         double dTheta = (thetaMax - theta0) / trajectorySubdivs;
 
         double p = o.orbit.GetSemimajorAxis() * (1 - o.orbit.e * o.orbit.e);
 
+        int numPoints = 0;
         for (int i = 0; i < trajectorySubdivs; i++)
         {
             double theta = theta0 + i * dTheta;
             double r = p / (1.0 + (float)o.orbit.e * Math.Cos(theta - o.orbit.omega));
-
-            points[i] = (float)r * new Vector3((float)Math.Cos(theta), (float)Math.Sin(theta));
+            if (r < 0.0) continue;
+            points[numPoints++] = (float)r * new Vector3((float)Math.Cos(theta), (float)Math.Sin(theta));
         }
-        lineRenderer.positionCount = trajectorySubdivs;
+        lineRenderer.positionCount = numPoints;
         lineRenderer.SetPositions(points);
         lineRenderer.widthMultiplier = width * MapViewManager.Instance.activeCamera.orthographicSize;
     }
