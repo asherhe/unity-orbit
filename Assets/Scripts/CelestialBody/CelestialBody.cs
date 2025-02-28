@@ -9,7 +9,7 @@ public class CelestialBody : MonoBehaviour
 
     private GameObject displayObject;
     private GameObject surfaceObject;
-    private GameObject atmosphereObject;
+    private GameObject atmObject;
     private GameObject trajectoriesObject;
 
     /// <summary>
@@ -71,48 +71,65 @@ public class CelestialBody : MonoBehaviour
         displayObject.transform.parent = transform;
         displayObject.transform.localPosition = Vector3.zero;
 
+        MakeDisplay(displayObject);
+    }
+
+    public void MakeDisplay(GameObject displayObject) {
+        LinkedList<Material> materials = new LinkedList<Material>();
+
+        Vector3[] verts = new Vector3[]
+        {
+            new Vector3(-1.0f, -1.0f),
+            new Vector3(1.0f, -1.0f),
+            new Vector3(1.0f, 1.0f),
+            new Vector3(-1.0f, 1.0f),
+        };
+        Vector2[] uvs = new Vector2[]
+        {
+            new Vector2(0.0f, 0.0f),
+            new Vector2(1.0f, 0.0f),
+            new Vector2(1.0f, 1.0f),
+            new Vector2(0.0f, 1.0f),
+        };
+        int[] tris = new int[]
+        {
+            0, 1, 2,
+            0, 2, 3,
+        };
+        Mesh quadMesh = new Mesh();
+        quadMesh.vertices = verts;
+        quadMesh.triangles = tris;
+        quadMesh.uv = uvs;
+
         surfaceObject = new GameObject("Surface");
         surfaceObject.transform.parent = displayObject.transform;
         surfaceObject.transform.localPosition = Vector3.forward * 550.0f;
-        surfaceObject.transform.localScale = Vector3.one * 2.0f * (float)radius;
-        SpriteRenderer displaySpriteRenderer = surfaceObject.AddComponent<SpriteRenderer>();
-        displaySpriteRenderer.sprite = data.baseSprite;
-        displaySpriteRenderer.material = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/Planet.mat", typeof(Material));
-        displaySpriteRenderer.material.SetTexture("_SpecularTex", data.specularTex);
+        surfaceObject.transform.localScale = Vector3.one * (float)radius;
+        MeshFilter surfaceMeshFilter = surfaceObject.AddComponent<MeshFilter>();
+        surfaceMeshFilter.mesh = quadMesh;
+        MeshRenderer surfaceMeshRenderer = surfaceObject.AddComponent<MeshRenderer>();
+        surfaceMeshRenderer.material = data.surfaceMaterial;
+        materials.AddLast(surfaceMeshRenderer.material);
 
         if (data.hasAtmosphere)
         {
-            atmosphereObject = new GameObject("Atmosphere");
-            atmosphereObject.transform.parent = displayObject.transform;
-            atmosphereObject.transform.localPosition = Vector3.forward * 500.0f;
-            atmosphereObject.transform.localScale = Vector3.one * (float)(radius + atmHeight);
+            atmObject = new GameObject("Atmosphere");
+            atmObject.transform.parent = displayObject.transform;
+            atmObject.transform.localPosition = Vector3.forward * 500.0f;
+            atmObject.transform.localScale = Vector3.one * (float)(radius + atmHeight);
+            MeshFilter atmMeshFilter = atmObject.AddComponent<MeshFilter>();
+            atmMeshFilter.mesh = quadMesh;
+            MeshRenderer atmMeshRenderer = atmObject.AddComponent<MeshRenderer>();
+            atmMeshRenderer.material = data.atmMaterial;
+            materials.AddLast(atmMeshRenderer.material);
+        }
 
-            Vector3[] verts = new Vector3[]
-            {
-                new Vector3(-1.0f, -1.0f),
-                new Vector3(1.0f, -1.0f),
-                new Vector3(1.0f, 1.0f),
-                new Vector3(-1.0f, 1.0f),
-            };
-            int[] tris = new int[]
-            {
-                0, 1, 2,
-                0, 2, 3,
-            };
-            Mesh mesh = new Mesh();
-            mesh.vertices = verts;
-            mesh.triangles = tris;
-
-            MeshFilter meshFilter = atmosphereObject.AddComponent<MeshFilter>();
-            meshFilter.mesh = mesh;
-
-            MeshRenderer meshRenderer = atmosphereObject.AddComponent<MeshRenderer>();
-            meshRenderer.material = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/Atmosphere.mat", typeof(Material));
-            meshRenderer.material.SetFloat("_PlanetRad", (float)radius);
-            meshRenderer.material.SetFloat("_AtmHeight", (float)atmHeight);
-            meshRenderer.material.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
-            meshRenderer.material.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
-            meshRenderer.material.SetColor("_AtmColor", data.atmosphereColor);
+        foreach (Material m in materials) {
+            m.SetFloat("_PlanetRad", (float)radius);
+            m.SetFloat("_AtmHeight", (float)atmHeight);
+            m.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
+            m.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
+            m.SetVector("_RayleighScatteringCoeff", data.rayleighScattering);
         }
     }
 
@@ -134,6 +151,9 @@ public class CelestialBody : MonoBehaviour
         GameObject newTrajectoryObject = new GameObject("Trajectory");
         newTrajectoryObject.transform.parent = trajectoriesObject.transform;
         newTrajectoryObject.transform.localPosition = Vector3.zero;
+        newTrajectoryObject.layer = LayerMask.NameToLayer("Show in Map");
+        newTrajectoryObject.AddComponent<MeshFilter>();
+        newTrajectoryObject.AddComponent<MeshRenderer>();
         Trajectory trajectory = newTrajectoryObject.AddComponent<Trajectory>();
         trajectory.o = o;
 

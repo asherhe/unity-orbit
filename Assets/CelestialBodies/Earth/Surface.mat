@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Planet
+  m_Name: Surface
   m_Shader: {fileID: 4800000, guid: ec287fe434987b3428a4ebf173ad62b9, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

@@ -28,14 +28,19 @@ public class CelestialBodyData : ScriptableObject
     /* body display */
 
     /// <summary>
-    /// sprite to display in map view
+    /// material to use for body surface
     /// </summary>
-    public Sprite baseSprite;
+    public Material surfaceMaterial;
 
     /// <summary>
-    /// specular texture (for oceans and stuff)
+    /// material to use for body atmosphere (if applicable)
     /// </summary>
-    public Texture specularTex;
+    public Material atmMaterial;
+
+    /// <summary>
+    /// color of planet glow
+    /// </summary>
+    public Color glowcolor;
 
     /* atmosphere & clouds */
 
@@ -60,7 +65,7 @@ public class CelestialBodyData : ScriptableObject
     public double atmosphereScaleHeight = 8.5;
 
     /// <summary>
-    /// atmosphere color
+    /// rayleight scattering coefficients
     /// </summary>
-    public Color atmosphereColor = new Color(1, 1, 1);
+    public Vector4 rayleighScattering = new Vector4(0.000005804542996261093f, 0.000013562911419845635f, 0.00003026590629238531f, 0.000012619774364741572f);
 }

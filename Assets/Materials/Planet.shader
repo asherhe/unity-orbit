@@ -15,7 +15,6 @@ Shader "Planet"
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000
         _AtmSeaLevelPressure ("Sea Level Pressure (atm)", Float) = 1
         _AtmScaleHeight ("Atmosphere Scale Height (m)", Float) = 8500
-        _AtmColor ("Atmosphere Color", Color) = (1,1,1,1)
         _RayleighScatteringCoeff ("Rayleigh Scattering Coefficient (m^-1)", Vector) = (0.000005804542996261093, 0.000013562911419845635, 0.00003026590629238531, 0.000012619774364741572)
         _LightSamples ("In-scattering samples", Range(0, 256)) = 24
     }
@@ -58,7 +57,6 @@ Shader "Planet"
                 float _AtmHeight;
                 float _AtmSeaLevelPressure;
                 float _AtmScaleHeight;
-                float4 _AtmColor;
                 float4 _RayleighScatteringCoeff;
                 int _ViewSamples;
                 int _LightSamples;
@@ -97,9 +95,6 @@ Shader "Planet"
             float4 frag(Varyings IN) : SV_Target
             {
                 float3 L = normalize((float3)_SunDir);
-
-                // [-0.5, 0.5] => [-1, 1]
-                IN.positionOS *= 2;
 
                 float r2 = IN.positionOS.x*IN.positionOS.x + IN.positionOS.y*IN.positionOS.y;
                 if (r2 > 1) return float4(0,0,0,0);
@@ -151,7 +146,7 @@ Shader "Planet"
 
                 float sunAngle = dot(sphereNormal, L);
                 if (sunAngle < 0) {
-                    float4 lightTex = SAMPLE_TEXTURE2D(_LightTex, sampler_LightTex, IN.uv);
+                    float3 lightTex = (float3)SAMPLE_TEXTURE2D(_LightTex, sampler_LightTex, IN.uv);
                     float fade = clamp(-4 * sunAngle, 0, 1); // fade lights to full brightness
                     color += lightTex * _LightColor.rgb * _LightColor.a * fade;
                 }

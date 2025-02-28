@@ -9,7 +9,6 @@ Shader "Atmosphere"
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000
         _AtmSeaLevelPressure ("Sea Level Pressure (atm)", Float) = 1
         _AtmScaleHeight ("Atmosphere Scale Height (m)", Float) = 8500
-        _AtmColor ("Atmosphere Color", Color) = (1,1,1,1)
         [Space]
         _RayleighScatteringCoeff ("Rayleigh Scattering Coefficient (m^-1)", Vector) = (0.000005804542996261093, 0.000013562911419845635, 0.00003026590629238531, 0.000012619774364741572)
         _ViewSamples ("Out-scattering samples", Range(0, 256)) = 24
@@ -42,7 +41,6 @@ Shader "Atmosphere"
                 float _AtmHeight;
                 float _AtmSeaLevelPressure;
                 float _AtmScaleHeight;
-                float4 _AtmColor;
                 float4 _RayleighScatteringCoeff;
                 int _ViewSamples;
                 int _LightSamples;
@@ -82,7 +80,7 @@ Shader "Atmosphere"
                     _AtmScaleHeight,
                     int2(_ViewSamples, _LightSamples)
                 );
-                scatter.rgb *= _SunIntensity * _AtmSeaLevelPressure * _AtmColor.rgb * _AtmColor.a;
+                scatter.rgb *= _SunIntensity * _AtmSeaLevelPressure;
                 return scatter;
             }
 
