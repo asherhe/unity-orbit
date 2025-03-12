@@ -89,43 +89,9 @@ public class Orbit
     /// <param name="body">parent celestial body</param>
     public static Orbit MakeOrbitFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
     {
-        // https://en.wikipedia.org/wiki/Orbit_determination#Orbit_Determination_from_a_State_Vector
-
-        double h = Vector2d.Cross(pos, vel);
-
-        // eccentricity vector, points in the direction of periapsis
-        Vector2d eccVec = Vector2d.Cross(vel, h) / body.GM - pos.normalized;
-        double e = eccVec.magnitude;
-
-        double omega = Math.Atan2(eccVec.y, eccVec.x);
-
-        // position in the perifocal plane
-        pos = pos.Rotate(-omega);
-
-        double M;
-        if (e == 1.0)
-        {
-            M = 0.0; // TODO: parabolic trajectories
-        }
-        else
-        {
-            pos.x += h * h * e / (body.GM * (1 - e * e));
-            pos.y /= Math.Sqrt(Math.Abs(1 - e * e));
-            if (h < 0.0) pos.y = -pos.y;
-
-            if (e < 1.0)
-            {
-                double E = Math.Atan2(pos.y, pos.x);
-                M = E - e * Math.Sin(E);
-            }
-            else
-            {
-                double E = -Math.Atanh(pos.y / pos.x);
-                M = e * Math.Sinh(E) - E;
-            }
-        }
-
-        return new Orbit(h, e, omega, M, t, body);
+        Orbit o = new Orbit();
+        o.UpdateFromStateVectors(pos, vel, t, body);
+        return o;
     }
 
     /// <summary>
@@ -148,12 +114,43 @@ public class Orbit
 
     public void UpdateFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
     {
-        Orbit o = MakeOrbitFromStateVectors(pos, vel, t, body);
-        h = o.h;
-        e = o.e;
-        omega = o.omega;
-        M0 = o.M0;
-        t0 = o.t0;
+        // https://en.wikipedia.org/wiki/Orbit_determination#Orbit_Determination_from_a_State_Vector
+
+        t0 = t;
+
+        h = Vector2d.Cross(pos, vel);
+
+        // eccentricity vector, points in the direction of periapsis
+        Vector2d eccVec = Vector2d.Cross(vel, h) / body.GM - pos.normalized;
+        e = eccVec.magnitude;
+
+        omega = Math.Atan2(eccVec.y, eccVec.x);
+
+        // position in the perifocal plane
+        pos = pos.Rotate(-omega);
+
+        if (e == 1.0)
+        {
+            M0 = 0.0; // TODO: parabolic trajectories
+        }
+        else
+        {
+            pos *= body.GM * (1 - e * e) / (h * h); // 1/a
+            pos.x += e;
+            pos.y /= Math.Sqrt(Math.Abs(1 - e * e));
+            if (h < 0.0) pos.y = -pos.y;
+
+            if (e < 1.0)
+            {
+                double E = Math.Atan2(pos.y, pos.x);
+                M0 = E - e * Math.Sin(E);
+            }
+            else
+            {
+                double E = -Math.Atanh(pos.y / pos.x);
+                M0 = e * Math.Sinh(E) - E;
+            }
+        }
     }
 
     /* get orbit info */
@@ -311,14 +308,17 @@ public class Orbit
 
             Vector2d vel;
             if (e < 1.0) vel = new Vector2d(-Math.Sin(E), Math.Cos(E));
-            else vel = new Vector2d(-Math.Sinh(E), Math.Cosh(E));
+            else vel = new Vector2d(Math.Sinh(E), -Math.Cosh(E));
 
-            vel.y *= Math.Sqrt(Math.Abs(1 - e * e));
+            vel.x *= Math.Sqrt(Math.Abs(1 - e * e));
+            vel.y *= Math.Abs(1 - e * e);
             if (h < 0.0) vel.y = -vel.y;
 
-            double a = GetSemimajorAxis();
-
-            vel *= Math.Sqrt(body.GM * Math.Abs(a)) / (a * (1 - e * Math.Cos(E)));
+            vel *= body.GM / (h * (e * (
+                e < 1.0 ?
+                Math.Cos(E) :
+                Math.Cosh(E)
+            ) - 1));
             vel = vel.Rotate(omega);
 
             return vel;

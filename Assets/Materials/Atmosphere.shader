@@ -54,7 +54,7 @@ Shader "Atmosphere"
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float4 position   : TEXCOORD0; // rotation and scale are in world space coordinates but centered at 0,0
+                float2 position   : TEXCOORD0; // rotation and scale are in world space coordinates but centered at 0,0
             };
 
             Varyings vert(Attributes IN)
@@ -64,7 +64,7 @@ Shader "Atmosphere"
                 OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
 
                 unity_ObjectToWorld._14_24_34 = 0;
-                OUT.position = mul(unity_ObjectToWorld, IN.positionOS);
+                OUT.position = mul(unity_ObjectToWorld, IN.positionOS).xy;
 
                 return OUT;
             }
@@ -72,7 +72,7 @@ Shader "Atmosphere"
             float4 frag(Varyings IN) : SV_Target
             {
                 float4 scatter = scatter2D(
-                    IN.position.xy,
+                    IN.position,
                     normalize(_SunDir.xyz),
                     _RayleighScatteringCoeff,
                     _PlanetRad,

@@ -51,8 +51,8 @@ class TrajectoryMesh
             prev[MathUtils.mod(i+1, len)*2+1] = points[i];
             next[MathUtils.mod(i-1, len)*2] = points[i];
             next[MathUtils.mod(i-1, len)*2+1] = points[i];
-            data[i*2] = new Vector2(-1, 0);
-            data[i*2+1] = new Vector2(1, 0);
+            data[i*2] = new Vector2(1, 0);
+            data[i*2+1] = new Vector2(-1, 0);
         }
         bounds = new Bounds(Vector2.zero, 2*maxCoords);
 
@@ -66,8 +66,8 @@ class TrajectoryMesh
             prev[len*2+1] = points[len-1];
             next[len*2] = points[1];
             next[len*2+1] = points[1];
-            data[len*2] = new Vector2(-1, 0);
-            data[len*2+1] = new Vector2(1, 0);
+            data[len*2] = new Vector2(1, 0);
+            data[len*2+1] = new Vector2(-1, 0);
         }
         else 
         {
@@ -87,16 +87,6 @@ class TrajectoryMesh
             tris[6*i+4] = 2*i + 2;
             tris[6*i+5] = 2*i + 3;
         }
-        // if (loop)
-        // {
-        //     tris[6*(len-1)  ] = 2*(len-1);
-        //     tris[6*(len-1)+1] = 2*(len-1) + 1;
-        //     tris[6*(len-1)+2] = 1;
-
-        //     tris[6*(len-1)+3] = 2*(len-1);
-        //     tris[6*(len-1)+4] = 0;
-        //     tris[6*(len-1)+5] = 1;
-        // }
     }
 
     public void UpdateMesh()
@@ -138,7 +128,7 @@ public class Trajectory : MonoBehaviour
         double theta0, thetaMax;
         if (o.orbit.e <= 1.0)
         {
-            theta0 = Math.Atan2(pos.y, pos.x);
+            theta0 = 0;
             thetaMax = theta0 + 2 * Math.PI * (o.orbit.h > 0.0 ? 1 : -1);
             trajectoryMesh.loop = true;
         }
@@ -158,7 +148,7 @@ public class Trajectory : MonoBehaviour
             double r = p / (1.0 + (float)o.orbit.e * Math.Cos(theta - o.orbit.omega));
             points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
         }
-
+        
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
     }

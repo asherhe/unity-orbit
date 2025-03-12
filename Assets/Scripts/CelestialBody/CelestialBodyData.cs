@@ -40,7 +40,7 @@ public class CelestialBodyData : ScriptableObject
     /// <summary>
     /// color of planet glow
     /// </summary>
-    public Color glowcolor;
+    public Color glowColor = new Color(1, 1, 1, 1);
 
     /* atmosphere & clouds */
 

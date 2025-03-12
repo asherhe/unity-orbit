@@ -17,6 +17,8 @@ MonoBehaviour:
   dayLength: 1
   surfaceMaterial: {fileID: 2100000, guid: 11ccedaf5252ea44780276a1f399cf33, type: 2}
   atmMaterial: {fileID: 2100000, guid: 3c800c16772830f4bbede9a5a9da7735, type: 2}
+  glowMaterial: {fileID: 2100000, guid: 342605813ed78074e92d5aa6de86cb1a, type: 2}
+  glowColor: {r: 0.61698115, g: 0.86930287, b: 1, a: 0.1254902}
   hasAtmosphere: 1
   atmosphereHeight: 100
   atmosphereSeaLevelPressure: 1

@@ -4,32 +4,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 
-[RequireComponent(typeof(CinemachineVirtualCamera))]
+public enum CameraView
+{
+    FlightView,
+    MapView,
+};
+
 public class MapViewManager : MonoBehaviour
 {
-    private CinemachineVirtualCamera _virtualCamera;
     private InputActions _inputActions;
 
     public static MapViewManager Instance { get; private set; }
 
-    public bool isInMapView { get; private set; } = false;
+    public CameraView activeView { get; private set; } = CameraView.FlightView;
 
     /// <summary>
     /// the camera responsible for rendering map view
     /// </summary>
-    public Camera activeCamera { get; private set; }
+    public Camera activeMapCamera { get; private set; }
 
     [SerializeField]
     private Camera minimapCamera;
 
     /// <summary>
-    /// layermask for map-only rendering (hide stuff we don't want to show in map view)
+    /// render layers for flight view
+    /// </summary>
+    [SerializeField]
+    private LayerMask flightCullingMask;
+    /// <summary>
+    /// render layers for map view
     /// </summary>
     [SerializeField]
     private LayerMask mapCullingMask;
-
-    /* saved camera properties from flight view (so we can revert back to it when we exit map view) */
-    private LayerMask oldCullingMask;
 
     /// <summary>
     /// gets invoked when map view is toggled
@@ -41,9 +47,7 @@ public class MapViewManager : MonoBehaviour
         if (Instance == null || Instance == this) Instance = this;
         else Destroy(this);
 
-        _virtualCamera = GetComponent<CinemachineVirtualCamera>();
-
-        activeCamera = minimapCamera;
+        activeMapCamera = minimapCamera;
 
         _inputActions = new InputActions();
         _inputActions.Flight.Enable();
@@ -52,33 +56,26 @@ public class MapViewManager : MonoBehaviour
 
     public void ToggleMapView()
     {
-        if (isInMapView) ExitMapView();
-        else EnterMapView();
+        if (activeView == CameraView.FlightView) EnterMapView();
+        else ExitMapView();
     }
 
     public void EnterMapView()
     {
-        isInMapView = true;
+        activeView = CameraView.MapView;
 
-        activeCamera = Camera.main;
-
-        oldCullingMask = Camera.main.cullingMask;
+        activeMapCamera = Camera.main;
         Camera.main.cullingMask = mapCullingMask;
-
-        _virtualCamera.Priority = 20;
 
         MapToggled.Invoke();
     }
 
     public void ExitMapView()
     {
-        isInMapView = false;
+        activeView = CameraView.FlightView;
 
-        activeCamera = minimapCamera;
-
-        Camera.main.cullingMask = oldCullingMask;
-
-        _virtualCamera.Priority = 0;
+        activeMapCamera = minimapCamera;
+        Camera.main.cullingMask = flightCullingMask;
 
         MapToggled.Invoke();
     }

@@ -71,7 +71,7 @@ Shader "Planet"
             struct Varyings
             {
                 float4 positionCS : SV_POSITION;
-                float4 positionOS : TEXCOORD0;
+                float2 positionOS : TEXCOORD0;
                 float2 uv         : TEXCOORD1;
             };
 
@@ -85,7 +85,7 @@ Shader "Planet"
                 rotO2W._11_21_31 = normalize(rotO2W._11_21_31);
                 rotO2W._12_22_32 = normalize(rotO2W._12_22_32);
                 rotO2W._13_23_33 = normalize(rotO2W._13_23_33);
-                OUT.positionOS = float4(mul(rotO2W, (float3)IN.positionOS), 1);
+                OUT.positionOS = mul(rotO2W, (float3)IN.positionOS).xy;
 
                 OUT.uv = IN.uv;
 
@@ -100,7 +100,7 @@ Shader "Planet"
                 if (r2 > 1) return float4(0,0,0,0);
 
                 // surface normal if the planet was a perfectly smooth sphere
-                float3 sphereNormal = float3(IN.positionOS.xy, -sqrt(1-r2));
+                float3 sphereNormal = float3(IN.positionOS, -sqrt(1-r2));
                 
                 float3 normalMap = UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, IN.uv)).xyz;
                 
@@ -145,9 +145,9 @@ Shader "Planet"
                 );
 
                 float sunAngle = dot(sphereNormal, L);
-                if (sunAngle < 0) {
+                if (sunAngle < 0.2) {
                     float3 lightTex = (float3)SAMPLE_TEXTURE2D(_LightTex, sampler_LightTex, IN.uv);
-                    float fade = clamp(-4 * sunAngle, 0, 1); // fade lights to full brightness
+                    float fade = clamp(-4 * (sunAngle - 0.2), 0, 1); // fade lights to full brightness
                     color += lightTex * _LightColor.rgb * _LightColor.a * fade;
                 }
 

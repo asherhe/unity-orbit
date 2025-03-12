@@ -275,6 +275,34 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Camera"",
+            ""id"": ""dcddcf8d-220b-495a-9c0a-eeb9c0f572c3"",
+            ""actions"": [
+                {
+                    ""name"": ""Zoom"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""15a3a0fe-c04f-441d-99ff-9fba947c261e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""b3d74ace-431b-4aa9-978d-25472686e512"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": ""Invert"",
+                    ""groups"": ""Keyboard + Mouse"",
+                    ""action"": ""Zoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -308,6 +336,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Warp_WarpIncrease = m_Warp.FindAction("WarpIncrease", throwIfNotFound: true);
         m_Warp_WarpDecrease = m_Warp.FindAction("WarpDecrease", throwIfNotFound: true);
         m_Warp_WarpCancel = m_Warp.FindAction("WarpCancel", throwIfNotFound: true);
+        // Camera
+        m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
+        m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -505,6 +536,52 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         }
     }
     public WarpActions @Warp => new WarpActions(this);
+
+    // Camera
+    private readonly InputActionMap m_Camera;
+    private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
+    private readonly InputAction m_Camera_Zoom;
+    public struct CameraActions
+    {
+        private @InputActions m_Wrapper;
+        public CameraActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Zoom => m_Wrapper.m_Camera_Zoom;
+        public InputActionMap Get() { return m_Wrapper.m_Camera; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
+        public void AddCallbacks(ICameraActions instance)
+        {
+            if (instance == null || m_Wrapper.m_CameraActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Add(instance);
+            @Zoom.started += instance.OnZoom;
+            @Zoom.performed += instance.OnZoom;
+            @Zoom.canceled += instance.OnZoom;
+        }
+
+        private void UnregisterCallbacks(ICameraActions instance)
+        {
+            @Zoom.started -= instance.OnZoom;
+            @Zoom.performed -= instance.OnZoom;
+            @Zoom.canceled -= instance.OnZoom;
+        }
+
+        public void RemoveCallbacks(ICameraActions instance)
+        {
+            if (m_Wrapper.m_CameraActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(ICameraActions instance)
+        {
+            foreach (var item in m_Wrapper.m_CameraActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_CameraActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public CameraActions @Camera => new CameraActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     public InputControlScheme KeyboardMouseScheme
     {
@@ -527,5 +604,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnWarpIncrease(InputAction.CallbackContext context);
         void OnWarpDecrease(InputAction.CallbackContext context);
         void OnWarpCancel(InputAction.CallbackContext context);
+    }
+    public interface ICameraActions
+    {
+        void OnZoom(InputAction.CallbackContext context);
     }
 }
