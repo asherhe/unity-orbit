@@ -14,9 +14,13 @@ Shader "Planet"
         _PlanetRad ("Planet Radius (m)", Float) = 6371000
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000
         _AtmSeaLevelPressure ("Sea Level Pressure (atm)", Float) = 1
-        _AtmScaleHeight ("Atmosphere Scale Height (m)", Float) = 8500
+        _RayleighScaleHeight ("Rayleigh Scattering Scale Height (m)", Float) = 8500
+        _MieScaleHeight ("Mie Scattering Scale Height (m)", Float) = 1200
         _RayleighScatteringCoeff ("Rayleigh Scattering Coefficient (m^-1)", Vector) = (0.000005804542996261093, 0.000013562911419845635, 0.00003026590629238531, 0.000012619774364741572)
-        _LightSamples ("In-scattering samples", Range(0, 256)) = 24
+        _MieScatteringCoeff ("Mie Scattering Coefficient (m^-1)", Vector) = (0.0000071, 0.0000071, 0.0000071,0.0000071)
+        _MiePhaseG ("Mie Phase Asymmetry", Float) = 0.6
+        _ViewSamples ("Out-scattering samples", Range(0, 256)) = 24
+        _LightSamples ("In-scattering samples", Range(0, 256)) = 8
     }
     SubShader
     {
@@ -56,8 +60,11 @@ Shader "Planet"
                 float _PlanetRad;
                 float _AtmHeight;
                 float _AtmSeaLevelPressure;
-                float _AtmScaleHeight;
+                float _RayleighScaleHeight;
+                float _MieScaleHeight;
                 float4 _RayleighScatteringCoeff;
+                float4 _MieScatteringCoeff;
+                float _MiePhaseG;
                 int _ViewSamples;
                 int _LightSamples;
             CBUFFER_END
@@ -117,24 +124,24 @@ Shader "Planet"
                 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 
-                float3 color = (_AmbientColor * baseTex).rgb;
-                float opticalDepth;
-                bool overground = lightSampling(
-                    _PlanetRad * sphereNormal,
+                float3 sunColor = scatterAttenuation(_PlanetRad * sphereNormal,
                     L,
                     _PlanetRad,
                     _AtmHeight,
-                    _AtmScaleHeight,
+                    _RayleighScaleHeight,
+                    _MieScaleHeight,
+                    _RayleighScatteringCoeff,
+                    _MieScatteringCoeff,
+                    _MiePhaseG,
                     _LightSamples,
-                    opticalDepth
-                );
-                float3 sunColor = float3(0, 0, 0);
-                if (overground) {
-                    sunColor = exp(-_RayleighScatteringCoeff.rgb * opticalDepth);
-                }
+                    true
+                ) * _SunIntensity * _AtmSeaLevelPressure;
 
+                // ambient
+                float3 color = (_AmbientColor * baseTex).rgb;
+                // diffuse
                 color += baseTex.rgb * LightingLambert(sunColor, L, normal);
-
+                // specular
                 color += LightingSpecular(
                     sunColor,
                     L,
@@ -144,6 +151,7 @@ Shader "Planet"
                     20
                 );
 
+                // city lights
                 float sunAngle = dot(sphereNormal, L);
                 if (sunAngle < 0.2) {
                     float3 lightTex = (float3)SAMPLE_TEXTURE2D(_LightTex, sampler_LightTex, IN.uv);

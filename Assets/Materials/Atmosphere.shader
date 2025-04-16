@@ -8,9 +8,12 @@ Shader "Atmosphere"
         _PlanetRad ("Planet Radius (m)", Float) = 6371000
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000
         _AtmSeaLevelPressure ("Sea Level Pressure (atm)", Float) = 1
-        _AtmScaleHeight ("Atmosphere Scale Height (m)", Float) = 8500
+        _RayleighScaleHeight ("Rayleigh Scattering Scale Height (m)", Float) = 8500
+        _MieScaleHeight ("Mie Scattering Scale Height (m)", Float) = 1200
         [Space]
         _RayleighScatteringCoeff ("Rayleigh Scattering Coefficient (m^-1)", Vector) = (0.000005804542996261093, 0.000013562911419845635, 0.00003026590629238531, 0.000012619774364741572)
+        _MieScatteringCoeff ("Mie Scattering Coefficient (m^-1)", Vector) = (0.0000071, 0.0000071, 0.0000071,0.0000071)
+        _MiePhaseG ("Mie Phase Asymmetry", Float) = 0.6
         _ViewSamples ("Out-scattering samples", Range(0, 256)) = 24
         _LightSamples ("In-scattering samples", Range(0, 256)) = 8
     }
@@ -40,8 +43,11 @@ Shader "Atmosphere"
                 float _PlanetRad;
                 float _AtmHeight;
                 float _AtmSeaLevelPressure;
-                float _AtmScaleHeight;
+                float _RayleighScaleHeight;
+                float _MieScaleHeight;
                 float4 _RayleighScatteringCoeff;
+                float4 _MieScatteringCoeff;
+                float _MiePhaseG;
                 int _ViewSamples;
                 int _LightSamples;
             CBUFFER_END
@@ -74,10 +80,13 @@ Shader "Atmosphere"
                 float4 scatter = scatter2D(
                     IN.position,
                     normalize(_SunDir.xyz),
-                    _RayleighScatteringCoeff,
                     _PlanetRad,
                     _AtmHeight,
-                    _AtmScaleHeight,
+                    _RayleighScaleHeight,
+                    _MieScaleHeight,
+                    _RayleighScatteringCoeff,
+                    _MieScatteringCoeff,
+                    _MiePhaseG,
                     int2(_ViewSamples, _LightSamples)
                 );
                 scatter.rgb *= _SunIntensity * _AtmSeaLevelPressure;

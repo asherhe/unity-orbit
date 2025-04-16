@@ -62,15 +62,20 @@ Material:
     - _AtmSeaLevelPressure: 1
     - _EnableExternalAlpha: 0
     - _LightSamples: 24
+    - _MiePhaseG: 0.8
+    - _MieScaleHeight: 1200
     - _PlanetRad: 6371000
+    - _RayleighScaleHeight: 8500
     - _SunIntensity: 20
+    - _ViewSamples: 24
     m_Colors:
-    - _AmbientColor: {r: 0.08, g: 0.1, b: 0.1, a: 1}
+    - _AmbientColor: {r: 0.22352941, g: 0.22352941, b: 0.22352941, a: 1}
     - _AtmColor: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _LightColor: {r: 0.9831475, g: 1, b: 0.7528302, a: 0.21568628}
+    - _MieScatteringCoeff: {r: 0.0001, g: 0.0001, b: 0.0001, a: 0.0001}
     - _RayleighScatteringCoeff: {r: 0.000005804543, g: 0.000013562912, b: 0.000030265906, a: 0.000012619775}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SunDir: {r: -1, g: 0, b: -0.2, a: 0}
