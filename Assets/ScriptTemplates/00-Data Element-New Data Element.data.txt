@@ -1,0 +1,4 @@
+# #SCRIPTNAME#.data
+
+# write yaml stuff here
+name: value
