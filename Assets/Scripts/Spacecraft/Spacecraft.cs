@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Spacecraft : MonoBehaviour, IHasOrbit
+public class Spacecraft : MonoBehaviour, IOrbitingObject
 {
-    public CelestialBody body;
+    // TODO: remove this once we have a way to automatically load crafts
+    [SerializeField]
+    private CelestialBody _body;
+
+    public CelestialBody body { get => orbit.body; }
     public Orbit orbit { get; set; }
     private Trajectory _trajectory;
 
@@ -21,28 +25,37 @@ public class Spacecraft : MonoBehaviour, IHasOrbit
     /// <summary>
     /// spacecraft thrust, in m/s^2
     /// </summary>
-    public double thrust = 20.0;
+    public float thrust = 20.0f;
 
     /// <summary>
     /// spacecraft turn rate, in deg/s
     /// </summary>
     public float turnRate = 60.0f;
 
+    private float _throttle = 0.0f;
     /// <summary>
     /// spacecraft throttle (between 0.0 and 1.0)
     /// </summary>
-    [NonSerialized]
-    public float throttle = 0.0f;
+    public float Throttle
+    {
+        get => _throttle;
+        set { _throttle = Mathf.Clamp01(value); }
+    }
+
+    public float _steeringControl = 0.0f;
     /// <summary>
     /// input for spacecraft steering (between -1.0 and 1.0), positive is ccw
     /// </summary>
-    [NonSerialized]
-    public float steeringControl = 0.0f;
+    public float SteeringControl
+    {
+        get => _steeringControl;
+        set { _steeringControl = Mathf.Clamp(value, -1.0f, 1.0f); }
+    }
 
     private void Awake()
     {
         // TODO: placeholder orbit, a 200km circular orbit
-        orbit = Orbit.MakeCircularOrbit(200.0, body);
+        orbit = Orbit.MakeCircularOrbit(200.0, _body);
 
         _trajectory = body.AddTrajectory(this);
 
@@ -55,12 +68,11 @@ public class Spacecraft : MonoBehaviour, IHasOrbit
 
         if (Universe.Instance.timewarpScale == 1.0)
         {
-            transform.rotation *= Quaternion.Euler(0, 0, (float)(steeringControl * turnRate * Universe.Instance.fixedDeltaTime));
-
-            throttle = Mathf.Clamp01(throttle);
-            if (throttle > 0.0)
+            transform.rotation *= Quaternion.Euler(0, 0, (float)(SteeringControl * turnRate * Universe.Instance.fixedDeltaTime));
+            
+            if (Throttle > 0.0)
             {
-                Vector2d dv = new Vector2d(transform.up.x, transform.up.y) * (throttle * thrust * Universe.Instance.fixedDeltaTime);
+                Vector2d dv = new Vector2d(transform.up.x, transform.up.y) * (Throttle * thrust * Universe.Instance.fixedDeltaTime);
                 orbit.UpdateFromStateVectors(pos, vel + dv, Universe.Instance.UT, body);
             }
         }

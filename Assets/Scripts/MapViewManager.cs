@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 
 public enum CameraView
 {
@@ -57,11 +56,12 @@ public class MapViewManager : MonoBehaviour
     public void ToggleMapView()
     {
         if (activeView == CameraView.FlightView) EnterMapView();
-        else ExitMapView();
+        else EnterFlightView();
     }
 
     public void EnterMapView()
     {
+        if (activeView == CameraView.MapView) return;
         activeView = CameraView.MapView;
 
         activeMapCamera = Camera.main;
@@ -70,8 +70,9 @@ public class MapViewManager : MonoBehaviour
         MapToggled.Invoke();
     }
 
-    public void ExitMapView()
+    public void EnterFlightView()
     {
+        if (activeView == CameraView.FlightView) return;
         activeView = CameraView.FlightView;
 
         activeMapCamera = minimapCamera;

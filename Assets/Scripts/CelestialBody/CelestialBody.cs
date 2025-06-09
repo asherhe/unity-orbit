@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class CelestialBody : MonoBehaviour
 {
-    public CelestialBodyData data;
+    public DataObject data;
 
     private GameObject displayObject;
     private GameObject surfaceObject;
@@ -30,7 +31,7 @@ public class CelestialBody : MonoBehaviour
     /// <summary>
     /// length of a day, in seconds
     /// </summary>
-    public double day { get; private set; }
+    public double dayLength { get; private set; }
 
     /// <summary>
     /// whether this celestial body has an atmosphere
@@ -55,16 +56,16 @@ public class CelestialBody : MonoBehaviour
     private void Awake()
     {
         /* read from data */
-        radius = data.radius * 1000.0;
-        GM = data.surfaceG * radius * radius;
+        radius = data.root["radius"].GetDouble() * 1000.0;
+        GM = data.root["surfaceG"].GetDouble() * radius * radius;
         mass = GM / Universe.Instance.G;
-        day = data.dayLength * 86400.0;
+        dayLength = data.root["dayLength"].GetDouble() * 86400.0;
 
-        if ((hasAtmosphere = data.hasAtmosphere))
+        if ((hasAtmosphere = data.root["hasAtmosphere"].GetBool()))
         {
-            atmHeight = data.atmosphereHeight * 1000.0;
-            atmSeaLevelPressure = data.atmosphereSeaLevelPressure;
-            atmScaleHeight = data.atmosphereScaleHeight * 1000.0;
+            atmHeight = data.root["atmosphereHeight"].GetDouble() * 1000.0;
+            atmSeaLevelPressure = data.root["atmosphereSeaLevelPressure"].GetDouble();
+            atmScaleHeight = data.root["atmosphereScaleHeight"].GetDouble() * 1000.0;
         }
 
         displayObject = new GameObject("Display");
@@ -74,9 +75,20 @@ public class CelestialBody : MonoBehaviour
         MakeDisplay(displayObject);
     }
 
-    public void MakeDisplay(GameObject displayObject) {
-        LinkedList<Material> materials = new LinkedList<Material>();
+    // configure a shader's values to match the celestial body's
+    private void SetShaderValues(Material m)
+    {
+        m.SetFloat("_PlanetRad", (float)radius);
+        m.SetFloat("_AtmHeight", (float)atmHeight);
+        m.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
+        m.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
+        // TODO: parse these in Awake()
+        m.SetVector("_RayleighScatteringCoeff", data.root["rayleighScattering"].ParseVector4());
+        m.SetVector("_MieScatteringCoeff", data.root["mieScattering"].ParseVector4());
+        m.SetFloat("_MiePhaseG", data.root["miePhaseG"].GetFloat());
+    }
 
+    public void MakeDisplay(GameObject displayObject) {
         Vector3[] verts = new Vector3[]
         {
             new Vector3(-1.0f, -1.0f),
@@ -108,10 +120,13 @@ public class CelestialBody : MonoBehaviour
         MeshFilter surfaceMeshFilter = surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = surfaceObject.AddComponent<MeshRenderer>();
-        surfaceMeshRenderer.material = data.surfaceMaterial;
-        materials.AddLast(surfaceMeshRenderer.material);
+        data.root["surfaceMaterial"].LoadAssetAsync<Material>().Completed += m =>
+        {
+            surfaceMeshRenderer.material = m.Result;
+            SetShaderValues(surfaceMeshRenderer.material);
+        };
 
-        if (data.hasAtmosphere)
+        if (data.root["hasAtmosphere"].GetBool())
         {
             atmObject = new GameObject("Atmosphere");
             atmObject.transform.parent = displayObject.transform;
@@ -120,26 +135,21 @@ public class CelestialBody : MonoBehaviour
             MeshFilter atmMeshFilter = atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = atmObject.AddComponent<MeshRenderer>();
-            atmMeshRenderer.material = data.atmMaterial;
-            materials.AddLast(atmMeshRenderer.material);
-        }
-
-        foreach (Material m in materials) {
-            m.SetFloat("_PlanetRad", (float)radius);
-            m.SetFloat("_AtmHeight", (float)atmHeight);
-            m.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
-            m.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
-            m.SetVector("_RayleighScatteringCoeff", data.rayleighScattering);
+            data.root["atmMaterial"].LoadAssetAsync<Material>().Completed += m =>
+            {
+                atmMeshRenderer.material = m.Result;
+                SetShaderValues(atmMeshRenderer.material);
+            };
         }
     }
 
     private void FixedUpdate()
     {
         transform.position = -ActiveCraftController.Instance.craft.pos;
-        displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(-360.0 * Universe.Instance.fixedDeltaTime / day));
+        displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(-360.0 * Universe.Instance.fixedDeltaTime / dayLength));
     }
 
-    public Trajectory AddTrajectory(IHasOrbit o)
+    public Trajectory AddTrajectory(IOrbitingObject o)
     {
         if (trajectoriesObject == null)
         {

@@ -35,6 +35,7 @@ public class Universe : MonoBehaviour
 
     private void Awake()
     {
+        // TODO: i'm not too sure how this will work with scene switching
         if (Instance == null || Instance == this) Instance = this;
         else Destroy(this);
 
@@ -46,7 +47,7 @@ public class Universe : MonoBehaviour
         _inputActions.Warp.WarpCancel.performed += WarpCancel;
     }
 
-    private void WarpIncrease(InputAction.CallbackContext context) { if (ActiveCraftController.Instance.craft.throttle == 0.0) timewarpScale *= 10.0; }
+    private void WarpIncrease(InputAction.CallbackContext context) { if (ActiveCraftController.Instance.craft.Throttle == 0.0) timewarpScale *= 10.0; }
     private void WarpDecrease(InputAction.CallbackContext context) { timewarpScale = Math.Max(1.0, timewarpScale * 0.1); }
     private void WarpCancel(InputAction.CallbackContext context) { timewarpScale = 1.0; }
 

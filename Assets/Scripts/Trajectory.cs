@@ -47,10 +47,10 @@ class TrajectoryMesh
             verts[i*2+1] = points[i];
             uvs[i*2] = new Vector2((float)i / (nVerts-1), 0);
             uvs[i*2+1] = new Vector2((float)i / (nVerts-1), 1);
-            prev[MathUtils.mod(i+1, len)*2] = points[i];
-            prev[MathUtils.mod(i+1, len)*2+1] = points[i];
-            next[MathUtils.mod(i-1, len)*2] = points[i];
-            next[MathUtils.mod(i-1, len)*2+1] = points[i];
+            prev[MathUtils.Mod(i+1, len)*2] = points[i];
+            prev[MathUtils.Mod(i+1, len)*2+1] = points[i];
+            next[MathUtils.Mod(i-1, len)*2] = points[i];
+            next[MathUtils.Mod(i-1, len)*2+1] = points[i];
             data[i*2] = new Vector2(1, 0);
             data[i*2+1] = new Vector2(-1, 0);
         }
@@ -108,7 +108,7 @@ public class Trajectory : MonoBehaviour
     private MeshFilter meshFilter;
     private MeshRenderer meshRenderer;
 
-    public IHasOrbit o;
+    public IOrbitingObject o;
     
     private void Awake()
     {
@@ -141,7 +141,7 @@ public class Trajectory : MonoBehaviour
         }
         double dTheta = (thetaMax - theta0) / trajectorySubdivs;
 
-        double p = o.orbit.GetSemimajorAxis() * (1 - o.orbit.e * o.orbit.e);
+        double p = o.orbit.SemimajorAxis * (1 - o.orbit.e * o.orbit.e);
         for (int i = 0; i < trajectorySubdivs; i++)
         {
             double theta = theta0 + i * dTheta;

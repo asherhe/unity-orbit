@@ -65,11 +65,21 @@ public class Orbit
 
     /* orbit constructors */
 
+    // TODO: im not sure what the default behaviour should be
     public Orbit()
     {
 
     }
 
+    /// <summary>
+    /// construct an orbit from orbital elements
+    /// </summary>
+    /// <param name="h">angular momentum</param>
+    /// <param name="e">eccentricity</param>
+    /// <param name="omega">longitude of periapsis</param>
+    /// <param name="M0">mean anomaly at epoch</param>
+    /// <param name="t0">epoch time</param>
+    /// <param name="body">parent celestial body</param>
     public Orbit(double h, double e, double omega, double M0, double t0, CelestialBody body)
     {
         this.body = body;
@@ -81,17 +91,15 @@ public class Orbit
     }
 
     /// <summary>
-    /// creates a new orbit from cartesian state vectors
+    /// construct an orbit from cartesian state vectors
     /// </summary>
     /// <param name="pos">position of orbit</param>
     /// <param name="vel">velocity of orbit</param>
     /// <param name="t">time (UT) where the position and velocity happen</param>
     /// <param name="body">parent celestial body</param>
-    public static Orbit MakeOrbitFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
+    public Orbit(Vector2d pos, Vector2d vel, double t, CelestialBody body)
     {
-        Orbit o = new Orbit();
-        o.UpdateFromStateVectors(pos, vel, t, body);
-        return o;
+        UpdateFromStateVectors(pos, vel, t, body);
     }
 
     /// <summary>
@@ -156,9 +164,9 @@ public class Orbit
     /* get orbit info */
 
     /// <summary>
-    /// get the semimajor axis (in meters) of the orbit
+    /// the semimajor axis (in meters) of the orbit
     /// </summary>
-    public double GetSemimajorAxis() => h * h / (body.GM * (1 - e * e));
+    public double SemimajorAxis { get => h * h / (body.GM * (1 - e * e)); }
 
     /// <summary>
     /// get mean anomaly at a given time
@@ -179,7 +187,6 @@ public class Orbit
     /// <summary>
     /// the derivative of CalcKepler
     /// </summary>
-    /// <param name="M">mean anomaly</param>
     /// <param name="E">eccentric anomaly</param>
     private double CalcDKepler(double E)
     {
@@ -279,7 +286,7 @@ public class Orbit
             pos.y *= Math.Sqrt(Math.Abs(1 - e * e));
             if (h < 0.0) pos.y = -pos.y;
 
-            pos = (pos * GetSemimajorAxis()).Rotate(omega);
+            pos = (pos * SemimajorAxis).Rotate(omega);
 
             return pos;
         }
@@ -326,7 +333,10 @@ public class Orbit
     }
 }
 
-public interface IHasOrbit
+/// <summary>
+/// any object in orbit around a celestial body
+/// </summary>
+public interface IOrbitingObject
 {
     public Orbit orbit { get; set; }
 }

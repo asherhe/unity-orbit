@@ -19,7 +19,7 @@ public class ActiveCraftController : MonoBehaviour
     public Spacecraft craft { get; private set; }
 
     /// <summary>
-    /// how fast throttle increases/decreases, as a fraction of full throttle per second
+    /// throttle change rate per second
     /// </summary>
     public float throttleRate = 0.3f;
 
@@ -37,14 +37,14 @@ public class ActiveCraftController : MonoBehaviour
         _inputActions.Flight.ThrottleFull.performed += FullThrottle;
     }
 
-    private void CutThrottle(InputAction.CallbackContext context) => craft.throttle = 0.0f;
-    private void FullThrottle(InputAction.CallbackContext context) => craft.throttle = 1.0f;
+    private void CutThrottle(InputAction.CallbackContext context) => craft.Throttle = 0.0f;
+    private void FullThrottle(InputAction.CallbackContext context) => craft.Throttle = 1.0f;
 
     private void Update()
     {
-        craft.steeringControl = _inputActions.Flight.Steering.ReadValue<float>();
+        craft.SteeringControl = _inputActions.Flight.Steering.ReadValue<float>();
 
         float throttleControl = _inputActions.Flight.Throttle.ReadValue<float>();
-        craft.throttle += throttleControl * throttleRate * Time.deltaTime;
+        craft.Throttle += throttleControl * throttleRate * Time.deltaTime;
     }
 }

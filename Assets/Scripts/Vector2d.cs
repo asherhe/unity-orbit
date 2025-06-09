@@ -61,7 +61,11 @@ public class Vector2d
     }
 
 
-    public static Vector2d zero = new Vector2d(0.0, 0.0);
+    public static Vector2d zero => new Vector2d(0.0, 0.0);
+    public static Vector2d up => new Vector2d(0.0, 1.0);
+    public static Vector2d down => new Vector2d(0.0, -1.0);
+    public static Vector2d left => new Vector2d(-1.0, 0.0);
+    public static Vector2d right => new Vector2d(1.0, 0.0);
 
     public override string ToString() => "(" + x + ", " + y + ")";
     public static implicit operator Vector2(Vector2d v) { return new Vector2((float)v.x, (float)v.y); }
