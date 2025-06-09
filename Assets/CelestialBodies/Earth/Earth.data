@@ -1,18 +1,16 @@
-{
-    "radius": 6371.0,
-    "surfaceG": 9.81,
-    "dayLength": 1.0,
+radius: 6371.0 # km
+surfaceG: 9.81 # m/s^2
+dayLength: 1.0 # julian days
 
-    "surfaceMaterial": "Assets/CelestialBodies/Earth/Surface.mat",
-    "atmMaterial": "Assets/CelestialBodies/Earth/Atmosphere.mat",
-    "glowColor": "#9ddeff",
+surfaceMaterial: "Assets/CelestialBodies/Earth/Surface.mat"
+atmMaterial: "Assets/CelestialBodies/Earth/Atmosphere.mat"
+glowColor: "#9ddeff"
 
-    "hasAtmosphere": true,
-    "atmosphereHeight": 100.0, // km
-    "atmosphereSeaLevelPressure": 1.0,
-    "atmosphereScaleHeight": 8.5,
+hasAtmosphere: true
+atmosphereHeight: 100.0 # km
+atmosphereSeaLevelPressure: 1.0 # atm
+atmosphereScaleHeight: 8.5 # km
 
-    "rayleighScattering": "5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5",
-    "mieScattering": "7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6",
-    "miePhaseG": 0.6
-}
+rayleighScattering: 5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5
+mieScattering: 7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6
+miePhaseG: 0.6

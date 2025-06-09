@@ -6,20 +6,27 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using Newtonsoft.Json.Linq;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using YamlDotNet.RepresentationModel;
 
 public class DataObject : ScriptableObject
 {
     public DataNode root;
 
     /// <summary>
-    /// load a json file as a DataObject
+    /// load a yaml file as a DataObject
     /// </summary>
-    public static DataObject LoadJson(string path)
+    public static DataObject LoadFile(string path)
     {
-        JToken t = JToken.Parse(File.ReadAllText(path));
-        DataObject dobject = ScriptableObject.CreateInstance<DataObject>();
-        dobject.root = DataNode.ParseToken(t);
-        return dobject;
+        using (var reader = new StreamReader(path))
+        {
+            var yaml = new YamlStream();
+            yaml.Load(reader);
+
+            var yamlRoot = yaml.Documents[0].RootNode;
+            DataObject dobject = ScriptableObject.CreateInstance<DataObject>();
+            dobject.root = DataNode.ParseYamlNode(yamlRoot);
+            return dobject;
+        }
     }
 
     public override string ToString()
@@ -31,239 +38,284 @@ public class DataObject : ScriptableObject
 public enum DataNodeType
 {
     None,
-    Object,
-    Array,
-    String,
-    Int,
-    Float,
-    Bool,
-    Null
+    Mapping,
+    Sequence,
+    Scalar
 };
 
 [System.Serializable]
 public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
 {
     [SerializeField] private DataNodeType _type;
-    [SerializeField] private string _path;
 
-    private Dictionary<string, DataNode> _properties; // objects
-
+    // mapping data
+    private Dictionary<string, DataNode> _mapKVPs; // key-value pairs
     // the below are for serialization
-    [SerializeField] private List<string> _propertyNames;
-    [SerializeReference] private List<DataNode> _propertyValues;
+    [SerializeField] private List<string> _mapKeys;
+    [SerializeReference] private List<DataNode> _mapVals;
 
-    [SerializeReference] private DataNode[] _elements; // arrays
-    [SerializeField] private string _stringValue; // strings
-    [SerializeField] private int _intValue; // ints
-    [SerializeField] private double _doubleValue; // floats
-    [SerializeField] private bool _boolValue; // bools
+    // sequence data
+    [SerializeReference] private List<DataNode> _seqEntries;
+
+    // scalar data
+    [SerializeField] private string _scalarValue;
 
     public DataNodeType Type { get => _type; }
 
     /// <summary>
-    /// json path from the root to this element
+    /// <para>mapping nodes: the number of key: value pairs</para>
+    /// <para>sequence nodes: the number of entries</para>
     /// </summary>
-    /// <example>
-    /// "planets[2].radius"
-    /// </example>
-    public string Path { get => _path; }
-
-    /* object type */
-    /// <summary>
-    /// number of properties in this object
-    /// </summary>
-    public int Count { get => _properties.Count; }
-    public DataNode this[string name] => _properties[name];
-
-    /* array type */
-    /// <summary>
-    /// number of elements in this array
-    /// </summary>
-    public int Length { get => _elements.Length; }
-    public DataNode this[int index] => _elements[index];
-
-    /* string type */
-    public string GetString() => _stringValue;
-
-    /* int type */
-    public int GetInt() => _intValue;
-
-    /* float type */
-    public float GetFloat() => (float)_doubleValue;
-    public double GetDouble() => _doubleValue;
-
-    /* boolean type */
-    public bool GetBool() => _boolValue;
-
-    /* non-primitive data, try to interpret string */
-
-    /// <summary>
-    /// parse a comma-separated string of 4 numbers as a Vector4
-    /// </summary>
-    public Vector4 ParseVector4()
+    public int Count
     {
-        string[] components = _stringValue.Split(new char[] { ' ', ',' }, System.StringSplitOptions.RemoveEmptyEntries);
-
-        return new Vector4(
-            float.Parse(components[0]),
-            float.Parse(components[1]),
-            float.Parse(components[2]),
-            float.Parse(components[3])
-        );
-    }
-
-    public AsyncOperationHandle<T> LoadAssetAsync<T>() => Addressables.LoadAssetAsync<T>(_stringValue);
-
-    /* array enumeration */
-    private class ArrayEnumerator : IEnumerator<DataNode>
-    {
-        private readonly DataNode _arrayData;
-        private int _index = -1;
-
-        public ArrayEnumerator(DataNode data) { _arrayData = data; }
-
-        public DataNode Current { get => _arrayData[_index]; }
-        object IEnumerator.Current => Current;
-
-        public bool MoveNext()
+        get
         {
-            if (_index < _arrayData.Length)
+            switch (Type)
             {
-                _index++;
-                return true;
+                case DataNodeType.Mapping:
+                    return _mapKVPs.Count;
+                case DataNodeType.Sequence:
+                    return _seqEntries.Count;
+                default:
+                    throw new InvalidOperationException("Cannot get property Count for non-mapping or sequence nodes");
             }
-            return false;
         }
-
-        public void Reset() => _index = -1;
-
-        public void Dispose() { }
     }
-    public IEnumerator<DataNode> GetEnumerator() => new ArrayEnumerator(this);
+
+    /// <summary>
+    /// checks to see if this node is of a required type and throws an error if it isn't
+    /// </summary>
+    /// <exception cref="InvalidOperationException">thrown if this node's type does not match <c>type</c></exception>
+    private void AssertNodeType(DataNodeType type)
+    {
+        if (Type != type)
+            throw new InvalidOperationException($"This operation is only valid for {type} DataNodes.");
+    }
+
+    /// <summary>
+    /// retrieves the value corresponding to <c>key</c> in a mapping node
+    /// </summary>
+    public DataNode this[string key]
+    {
+        get
+        {
+            AssertNodeType(DataNodeType.Mapping);
+            return _mapKVPs[key];
+        }
+    }
+
+    /// <summary>
+    /// retrieve the <c>i</c>-th entry in a sequence node
+    /// </summary>
+    public DataNode this[int i]
+    {
+        get
+        {
+            AssertNodeType(DataNodeType.Sequence);
+            return _seqEntries[i];
+        }
+    }
+
+    /* sequence enumeration */
+    private class SeqEnumerator : IEnumerator<DataNode>
+    {
+        private IEnumerator<DataNode> _enumerator;
+        public SeqEnumerator(IEnumerator<DataNode> enumerator) { _enumerator = enumerator; }
+        public DataNode Current { get => _enumerator.Current; }
+        object IEnumerator.Current => Current;
+        public bool MoveNext() => _enumerator.MoveNext();
+        public void Reset() => _enumerator.Reset();
+        public void Dispose() => _enumerator.Dispose();
+    }
+    public IEnumerator<DataNode> GetEnumerator() => new SeqEnumerator(_seqEntries.GetEnumerator());
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /* object enumeration */
-    public class Property
+    public struct KeyValuePair
     {
-        public string Name { get; private set; }
-        public DataNode Value { get; private set; }
-
-        public Property(KeyValuePair<string, DataNode> kvp) { Name = kvp.Key; Value = kvp.Value; }
+        public readonly string key;
+        public readonly DataNode value;
+        public KeyValuePair(string key, DataNode value) { this.key = key; this.value = value; }
     }
-    private class PropertiesEnumerator : IEnumerator<Property>
+    private class PropertiesEnumerator : IEnumerator<KeyValuePair>
     {
-        private Dictionary<string, DataNode>.Enumerator _dictEnumerator;
-        public PropertiesEnumerator(Dictionary<string, DataNode>.Enumerator dictEnumerator) { _dictEnumerator = dictEnumerator; }
-
-        public Property Current { get => new Property(_dictEnumerator.Current); }
+        private Dictionary<string, DataNode>.Enumerator _enumerator;
+        public PropertiesEnumerator(Dictionary<string, DataNode>.Enumerator enumerator) { _enumerator = enumerator; }
+        public KeyValuePair Current
+        {
+            get
+            {
+                var kvp = _enumerator.Current;
+                return new KeyValuePair(kvp.Key, kvp.Value);
+            }
+        }
         object IEnumerator.Current => Current;
-
-        public bool MoveNext() => _dictEnumerator.MoveNext();
-
+        public bool MoveNext() => _enumerator.MoveNext();
         public void Reset() => throw new NotSupportedException();
-
-        public void Dispose() => _dictEnumerator.Dispose();
+        public void Dispose() => _enumerator.Dispose();
     }
-    private class PropertiesEnumerable : IEnumerable<Property>
+    private class PropertiesEnumerable : IEnumerable<KeyValuePair>
     {
         private readonly DataNode _objectData;
         public PropertiesEnumerable(DataNode data) { _objectData = data; }
-        public IEnumerator<Property> GetEnumerator() => new PropertiesEnumerator(_objectData._properties.GetEnumerator());
+        public IEnumerator<KeyValuePair> GetEnumerator() => new PropertiesEnumerator(_objectData._mapKVPs.GetEnumerator());
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
-    public IEnumerable<Property> Properties { get => new PropertiesEnumerable(this); }
+    /// <summary>
+    /// get an <c>IEnumerable</c> for key-value pairs
+    /// </summary>
+    public IEnumerable<KeyValuePair> KeyValuePairs { get => new PropertiesEnumerable(this); }
 
-    /* loading from json */
-    public static DataNode ParseToken(JToken t)
+    /* loading from yaml */
+
+    /// <summary>
+    /// construct a new DataNode tree from a YamlNode
+    /// </summary>
+    public static DataNode ParseYamlNode(YamlNode yaml)
     {
-        DataNode d = new DataNode();
-        d._path = t.Path;
-        switch (t.Type)
+        DataNode data = new DataNode();
+        switch (yaml)
         {
-            case JTokenType.Object:
-                d._type = DataNodeType.Object;
-                d._properties = new Dictionary<string, DataNode>();
-                foreach (JProperty property in ((JObject)t).Properties())
+            case YamlMappingNode map:
+                data._type = DataNodeType.Mapping;
+                data._mapKVPs = new Dictionary<string, DataNode>();
+                foreach (var kvp in map.Children)
                 {
-                    d._properties.Add(property.Name, ParseToken(property.Value));
+                    data._mapKVPs.Add(
+                        ((YamlScalarNode)kvp.Key).Value,
+                        ParseYamlNode(kvp.Value)
+                    );
                 }
                 break;
-            case JTokenType.Array:
-                JArray arr = (JArray)t;
-                d._elements = new DataNode[arr.Count];
-                int i = 0;
-                foreach (JToken element in arr)
-                    d._elements[i] = ParseToken(element);
+            case YamlSequenceNode seq:
+                data._type = DataNodeType.Sequence;
+                data._seqEntries = new List<DataNode>();
+                foreach (var child in seq.Children)
+                    data._seqEntries.Add(ParseYamlNode(child));
                 break;
-            case JTokenType.String:
-                d._type = DataNodeType.String;
-                d._stringValue = t.ToObject<string>();
-                break;
-            case JTokenType.Integer:
-                d._type = DataNodeType.Int;
-                d._intValue = t.ToObject<int>();
-                break;
-            case JTokenType.Float:
-                d._type = DataNodeType.Float;
-                d._doubleValue = t.ToObject<double>();
-                break;
-            case JTokenType.Boolean:
-                d._type = DataNodeType.Bool;
-                d._boolValue = t.ToObject<bool>();
+            case YamlScalarNode scalar:
+                data._type = DataNodeType.Scalar;
+                data._scalarValue = scalar.Value;
                 break;
             default:
-                d._type = DataNodeType.None;
+                data._type = DataNodeType.None;
                 break;
         }
-        return d;
+        return data;
     }
 
     /* serialization */
     public void OnBeforeSerialize()
     {
-        if (Type != DataNodeType.Object) return;
+        if (Type != DataNodeType.Mapping) return;
 
-        if (_propertyNames == null) _propertyNames = new List<string>();
-        else _propertyNames.Clear();
+        if (_mapKeys == null) _mapKeys = new List<string>();
+        else _mapKeys.Clear();
 
-        if (_propertyValues == null) _propertyValues = new List<DataNode>();
-        else _propertyValues.Clear();
+        if (_mapVals == null) _mapVals = new List<DataNode>();
+        else _mapVals.Clear();
 
-        foreach (var kvp in _properties)
+        foreach (var kvp in _mapKVPs)
         {
-            _propertyNames.Add(kvp.Key);
-            _propertyValues.Add(kvp.Value);
+            _mapKeys.Add(kvp.Key);
+            _mapVals.Add(kvp.Value);
         }
     }
 
     public void OnAfterDeserialize()
     {
-        if (Type != DataNodeType.Object) return;
+        if (Type != DataNodeType.Mapping) return;
 
-        _properties = new Dictionary<string, DataNode>();
+        _mapKVPs = new Dictionary<string, DataNode>();
 
-        for (int i = 0; i < _propertyNames.Count; i++)
-            _properties.Add(_propertyNames[i], _propertyValues[i]);
+        for (int i = 0; i < _mapKeys.Count; i++)
+            _mapKVPs.Add(_mapKeys[i], _mapVals[i]);
+    }
+
+    /* scalar conversion */
+
+    /// <summary>
+    /// loads an addressable asset with the same key as the content of this scalar node
+    /// </summary>
+    /// <returns>operation handle for the requested asset</returns>
+    public AsyncOperationHandle<T> LoadAddressableAsync<T>()
+    {
+        AssertNodeType(DataNodeType.Scalar);
+        return Addressables.LoadAssetAsync<T>(_scalarValue);
+    }
+
+    /// <summary>
+    /// convert a scalar to some object
+    /// </summary>
+    /// <exception cref="InvalidCastException">thrown if the conversion to type <c>T</c> is not supported</exception>
+    public T ToObject<T>()
+    {
+        AssertNodeType(DataNodeType.Scalar);
+        var type = typeof(T);
+
+        try
+        {
+            return (T)Convert.ChangeType(_scalarValue, type); // for default types
+        }
+        catch (Exception e)
+        {
+            // if we have an InvalidCastException, then we'll try the other types. otherwise, the exception does its thing
+            if (e is not InvalidCastException)
+                throw e;
+        }
+
+        if (type == typeof(Vector2d)) return (T)(object)ParseVector2d();
+        if (type == typeof(Vector2)) return (T)(object)ParseVector<Vector2>(2, v => new Vector2(v[0], v[1]));
+        if (type == typeof(Vector3)) return (T)(object)ParseVector<Vector3>(3, v => new Vector3(v[0], v[1], v[2]));
+        if (type == typeof(Vector4)) return (T)(object)ParseVector<Vector4>(4, v => new Vector4(v[0], v[1], v[2], v[3]));
+
+        throw new InvalidCastException($"Conversion of scalar node to {type} is not supported.");
+    }
+
+    private Vector2d ParseVector2d()
+    {
+        var components = _scalarValue.Split(new char[] { ' ', ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+        if (components.Length != 2)
+            throw new FormatException($"Expected exactly 2 components in scalar '{_scalarValue}', found {components.Length}.");
+
+        try
+        {
+            return new Vector2d(
+                double.Parse(components[0]),
+                double.Parse(components[1])
+            );
+        }
+        catch (FormatException e)
+        {
+            throw new FormatException($"At least one component of '{_scalarValue}' could not be parsed as a double.", e);
+        }
+    }
+
+    private T ParseVector<T>(int numComponents, Func<float[], T> constructor)
+    {
+        var components = _scalarValue.Split(new char[] { ' ', ',' }, System.StringSplitOptions.RemoveEmptyEntries);
+        if (components.Length != numComponents)
+            throw new FormatException($"Expected exactly {numComponents} components in scalar '{_scalarValue}', found {components.Length}.");
+
+        var vals = new float[numComponents];
+        for (int i = 0; i < numComponents; i++)
+        {
+            if (!float.TryParse(components[i], out vals[i]))
+                throw new FormatException($"Could not parse component {i} in '{_scalarValue}' as a float.");
+        }
+        return constructor(vals);
     }
 
     public override string ToString()
     {
         switch (Type)
         {
-            case DataNodeType.Object:
+            case DataNodeType.Mapping:
                 return "DataNode Object";
-            case DataNodeType.Array:
+            case DataNodeType.Sequence:
                 return "DataNode Array";
-            case DataNodeType.String:
-                return $"\"{_stringValue}\"";
-            case DataNodeType.Int:
-                return _intValue.ToString();
-            case DataNodeType.Float:
-                return _doubleValue.ToString();
-            case DataNodeType.Bool:
-                return _boolValue ? "true" : "false";
-            case DataNodeType.Null:
-                return "null";
+            case DataNodeType.Scalar:
+                return _scalarValue;
             default:
                 return base.ToString();
         }

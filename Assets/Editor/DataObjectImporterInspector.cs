@@ -11,7 +11,7 @@ public class DataObjectImporterInspector : Editor
 
     private void OnEnable()
     {
-        _foldoutState[""] = true; // root object should be unfolded
+        _foldoutState["$"] = true; // root object should be unfolded
     }
 
     public override void OnInspectorGUI()
@@ -20,64 +20,64 @@ public class DataObjectImporterInspector : Editor
         DataObject data = importer.data;
 
         EditorGUILayout.LabelField("Contained Data:", EditorStyles.boldLabel);
-        RenderDataNode(data.root);
+        RenderDataNode(data.root, "$"); // keep track of path as we go
     }
 
-    private void RenderDataNode(DataNode node)
+    private void RenderDataNode(DataNode node, string path)
     {
         switch (node.Type)
         {
-            case DataNodeType.Object:
-                RenderObject(node);
+            case DataNodeType.Mapping:
+                RenderObject(node, path);
                 break;
-            case DataNodeType.Array:
-                RenderArray(node);
+            case DataNodeType.Sequence:
+                RenderArray(node, path);
                 break;
             default:
-                RenderValue(node);
+                RenderValue(node, path);
                 break;
         }
     }
 
-    private void RenderObject(DataNode node)
+    private void RenderObject(DataNode node, string path)
     {
         bool isExpanded = false;
-        _foldoutState.TryGetValue(node.Path, out isExpanded);
+        _foldoutState.TryGetValue(path, out isExpanded);
         isExpanded = EditorGUILayout.Foldout(isExpanded, $"Object ({node.Count} properties)");
-        if (!(_foldoutState[node.Path] = isExpanded)) return;
+        if (!(_foldoutState[path] = isExpanded)) return;
 
         EditorGUI.indentLevel++;
-        foreach (var property in node.Properties)
+        foreach (var property in node.KeyValuePairs)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.PrefixLabel(property.Name);
+            EditorGUILayout.PrefixLabel(property.key);
             EditorGUILayout.BeginVertical();
-            RenderDataNode(property.Value);
+            RenderDataNode(property.value, $"{path}.{property.key}");
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }
         EditorGUI.indentLevel--;
     }
-    private void RenderArray(DataNode node)
+    private void RenderArray(DataNode node, string path)
     {
         bool isExpanded = false;
-        _foldoutState.TryGetValue(node.Path, out isExpanded);
+        _foldoutState.TryGetValue(path, out isExpanded);
         isExpanded = EditorGUILayout.Foldout(isExpanded, $"Array ({node.Count})");
-        if (!(_foldoutState[node.Path] = isExpanded)) return;
+        if (!(_foldoutState[path] = isExpanded)) return;
 
         EditorGUI.indentLevel++;
-        for (int i = 0; i < node.Length; i++)
+        for (int i = 0; i < node.Count; i++)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.PrefixLabel($"[{i}]");
             EditorGUILayout.BeginVertical();
-            RenderDataNode(node[i]);
+            RenderDataNode(node[i], $"{path}[{i}]");
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndHorizontal();
         }
         EditorGUI.indentLevel--;
     }
-    private void RenderValue(DataNode node)
+    private void RenderValue(DataNode node, string path)
     {
         EditorGUILayout.LabelField(node.ToString(), EditorStyles.wordWrappedLabel);
     }

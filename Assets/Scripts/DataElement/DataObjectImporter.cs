@@ -14,7 +14,7 @@ public class DataObjectImporter : ScriptedImporter
 
     public override void OnImportAsset(AssetImportContext ctx)
     {
-        data = DataObject.LoadJson(ctx.assetPath);
+        data = DataObject.LoadFile(ctx.assetPath);
         ctx.AddObjectToAsset("Data Object", data);
         ctx.SetMainObject(data);
 

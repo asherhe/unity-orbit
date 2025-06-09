@@ -56,16 +56,16 @@ public class CelestialBody : MonoBehaviour
     private void Awake()
     {
         /* read from data */
-        radius = data.root["radius"].GetDouble() * 1000.0;
-        GM = data.root["surfaceG"].GetDouble() * radius * radius;
+        radius = data.root["radius"].ToObject<double>() * 1000.0;
+        GM = data.root["surfaceG"].ToObject<double>() * radius * radius;
         mass = GM / Universe.Instance.G;
-        dayLength = data.root["dayLength"].GetDouble() * 86400.0;
+        dayLength = data.root["dayLength"].ToObject<double>() * 86400.0;
 
-        if ((hasAtmosphere = data.root["hasAtmosphere"].GetBool()))
+        if ((hasAtmosphere = data.root["hasAtmosphere"].ToObject<bool>()))
         {
-            atmHeight = data.root["atmosphereHeight"].GetDouble() * 1000.0;
-            atmSeaLevelPressure = data.root["atmosphereSeaLevelPressure"].GetDouble();
-            atmScaleHeight = data.root["atmosphereScaleHeight"].GetDouble() * 1000.0;
+            atmHeight = data.root["atmosphereHeight"].ToObject<double>() * 1000.0;
+            atmSeaLevelPressure = data.root["atmosphereSeaLevelPressure"].ToObject<double>();
+            atmScaleHeight = data.root["atmosphereScaleHeight"].ToObject<double>() * 1000.0;
         }
 
         displayObject = new GameObject("Display");
@@ -83,9 +83,9 @@ public class CelestialBody : MonoBehaviour
         m.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
         m.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
         // TODO: parse these in Awake()
-        m.SetVector("_RayleighScatteringCoeff", data.root["rayleighScattering"].ParseVector4());
-        m.SetVector("_MieScatteringCoeff", data.root["mieScattering"].ParseVector4());
-        m.SetFloat("_MiePhaseG", data.root["miePhaseG"].GetFloat());
+        m.SetVector("_RayleighScatteringCoeff", data.root["rayleighScattering"].ToObject<Vector4>());
+        m.SetVector("_MieScatteringCoeff", data.root["mieScattering"].ToObject<Vector4>());
+        m.SetFloat("_MiePhaseG", data.root["miePhaseG"].ToObject<float>());
     }
 
     public void MakeDisplay(GameObject displayObject) {
@@ -120,13 +120,13 @@ public class CelestialBody : MonoBehaviour
         MeshFilter surfaceMeshFilter = surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = surfaceObject.AddComponent<MeshRenderer>();
-        data.root["surfaceMaterial"].LoadAssetAsync<Material>().Completed += m =>
+        data.root["surfaceMaterial"].LoadAddressableAsync<Material>().Completed += m =>
         {
             surfaceMeshRenderer.material = m.Result;
             SetShaderValues(surfaceMeshRenderer.material);
         };
 
-        if (data.root["hasAtmosphere"].GetBool())
+        if (data.root["hasAtmosphere"].ToObject<bool>())
         {
             atmObject = new GameObject("Atmosphere");
             atmObject.transform.parent = displayObject.transform;
@@ -135,7 +135,7 @@ public class CelestialBody : MonoBehaviour
             MeshFilter atmMeshFilter = atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = atmObject.AddComponent<MeshRenderer>();
-            data.root["atmMaterial"].LoadAssetAsync<Material>().Completed += m =>
+            data.root["atmMaterial"].LoadAddressableAsync<Material>().Completed += m =>
             {
                 atmMeshRenderer.material = m.Result;
                 SetShaderValues(atmMeshRenderer.material);
