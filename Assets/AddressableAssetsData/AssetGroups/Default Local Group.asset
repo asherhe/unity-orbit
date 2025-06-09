@@ -18,12 +18,12 @@ MonoBehaviour:
   m_GUID: f1973eac333e7db49b6dfe1a61f66bf9
   m_SerializeEntries:
   - m_GUID: 11ccedaf5252ea44780276a1f399cf33
-    m_Address: Assets/CelestialBodies/Earth/Surface.mat
+    m_Address: Assets/GameData/CelestialBodies/Earth/Surface.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3c800c16772830f4bbede9a5a9da7735
-    m_Address: Assets/CelestialBodies/Earth/Atmosphere.mat
+    m_Address: Assets/GameData/CelestialBodies/Earth/Atmosphere.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

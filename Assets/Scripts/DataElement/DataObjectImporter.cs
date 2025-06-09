@@ -10,11 +10,9 @@ using UnityEditor.AssetImporters;
 [ScriptedImporter(1, "data")]
 public class DataObjectImporter : ScriptedImporter
 {
-    public DataObject data;
-
     public override void OnImportAsset(AssetImportContext ctx)
     {
-        data = DataObject.LoadFile(ctx.assetPath);
+        var data = DataObject.LoadFile(ctx.assetPath);
         ctx.AddObjectToAsset("Data Object", data);
         ctx.SetMainObject(data);
 
