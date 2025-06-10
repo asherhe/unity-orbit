@@ -4,29 +4,23 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
-using Newtonsoft.Json.Linq;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using YamlDotNet.RepresentationModel;
 
 public class DataObject : ScriptableObject
 {
-    public DataNode root;
+    [SerializeField] private DataNode _root;
+    public DataNode root { get => _root; }
 
     /// <summary>
-    /// load a yaml file as a DataObject
+    /// load a yaml document as a DataObject
     /// </summary>
-    public static DataObject LoadFile(string path)
+    public static DataObject LoadDocument(YamlDocument doc)
     {
-        using (var reader = new StreamReader(path))
-        {
-            var yaml = new YamlStream();
-            yaml.Load(reader);
-
-            var yamlRoot = yaml.Documents[0].RootNode;
-            DataObject dobject = ScriptableObject.CreateInstance<DataObject>();
-            dobject.root = DataNode.ParseYamlNode(yamlRoot);
-            return dobject;
-        }
+        var yamlRoot = doc.RootNode;
+        DataObject dobject = ScriptableObject.CreateInstance<DataObject>();
+        dobject._root = DataNode.ParseYamlNode(yamlRoot);
+        return dobject;
     }
 
     public override string ToString()
@@ -63,6 +57,7 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
     public DataNodeType Type { get => _type; }
 
     /// <summary>
+    /// number of children in a datanode
     /// <para>mapping nodes: the number of key: value pairs</para>
     /// <para>sequence nodes: the number of entries</para>
     /// </summary>
@@ -131,7 +126,7 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /* object enumeration */
-    public struct KeyValuePair
+    public class KeyValuePair
     {
         public readonly string key;
         public readonly DataNode value;
@@ -245,7 +240,7 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
     }
 
     /// <summary>
-    /// convert a scalar to some object
+    /// convert a scalar to some type
     /// </summary>
     /// <exception cref="InvalidCastException">thrown if the conversion to type <c>T</c> is not supported</exception>
     public T ToObject<T>()
