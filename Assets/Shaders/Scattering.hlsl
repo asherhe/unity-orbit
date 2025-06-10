@@ -1,6 +1,10 @@
 #ifndef SCATTERING_INCLUDED
 #define SCATTERING_INCLUDED
 
+// check for an intersection between a sphere and a ray
+// return true if there exists an intersection
+// if there is an intersection, A and B will also be filled with the enter and
+// exit times of the ray through the sphere
 bool rayIntersect(
     float3 O, // ray origin
     float3 D, // ray direction
@@ -25,6 +29,8 @@ bool rayIntersect(
     return true;
 }
 
+// get optical depth for rayleigh and mie scattering
+// basically just integrating density across a ray of atmosphere
 bool lightSampling(
     float3 P, // position
     float3 L, // sun direction
@@ -38,11 +44,13 @@ bool lightSampling(
     out float mieOpticalDepth
 )
 {
-    float C1, C2;
-    rayIntersect(P, L, float3(0, 0, 0), planetRadius + atmHeight, C1, C2);
-    
     rayOpticalDepth = 0;
     mieOpticalDepth = 0;
+
+    float C1, C2;
+    if (!rayIntersect(P, L, float3(0, 0, 0), planetRadius + atmHeight, C1, C2))
+        return true; // no atmosphere entry = didn't touch ground
+    
     float time = 0;
     float3 C = P + L * C2;
     float dt = distance(P, C) / (float) samples;
@@ -61,6 +69,7 @@ bool lightSampling(
     return true;
 }
 
+// attenuation factor for light passing through the atmosphere
 float3 scatterAttenuation(
     float3 P, // position
     float3 L, // sun direction

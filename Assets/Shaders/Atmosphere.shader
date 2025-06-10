@@ -17,24 +17,29 @@ Shader "Atmosphere"
         _ViewSamples ("Out-scattering samples", Range(0, 256)) = 24
         _LightSamples ("In-scattering samples", Range(0, 256)) = 8
     }
+    // scattering pass
     SubShader
     {
         Tags { "RenderPipeline"="UniversalPipeline" "Queue"="Transparent" "RenderType"="Transparent" }
         
-        Blend One SrcAlpha // we use alpha channel to scatter background stuff
         Cull Off
         ZWrite Off
 
         LOD 100
 
-        Pass
+        // attenuation pass
+        /*Pass
         {
+            Blend Zero SrcColor // multiplicative blending
+            // Blend Zero One
+
             HLSLPROGRAM
 
-            #pragma vertex vert
+            #pragma vertex vert_centeredWS // see WorldSpaceVert.hlsl
             #pragma fragment frag
             
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "WorldSpaceVert.hlsl"
             #include "Scattering.hlsl"
             
             CBUFFER_START(UnityPerMaterial)
@@ -52,34 +57,66 @@ Shader "Atmosphere"
                 int _LightSamples;
             CBUFFER_END
 
-            struct Attributes
+            float4 frag(WSVVaryings IN) : SV_Target
             {
-                float4 positionOS : POSITION;
-            };
+                float3 attenuation = scatterAttenuation(
+                    IN.position.xyz,
+                    normalize(_SunDir.xyz),
+                    _PlanetRad,
+                    _AtmHeight,
+                    _RayleighScaleHeight,
+                    _MieScaleHeight,
+                    _RayleighScatteringCoeff,
+                    _MieScatteringCoeff,
+                    _MiePhaseG,
+                    _LightSamples,
+                    true
+                ) * _AtmSeaLevelPressure;
 
-            struct Varyings
-            {
-                float4 positionCS : SV_POSITION;
-                float2 position   : TEXCOORD0; // rotation and scale are in world space coordinates but centered at 0,0
-            };
-
-            Varyings vert(Attributes IN)
-            {
-                Varyings OUT;
-                VertexPositionInputs positions = GetVertexPositionInputs(IN.positionOS.xyz);
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-
-                unity_ObjectToWorld._14_24_34 = 0;
-                OUT.position = mul(unity_ObjectToWorld, IN.positionOS).xy;
-
-                return OUT;
+                return float4(attenuation, 1);
             }
 
-            float4 frag(Varyings IN) : SV_Target
+            ENDHLSL
+        }*/
+
+        // scattering pass
+        Pass
+        {
+            // Blend One One // additive blending
+            Blend One SrcAlpha // add rgb and attenuate background by alpha
+
+            HLSLPROGRAM
+
+            #pragma vertex vert_centeredWS // see WorldSpaceVert.hlsl
+            #pragma fragment frag
+            
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "WorldSpaceVert.hlsl"
+            #include "Scattering.hlsl"
+            
+            CBUFFER_START(UnityPerMaterial)
+                float4 _SunDir;
+                float _SunIntensity;
+                float _PlanetRad;
+                float _AtmHeight;
+                float _AtmSeaLevelPressure;
+                float _RayleighScaleHeight;
+                float _MieScaleHeight;
+                float4 _RayleighScatteringCoeff;
+                float4 _MieScatteringCoeff;
+                float _MiePhaseG;
+                int _ViewSamples;
+                int _LightSamples;
+            CBUFFER_END
+
+            float4 frag(WSVVaryings IN) : SV_Target
             {
+                float3 L = normalize(_SunDir.xyz);
+
+                // extra light we gain from in-scattering
                 float4 scatter = scatter2D(
-                    IN.position,
-                    normalize(_SunDir.xyz),
+                    IN.position.xy,
+                    L,
                     _PlanetRad,
                     _AtmHeight,
                     _RayleighScaleHeight,
@@ -90,6 +127,7 @@ Shader "Atmosphere"
                     int2(_ViewSamples, _LightSamples)
                 );
                 scatter.rgb *= _SunIntensity * _AtmSeaLevelPressure;
+
                 return scatter;
             }
 

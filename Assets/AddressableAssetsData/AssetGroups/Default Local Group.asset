@@ -23,7 +23,7 @@ MonoBehaviour:
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3c800c16772830f4bbede9a5a9da7735
-    m_Address: Assets/GameData/CelestialBodies/Earth/Atmosphere.mat
+    m_Address: Assets/Materials/Atmosphere.mat
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

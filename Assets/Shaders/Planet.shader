@@ -36,11 +36,12 @@ Shader "Planet"
         {
             HLSLPROGRAM
 
-            #pragma vertex vert
+            #pragma vertex vert_centeredWS
             #pragma fragment frag
            
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "WorldSpaceVert.hlsl"
             #include "Scattering.hlsl"
 
             CBUFFER_START(UnityPerMaterial)
@@ -68,46 +69,18 @@ Shader "Planet"
                 int _ViewSamples;
                 int _LightSamples;
             CBUFFER_END
-
-            struct Attributes
-            {
-                float4 positionOS : POSITION;
-                float2 uv         : TEXCOORD0;
-            };
-
-            struct Varyings
-            {
-                float4 positionCS : SV_POSITION;
-                float2 positionOS : TEXCOORD0;
-                float2 uv         : TEXCOORD1;
-            };
-
-            Varyings vert(Attributes IN)
-            {
-                Varyings OUT;
-                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
-                
-                // extract only rotation of transform matrix
-                float3x3 rotO2W = (float3x3)unity_ObjectToWorld;
-                rotO2W._11_21_31 = normalize(rotO2W._11_21_31);
-                rotO2W._12_22_32 = normalize(rotO2W._12_22_32);
-                rotO2W._13_23_33 = normalize(rotO2W._13_23_33);
-                OUT.positionOS = mul(rotO2W, (float3)IN.positionOS).xy;
-
-                OUT.uv = IN.uv;
-
-                return OUT;
-            }
-
-            float4 frag(Varyings IN) : SV_Target
+            
+            float4 frag(WSVVaryings IN) : SV_Target
             {
                 float3 L = normalize((float3)_SunDir);
 
-                float r2 = IN.positionOS.x*IN.positionOS.x + IN.positionOS.y*IN.positionOS.y;
+                IN.position /= _PlanetRad;
+
+                float r2 = IN.position.x*IN.position.x + IN.position.y*IN.position.y;
                 if (r2 > 1) return float4(0,0,0,0);
 
                 // surface normal if the planet was a perfectly smooth sphere
-                float3 sphereNormal = float3(IN.positionOS, -sqrt(1-r2));
+                float3 sphereNormal = float3(IN.position.xy, -sqrt(1-r2));
                 
                 float3 normalMap = UnpackNormal(SAMPLE_TEXTURE2D(_NormalMap, sampler_NormalMap, IN.uv)).xyz;
                 
@@ -124,7 +97,8 @@ Shader "Planet"
                 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 
-                float3 sunColor = scatterAttenuation(_PlanetRad * sphereNormal,
+                float3 sunColor = scatterAttenuation(
+                    _PlanetRad * sphereNormal,
                     L,
                     _PlanetRad,
                     _AtmHeight,
