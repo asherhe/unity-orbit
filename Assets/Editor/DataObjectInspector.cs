@@ -39,7 +39,7 @@ public class DataObjectInspector : Editor
     {
         foreach (var kvp in node.KeyValuePairs)
         {
-            RenderKVP(kvp.key, kvp.value, $"{path}.{kvp.key}");
+            RenderKVP(kvp.Key, kvp.Value, $"{path}.{kvp.Key}");
         }
     }
     private void RenderSequence(DataNode node, string path)

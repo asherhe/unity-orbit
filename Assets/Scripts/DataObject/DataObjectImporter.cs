@@ -14,20 +14,20 @@ public class DataObjectImporter : ScriptedImporter
     public override void OnImportAsset(AssetImportContext ctx)
     {
         // read all documents
-        var dobjects = new List<DataObject>();
+        var dobjs = new List<DataObject>();
         using (var reader = new StreamReader(ctx.assetPath))
         {
             var yaml = new YamlStream();
             yaml.Load(reader);
 
             foreach (var doc in yaml.Documents)
-                dobjects.Add(DataObject.LoadDocument(doc));
+                dobjs.Add(DataObject.LoadDocument(doc));
         }
 
         // add all DataObjects
-        for (int i = 0; i < dobjects.Count; i++)
-            ctx.AddObjectToAsset($"Data Object {i + 1}", dobjects[i]);
-        ctx.SetMainObject(dobjects[0]);
+        for (int i = 0; i < dobjs.Count; i++)
+            ctx.AddObjectToAsset($"Data Object {i + 1}", dobjs[i]);
+        ctx.SetMainObject(dobjs[0]);
 
         // register extension if necessary
         if (!EditorSettings.projectGenerationUserExtensions.Contains("data"))

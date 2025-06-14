@@ -1,12 +1,22 @@
 # Earth.data
 
+name: Earth
+
 # planetary info
 radius: 6371.0 # km
 surfaceG: 9.81 # m/s^2
 dayLength: 1.0 # julian days
 
 surfaceMaterial: Assets/GameData/CelestialBodies/Earth/Surface.mat
-glowColor: "#9ddeff"
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Sun
+  semimajorAxis: 1.496e8 # km
+  eccentricity: 0.017
+  longitudePeriapsis: 73 # deg
+  epochMeanAnom: -34 # deg
+  epochTime: 0 # s
 
 # atmospheric data, set to false if no atmosphere
 atmosphere:
