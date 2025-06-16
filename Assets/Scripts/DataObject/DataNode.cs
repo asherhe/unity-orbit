@@ -382,16 +382,22 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
 
     public override string ToString()
     {
+        string s;
         switch (Type)
         {
             case DataNodeType.Mapping:
-                return "DataNode Object";
+                s = $"{{ {string.Join(", ", KeyValuePairs.Select(kvp => $"{kvp.Key}: {kvp.Value}"))} }}";
+                break;
             case DataNodeType.Sequence:
-                return "DataNode Array";
+                s = $"[ {string.Join(", ", this.Select(node => node.ToString()))} ]";
+                break;
             case DataNodeType.Scalar:
-                return Value;
+                s = Value;
+                break;
             default:
-                return base.ToString();
+                s = base.ToString();
+                break;
         }
+        return s;
     }
 }

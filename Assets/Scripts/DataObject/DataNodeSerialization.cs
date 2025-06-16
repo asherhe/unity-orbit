@@ -53,6 +53,17 @@ public class DataNodeSerialization
             foreach (var e in (IList)obj)
                 node.Add(Serialize(elementType, e));
         }
+        else if (typeof(IDictionary).IsAssignableFrom(type) && type.IsGenericType)
+        {
+            node = new DataNode(DataNodeType.Mapping);
+            var generics = type.GetGenericArguments();
+            var keyType = generics[0]; var valType = generics[1];
+            foreach (DictionaryEntry kvp in (IDictionary)obj)
+                node.Add(
+                    kvp.Key.ToString(),
+                    Serialize(valType, kvp.Value)
+                );
+        }
         else
         {
             node = new DataNode(DataNodeType.Mapping);
@@ -161,7 +172,11 @@ public class DataNodeSerialization
     }
     private static object DeserializeMap(Type type, DataNode node)
     {
+        if (typeof(IDictionary).IsAssignableFrom(type) && type.IsGenericType)
+            return DeserializeDict(type, node);
+
         var obj = Activator.CreateInstance(type);
+
         foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
             if (!IsFieldSerializable(field))
@@ -180,6 +195,18 @@ public class DataNodeSerialization
                 valObj = Deserialize(field.FieldType, valNode);
             field.SetValue(obj, valObj);
         }
+        return obj;
+    }
+    private static object DeserializeDict(Type type, DataNode node)
+    {
+        var obj = (IDictionary)Activator.CreateInstance(type);
+        var generics = type.GetGenericArguments();
+        var keyType = generics[0]; var valType = generics[1];
+        foreach (var kvp in node.KeyValuePairs)
+            obj.Add(
+                new DataNode(kvp.Key).As(keyType), // also parses enums, vectors, etc. which is nice
+                Deserialize(valType, kvp.Value)
+            );
         return obj;
     }
 }
