@@ -6,6 +6,18 @@ using UnityEngine;
 
 public class DataNodeSerialization
 {
+    public static bool IsTypeSerializable(Type type)
+        => type.IsPrimitive
+        || type == typeof(string)
+        || type.IsEnum
+        || type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4) // vector types are chill
+        || (type.IsArray && IsTypeSerializable(type.GetElementType()))
+        || (type.IsGenericType && (
+                 (typeof(IList).IsAssignableFrom(type) && IsTypeSerializable(type.GetGenericArguments()[0]))
+              || (typeof(IDictionary).IsAssignableFrom(type) && IsTypeSerializable(type.GetGenericArguments()[1]))
+            ))
+        || Attribute.IsDefined(type, typeof(SerializableAttribute)); // all other classes
+
     /// <summary>
     /// checks if a field can be serialized
     /// <para>serializable fields must be:</para>
@@ -19,7 +31,8 @@ public class DataNodeSerialization
         => (field.IsPublic || field.GetCustomAttribute<SerializeField>() != null)
         && !field.IsStatic
         && !field.IsLiteral // is this field hardcoded in compile time? (consts)
-        && !field.IsInitOnly;
+        && !field.IsInitOnly
+        && IsTypeSerializable(field.FieldType);
 
     /// <summary>
     /// summary TODO
@@ -31,6 +44,9 @@ public class DataNodeSerialization
 
     public static DataNode Serialize(Type type, object obj)
     {
+        if (!IsTypeSerializable(type))
+            throw new NotSupportedException($"Serialization of {type} is currently not supported. If you are serializing a custom class, please add the [System.Serializable] attribute");
+
         if (typeof(ISerializationCallbackReceiver).IsAssignableFrom(type))
             ((ISerializationCallbackReceiver)obj).OnBeforeSerialize();
 
@@ -91,7 +107,7 @@ public class DataNodeSerialization
     /// deserializes a DataNode into an object. currently supports:
     /// <list type="bullet">
     ///   <item>
-    ///     <term>objects</term>
+    ///     <term>objects with <c>[System.Serializable]</c></term>
     ///     <description>key-value pairs of a mapping DataNode fill in the properties of the object</description>
     ///   </item>
     ///   <item>
@@ -126,6 +142,9 @@ public class DataNodeSerialization
     /// </summary>
     public static object Deserialize(Type type, DataNode node)
     {
+        if (!IsTypeSerializable(type))
+            throw new NotSupportedException($"Deserialization of {type} is currently not supported. If you are serializing a custom class, please add the [System.Serializable] attribute");
+
         object obj;
         switch (node.Type)
         {
@@ -172,10 +191,20 @@ public class DataNodeSerialization
     }
     private static object DeserializeMap(Type type, DataNode node)
     {
-        if (typeof(IDictionary).IsAssignableFrom(type) && type.IsGenericType)
-            return DeserializeDict(type, node);
-
         var obj = Activator.CreateInstance(type);
+
+        if (typeof(IDictionary).IsAssignableFrom(type) && type.IsGenericType)
+        {
+            var dictObj = (IDictionary)obj;
+            var generics = type.GetGenericArguments();
+            var keyType = generics[0]; var valType = generics[1];
+            foreach (var kvp in node.KeyValuePairs)
+                dictObj.Add(
+                    new DataNode(kvp.Key).As(keyType), // also parses enums, vectors, etc. which is nice
+                    Deserialize(valType, kvp.Value)
+                );
+            return dictObj;
+        }
 
         foreach (var field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
         {
@@ -195,18 +224,6 @@ public class DataNodeSerialization
                 valObj = Deserialize(field.FieldType, valNode);
             field.SetValue(obj, valObj);
         }
-        return obj;
-    }
-    private static object DeserializeDict(Type type, DataNode node)
-    {
-        var obj = (IDictionary)Activator.CreateInstance(type);
-        var generics = type.GetGenericArguments();
-        var keyType = generics[0]; var valType = generics[1];
-        foreach (var kvp in node.KeyValuePairs)
-            obj.Add(
-                new DataNode(kvp.Key).As(keyType), // also parses enums, vectors, etc. which is nice
-                Deserialize(valType, kvp.Value)
-            );
         return obj;
     }
 }

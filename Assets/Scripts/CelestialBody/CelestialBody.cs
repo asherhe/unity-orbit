@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -26,6 +27,7 @@ public class CelestialBody : MonoBehaviour
         // orbital info, optional for the sun
         [OptionalValueField]
         public OrbitInfo orbit;
+        [Serializable]
         public class OrbitInfo
         {
             public string parent;
@@ -39,6 +41,7 @@ public class CelestialBody : MonoBehaviour
         // atmosphere info
         [OptionalValueField]
         public AtmInfo atmosphere;
+        [Serializable]
         public class AtmInfo
         {
             // altitude above sea level to the top of atmosphere

@@ -7,6 +7,7 @@ using UnityEngine;
 /// similar to <c>Vector2</c>, but uses a double internally.
 /// this is used for orbital calculations, which require higher precision
 /// </summary>
+[Serializable]
 public class Vector2d
 {
     public double x, y;
