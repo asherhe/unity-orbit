@@ -10,6 +10,7 @@ public class DataNodeSerialization
         => type.IsPrimitive
         || type == typeof(string)
         || type.IsEnum
+        || type == typeof(DataNode)
         || type == typeof(Vector2) || type == typeof(Vector3) || type == typeof(Vector4) // vector types are chill
         || (type.IsArray && IsTypeSerializable(type.GetElementType()))
         || (type.IsGenericType && (
@@ -46,6 +47,8 @@ public class DataNodeSerialization
     {
         if (!IsTypeSerializable(type))
             throw new NotSupportedException($"Serialization of {type} is currently not supported. If you are serializing a custom class, please add the [System.Serializable] attribute");
+
+        if (type == typeof(DataNode)) return (DataNode)obj;
 
         if (typeof(ISerializationCallbackReceiver).IsAssignableFrom(type))
             ((ISerializationCallbackReceiver)obj).OnBeforeSerialize();
@@ -88,7 +91,11 @@ public class DataNodeSerialization
                 if (!IsFieldSerializable(field))
                     continue;
 
+                if (field.GetValue(obj) == null)
+                    continue;
+
                 var key = field.Name;
+
                 // check for custom key
                 var keyAttr = field.GetCustomAttribute<SerializationKeyAttribute>();
                 if (keyAttr != null) key = keyAttr.Key;
@@ -144,6 +151,8 @@ public class DataNodeSerialization
     {
         if (!IsTypeSerializable(type))
             throw new NotSupportedException($"Deserialization of {type} is currently not supported. If you are serializing a custom class, please add the [System.Serializable] attribute");
+
+        if (type == typeof(DataNode)) return node;
 
         object obj;
         switch (node.Type)

@@ -31,6 +31,24 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
 
     /* constructors */
 
+    public DataNode(DataNode other)
+    {
+        switch (_type = other.Type)
+        {
+            case DataNodeType.Scalar:
+                _scalarValue = other._scalarValue;
+                break;
+            case DataNodeType.Sequence:
+                _seqEntries = other._seqEntries;
+                break;
+            case DataNodeType.Mapping:
+                _mapKVPs = other._mapKVPs;
+                break;
+            default:
+                break;
+        }
+    }
+
     public DataNode(DataNodeType type)
     {
         _type = type;
@@ -273,6 +291,37 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
 
         for (int i = 0; i < _mapKeys.Count; i++)
             _mapKVPs.Add(_mapKeys[i], _mapVals[i]);
+    }
+
+    /* cloning */
+
+    /// <summary>
+    /// create a deep clone of this DataNode.
+    /// recursively create a copy of this DataNode as well as all child DataNodes as well.
+    /// for shallow cloning, use the copy constructor DataNode(DataNode);
+    /// </summary>
+    public DataNode DeepClone()
+    {
+        DataNode clone;
+        switch (Type)
+        {
+            case DataNodeType.Scalar:
+                clone = new DataNode(Value);
+                break;
+            case DataNodeType.Sequence:
+                clone = new DataNode(DataNodeType.Sequence);
+                foreach (var entry in this)
+                    clone.Add(entry.DeepClone());
+                break;
+            case DataNodeType.Mapping:
+                clone = new DataNode(DataNodeType.Mapping);
+                foreach (var kvp in KeyValuePairs)
+                    clone.Add(kvp.Key, kvp.Value.DeepClone());
+                break;
+            default:
+                throw new NotSupportedException($"Deep cloning of {Type} DataNodes is not supported.");
+        }
+        return clone;
     }
 
     /* scalar conversion */
