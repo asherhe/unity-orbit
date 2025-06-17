@@ -1,0 +1,16 @@
+# TestingCommandPod.data
+
+name: Testing Command Pod
+mass: 0.8 # t
+
+sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
+
+attachmentNodes:
+  - name: top
+    pos: { x: 0.0, y: 1.0 }
+  - name: bottom
+    pos: { x: 0.0, y: -1.0 }
+
+plugins:
+  CommandPlugin: {}
+  ReactionWheelPlugin: {}

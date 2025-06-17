@@ -1,0 +1,25 @@
+# Resources.data
+
+# a list of all in-game resources and its information
+# schema for a resource:
+#
+# type: internal name for this type of resource. used for referring to
+#       a resource in code or in configs
+# name: resource's display name, shown in-game when displaying resources
+# density: kg/unit a resource adds to the mass of a part
+# flow: how this resource can be used by other parts in a craft. options are:
+#   - None - can only be used by the part it's in (e.g. solid fuel, ablator)
+#   - Stage - can be used from within one stage, defined by crossfeed rules (liquid fuel/oxidizer)
+#   - Craft - can be used by any part within the craft (e.g. electricity)
+
+# Aerozine 50 hypergolic fuel used in orbital stages
+- type: Hydrazine
+  name: Hydrazine
+  density: 1
+  flow: Stage
+
+# Nitrogen tetroxide, hypergolic oxidizer used with hydrazine
+- type: NTO
+  name: N2O4
+  density: 1
+  flow: Stage

@@ -10,16 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Default Local Group
+  m_Name: GameData
   m_EditorClassIdentifier: 
-  m_GroupName: Default Local Group
+  m_GroupName: GameData
   m_Data:
     m_SerializedData: []
-  m_GUID: f1973eac333e7db49b6dfe1a61f66bf9
-  m_SerializeEntries: []
+  m_GUID: d02ea31cfbf04e747950e3c76a380e2b
+  m_SerializeEntries:
+  - m_GUID: e4e8d7deaa697554982ad03f03076854
+    m_Address: Assets/GameData
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: f30176eb3c73e0349b535d48f99a2f26, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 29c21d41cbea2cd45ba20ce97b62c277, type: 2}
-    - {fileID: 11400000, guid: 4f1b6fc38f780874c855b161e1348b42, type: 2}
+    - {fileID: 11400000, guid: f1ea87d9b8c66e34c9d22c2d8d756d7a, type: 2}
+    - {fileID: 11400000, guid: 62b19d3eaaefc3f43bc701f543d4c82c, type: 2}

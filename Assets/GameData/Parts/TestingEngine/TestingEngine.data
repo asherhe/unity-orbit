@@ -1,8 +1,17 @@
 # TestingEngine.data
 
 name: Testing Engine
-mass: 0.5 # t
+mass: 1.2 # t
+
+sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
+
+attachmentNodes:
+  - name: top
+    pos: { x: 0.0, y: 0.75 }
+  - name: bottom
+    pos: { x: 0.0, y: -0.75 }
+
 plugins:
-  - type: EnginePartPlugin
-    isp: 345 # s
-    thrust: 60 # kN
+  EnginePlugin:
+    isp: 316 # s
+    thrust: 26.7 # kN

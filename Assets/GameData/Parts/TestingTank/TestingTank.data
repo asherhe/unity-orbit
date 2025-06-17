@@ -1,0 +1,18 @@
+# TestingTank.data
+
+name: Testing Tank
+mass: 0.6 # t
+
+sprite: Assets/GameData/Parts/TestingTank/TestingTank.png
+
+attachmentNodes:
+  - name: top
+    pos: { x: 0.0, y: 1.0 }
+  - name: bottom
+    pos: { x: 0.0, y: -1.0 }
+
+plugins:
+  ResourceContainerPlugin:
+    maxAmount:
+      NTO: 3600
+      Hydrazine: 2400

@@ -10,6 +10,7 @@ public class CelestialBody : MonoBehaviour
     public DataObject configData;
 
     private CelestialBodyConfig _config;
+    [Serializable]
     private class CelestialBodyConfig
     {
         public string name;

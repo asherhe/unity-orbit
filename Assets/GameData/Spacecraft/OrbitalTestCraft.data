@@ -1,0 +1,67 @@
+# OrbitalTestCraft.data
+
+name: Orbital Test Craft
+
+orbit:
+  parent: Earth
+  h: -5.41481780796713e10
+  e: 0.1
+  omega: 1
+  M0: 0
+  t0: 0
+
+parts:
+  - type: TestingCommandPod
+    id: TestingCommandPod_1
+    name: Testing Command Pod
+
+    transform:
+      pos: { x: 0.0, y: 0.0 }
+      rot: 0
+
+    attachments:
+      - mode: Node
+        node: bottom
+        atchPart: TestingTank_2 # attached part
+        atchNode: top # attachment node of attached part
+
+  - type: TestingTank
+    id: TestingTank_2
+    name: Testing Tank
+
+    transform:
+      pos: { x: 0.0, y: -2.0 }
+      rot: 0
+
+    attachments:
+      - mode: Node
+        node: top
+        atchPart: TestingCommandPod_1
+        atchNode: bottom
+      - mode: Node
+        node: bottom
+        atchPart: TestingEngine_3
+        atchNode: top
+
+    plugins:
+      ResourceContainerPlugin:
+        amount:
+          NTO: 3600
+          Hydrazine: 2400
+        priority:
+          NTO: 0
+          Hydrazine: 0
+
+  - type: TestingEngine
+    id: TestingEngine_3
+    name: Testing Engine
+
+    transform:
+      pos: { x: 0.0, y: -3.75 }
+      rot: 0
+
+    attachments:
+      - mode: Node
+        node: top
+        atchPart: TestingTank_2
+        atchNode: bottom
