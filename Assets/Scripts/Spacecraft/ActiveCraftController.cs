@@ -18,17 +18,17 @@ public class ActiveCraftController : MonoBehaviour
     /// </summary>
     public Spacecraft craft { get; private set; }
 
+    public SpacecraftControl control { get; private set; }
+
     /// <summary>
     /// throttle change rate per second
     /// </summary>
-    public float throttleRate = 0.3f;
+    public float throttlingRate = 0.3f;
 
     private void Awake()
     {
-        if (Instance == null || Instance == this)  Instance = this;
+        if (Instance == null || Instance == this) Instance = this;
         else Destroy(this);
-
-        craft = GetComponent<Spacecraft>();
 
         _inputActions = new InputActions();
         _inputActions.Flight.Enable();
@@ -37,14 +37,21 @@ public class ActiveCraftController : MonoBehaviour
         _inputActions.Flight.ThrottleFull.performed += FullThrottle;
     }
 
-    private void CutThrottle(InputAction.CallbackContext context) => craft.Throttle = 0.0f;
-    private void FullThrottle(InputAction.CallbackContext context) => craft.Throttle = 1.0f;
+    private void Start()
+    {
+        // these components are added in Spacecraft.Awake(), so we run them here
+        craft = GetComponent<Spacecraft>();
+        control = GetComponent<SpacecraftControl>();
+    }
+
+    public void CutThrottle(InputAction.CallbackContext context) => control.Throttle = 0.0f;
+    public void FullThrottle(InputAction.CallbackContext context) => control.Throttle = 1.0f;
 
     private void Update()
     {
-        craft.SteeringControl = _inputActions.Flight.Steering.ReadValue<float>();
+        control.SteeringControl = _inputActions.Flight.Steering.ReadValue<float>();
 
         float throttleControl = _inputActions.Flight.Throttle.ReadValue<float>();
-        craft.Throttle += throttleControl * throttleRate * Time.deltaTime;
+        control.Throttle += throttleControl * throttlingRate * Time.deltaTime;
     }
 }

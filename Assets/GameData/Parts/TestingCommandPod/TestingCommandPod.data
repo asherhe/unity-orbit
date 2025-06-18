@@ -13,4 +13,5 @@ plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
   CommandPlugin: {}
-  ReactionWheelPlugin: {}
+  ReactionWheelPlugin:
+    torque: 5 # kN m

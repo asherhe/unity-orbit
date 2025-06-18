@@ -40,15 +40,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "ToggleMap",
-                    "type": "Button",
-                    "id": "ab4f4dfe-9648-4185-ab00-f4e2f2f1bbe3",
-                    "expectedControlType": "Button",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -172,17 +163,6 @@
                     "action": "ThrottleFull",
                     "isComposite": false,
                     "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "3de33db1-b964-4fd3-902f-9cadf0038a99",
-                    "path": "<Keyboard>/m",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard + Mouse",
-                    "action": "ToggleMap",
-                    "isComposite": false,
-                    "isPartOfComposite": false
                 }
             ]
         },
@@ -266,6 +246,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "ToggleMap",
+                    "type": "Button",
+                    "id": "6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -277,6 +266,17 @@
                     "processors": "Invert",
                     "groups": "Keyboard + Mouse",
                     "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c9f50d84-e23d-4151-8168-b3101dc80178",
+                    "path": "<Keyboard>/m",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard + Mouse",
+                    "action": "ToggleMap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

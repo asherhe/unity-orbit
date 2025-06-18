@@ -96,9 +96,11 @@ public class SpacecraftNewtonian : MonoBehaviour
     {
         if (momentOfInertia != 0.0)
         {
-            angularMomentum += _accumulatedTorque * Universe.Instance.fixedDeltaTime / momentOfInertia;
+            angularMomentum += _accumulatedTorque * Universe.Instance.fixedDeltaTime;
+            _accumulatedTorque = 0.0;
+
             angle += angularVelocity * Universe.Instance.fixedDeltaTime;
-            angle = angle % (2 * Math.PI);
+            angle = angle % (2.0 * Math.PI);
         }
     }
 }

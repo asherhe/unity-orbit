@@ -47,12 +47,6 @@ namespace Parts
         public DataNode craftConfig;
         */
 
-        public virtual void OnAwake() { }
-        public virtual void OnStart() { }
-        public virtual void OnFixedUpdate() { }
-        public virtual void OnUpdate() { }
-        public virtual void OnLateUpdate() { }
-
         /// <summary>
         /// called when this plugin's data is loaded.
         /// if the plugin is being loaded on part for the first time, this will run AFTER OnAwake().
@@ -64,11 +58,5 @@ namespace Parts
         /// this method is suitable for putting load operations that require loading or long computations
         /// </summary>
         public virtual async Task OnLoadAsync(DataNode config) { await Task.CompletedTask; } // asynchronously do nothing
-
-        private void Awake() { OnAwake(); }
-        private void Start() { OnStart(); }
-        private void FixedUpdate() { OnFixedUpdate(); }
-        private void Update() { OnUpdate(); }
-        private void LateUpdate() { OnLateUpdate(); }
     }
 }

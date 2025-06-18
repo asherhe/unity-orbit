@@ -62,15 +62,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
-                },
-                {
-                    ""name"": ""ToggleMap"",
-                    ""type"": ""Button"",
-                    ""id"": ""ab4f4dfe-9648-4185-ab00-f4e2f2f1bbe3"",
-                    ""expectedControlType"": ""Button"",
-                    ""processors"": """",
-                    ""interactions"": """",
-                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -194,17 +185,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""ThrottleFull"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3de33db1-b964-4fd3-902f-9cadf0038a99"",
-                    ""path"": ""<Keyboard>/m"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""ToggleMap"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -288,6 +268,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ToggleMap"",
+                    ""type"": ""Button"",
+                    ""id"": ""6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -299,6 +288,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": ""Invert"",
                     ""groups"": ""Keyboard + Mouse"",
                     ""action"": ""Zoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c9f50d84-e23d-4151-8168-b3101dc80178"",
+                    ""path"": ""<Keyboard>/m"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard + Mouse"",
+                    ""action"": ""ToggleMap"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -330,7 +330,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Flight_Throttle = m_Flight.FindAction("Throttle", throwIfNotFound: true);
         m_Flight_ThrottleCut = m_Flight.FindAction("ThrottleCut", throwIfNotFound: true);
         m_Flight_ThrottleFull = m_Flight.FindAction("ThrottleFull", throwIfNotFound: true);
-        m_Flight_ToggleMap = m_Flight.FindAction("ToggleMap", throwIfNotFound: true);
         // Warp
         m_Warp = asset.FindActionMap("Warp", throwIfNotFound: true);
         m_Warp_WarpIncrease = m_Warp.FindAction("WarpIncrease", throwIfNotFound: true);
@@ -339,6 +338,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
+        m_Camera_ToggleMap = m_Camera.FindAction("ToggleMap", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -404,7 +404,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_Throttle;
     private readonly InputAction m_Flight_ThrottleCut;
     private readonly InputAction m_Flight_ThrottleFull;
-    private readonly InputAction m_Flight_ToggleMap;
     public struct FlightActions
     {
         private @InputActions m_Wrapper;
@@ -413,7 +412,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         public InputAction @Throttle => m_Wrapper.m_Flight_Throttle;
         public InputAction @ThrottleCut => m_Wrapper.m_Flight_ThrottleCut;
         public InputAction @ThrottleFull => m_Wrapper.m_Flight_ThrottleFull;
-        public InputAction @ToggleMap => m_Wrapper.m_Flight_ToggleMap;
         public InputActionMap Get() { return m_Wrapper.m_Flight; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -435,9 +433,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrottleFull.started += instance.OnThrottleFull;
             @ThrottleFull.performed += instance.OnThrottleFull;
             @ThrottleFull.canceled += instance.OnThrottleFull;
-            @ToggleMap.started += instance.OnToggleMap;
-            @ToggleMap.performed += instance.OnToggleMap;
-            @ToggleMap.canceled += instance.OnToggleMap;
         }
 
         private void UnregisterCallbacks(IFlightActions instance)
@@ -454,9 +449,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrottleFull.started -= instance.OnThrottleFull;
             @ThrottleFull.performed -= instance.OnThrottleFull;
             @ThrottleFull.canceled -= instance.OnThrottleFull;
-            @ToggleMap.started -= instance.OnToggleMap;
-            @ToggleMap.performed -= instance.OnToggleMap;
-            @ToggleMap.canceled -= instance.OnToggleMap;
         }
 
         public void RemoveCallbacks(IFlightActions instance)
@@ -541,11 +533,13 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Camera;
     private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
     private readonly InputAction m_Camera_Zoom;
+    private readonly InputAction m_Camera_ToggleMap;
     public struct CameraActions
     {
         private @InputActions m_Wrapper;
         public CameraActions(@InputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Zoom => m_Wrapper.m_Camera_Zoom;
+        public InputAction @ToggleMap => m_Wrapper.m_Camera_ToggleMap;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -558,6 +552,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Zoom.started += instance.OnZoom;
             @Zoom.performed += instance.OnZoom;
             @Zoom.canceled += instance.OnZoom;
+            @ToggleMap.started += instance.OnToggleMap;
+            @ToggleMap.performed += instance.OnToggleMap;
+            @ToggleMap.canceled += instance.OnToggleMap;
         }
 
         private void UnregisterCallbacks(ICameraActions instance)
@@ -565,6 +562,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Zoom.started -= instance.OnZoom;
             @Zoom.performed -= instance.OnZoom;
             @Zoom.canceled -= instance.OnZoom;
+            @ToggleMap.started -= instance.OnToggleMap;
+            @ToggleMap.performed -= instance.OnToggleMap;
+            @ToggleMap.canceled -= instance.OnToggleMap;
         }
 
         public void RemoveCallbacks(ICameraActions instance)
@@ -597,7 +597,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         void OnThrottle(InputAction.CallbackContext context);
         void OnThrottleCut(InputAction.CallbackContext context);
         void OnThrottleFull(InputAction.CallbackContext context);
-        void OnToggleMap(InputAction.CallbackContext context);
     }
     public interface IWarpActions
     {
@@ -608,5 +607,6 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     public interface ICameraActions
     {
         void OnZoom(InputAction.CallbackContext context);
+        void OnToggleMap(InputAction.CallbackContext context);
     }
 }

@@ -1,0 +1,24 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Parts
+{
+    public class #SCRIPTNAME# : PartPlugin
+    {
+        private Config _config;
+        [Serializable]
+        private class Config
+        {
+            // your config format here
+        }
+
+        public override void OnLoad(DataNode config)
+        {
+            _config = DataNodeSerialization.Deserialize<Config>(config);
+
+            // initialization code using config
+        }
+    }
+}

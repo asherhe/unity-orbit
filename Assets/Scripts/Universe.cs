@@ -43,7 +43,11 @@ public class Universe : SingletonBehaviour<Universe>
         _inputActions.Warp.WarpCancel.performed += WarpCancel;
     }
 
-    private void WarpIncrease(InputAction.CallbackContext context) { if (ActiveCraftController.Instance.craft.Throttle == 0.0) timewarpScale *= 10.0; }
+    // TODO: i dont want to rely on ActiveCraftcontroller, so either we allow timewarp wtih throttle to a certain speed (what i hope we can do),
+    // or we add an interface to restrict timewarp and then use it in ActiveCraftController
+    // however this works fine for now so we'll keep it
+    // honestly i should also separate the time warp controller to a new component while i'm at it
+    private void WarpIncrease(InputAction.CallbackContext context) { if (ActiveCraftController.Instance.control.Throttle == 0.0) timewarpScale *= 10.0; }
     private void WarpDecrease(InputAction.CallbackContext context) { timewarpScale = Math.Max(1.0, timewarpScale * 0.1); }
     private void WarpCancel(InputAction.CallbackContext context) { timewarpScale = 1.0; }
 

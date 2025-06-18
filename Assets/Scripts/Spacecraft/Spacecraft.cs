@@ -33,10 +33,21 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         public List<DataNode> parts;
     }
 
+    /// <summary>
+    /// deals with newtonian physics.
+    /// spacecraft properties like mass, moment of inertia, etc. are found here.
+    /// also deals with torque, forces, etc.
+    /// </summary>
     public SpacecraftNewtonian Newtonian { get; private set; }
-    private Action _massChangeHandler;
 
+    /// <summary>
+    /// list of parts that make up this spacecraft
+    /// </summary>
     public List<Part> parts;
+    /// <summary>
+    /// parent object for all parts
+    /// </summary>
+    private GameObject _partsGameObject;
 
 
     // TODO: remove this once we have celestial body system
@@ -51,34 +62,17 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public Vector2d vel { get; private set; }
     public double altitude { get => pos.magnitude - body.radius; }
 
-
-    private GameObject _partsGameObject;
-
-
-    // spacecraft control
-    // TODO: move this somewhere else
-    private float _throttle = 0.0f;
     /// <summary>
-    /// spacecraft throttle (between 0.0 and 1.0)
+    /// provides events and values that can be used to control this spacecraft.
+    /// exists as another component on this GameObject
+    /// the SpacecraftControl component is not responsible for actuating controls, it only serves to provide an interface to manipulate the spacecraft
     /// </summary>
-    public float Throttle
-    {
-        get => _throttle;
-        set { _throttle = Mathf.Clamp01(value); }
-    }
-    private float _steeringControl = 0.0f;
-    /// <summary>
-    /// input for spacecraft steering (between -1.0 and 1.0), positive is ccw
-    /// </summary>
-    public float SteeringControl
-    {
-        get => _steeringControl;
-        set { _steeringControl = Mathf.Clamp(value, -1.0f, 1.0f); }
-    }
+    public SpacecraftControl Control { get; private set; }
 
     private void Awake()
     {
         Newtonian = gameObject.AddComponent<SpacecraftNewtonian>();
+        Control = gameObject.AddComponent<SpacecraftControl>();
 
         IEnumerator OnLoadCoroutine(DataNode config)
         {
