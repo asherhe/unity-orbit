@@ -7,10 +7,8 @@ using UnityEngine.InputSystem;
 /// <summary>
 /// contains information about the in-game universe
 /// </summary>
-public class Universe : MonoBehaviour
+public class Universe : SingletonBehaviour<Universe>
 {
-    public static Universe Instance { get; private set; }
-
     /// <summary>
     /// universal gravitational constant, in <c>m^3/(kg s^2)</c>
     /// </summary>
@@ -33,11 +31,9 @@ public class Universe : MonoBehaviour
 
     private InputActions _inputActions;
 
-    private void Awake()
+    protected override void Awake()
     {
-        // TODO: i'm not too sure how this will work with scene switching
-        if (Instance == null || Instance == this) Instance = this;
-        else Destroy(this);
+        base.Awake();
 
         _inputActions = new InputActions();
         _inputActions.Warp.Enable();

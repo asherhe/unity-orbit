@@ -210,8 +210,13 @@ public class CelestialBody : MonoBehaviour
 
     private void FixedUpdate()
     {
-        transform.position = -ActiveCraftController.Instance.craft.pos;
         _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(-360.0 * Universe.Instance.fixedDeltaTime / dayLength));
+    }
+
+    private void Update()
+    {
+        // TODO: only works for active body
+        transform.position = -CameraFocus.Instance.FocusPos;
     }
 
     public Trajectory AddTrajectory(IOrbitingObject o)

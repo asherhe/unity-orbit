@@ -71,4 +71,6 @@ public class Vector2d
     public override string ToString() => "(" + x + ", " + y + ")";
     public static implicit operator Vector2(Vector2d v) { return new Vector2((float)v.x, (float)v.y); }
     public static implicit operator Vector3(Vector2d v) { return new Vector3((float)v.x, (float)v.y, 0.0f); }
+    public static explicit operator Vector2d(Vector2 v) { return new Vector2d(v.x, v.y); }
+    public static explicit operator Vector2d(Vector3 v) { return new Vector2d(v.x, v.y); }
 }

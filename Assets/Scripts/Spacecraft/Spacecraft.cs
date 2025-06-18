@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class Spacecraft : MonoBehaviour, IOrbitingObject
@@ -22,12 +23,20 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             public double h, e, omega, M0, t0;
         }
 
+        public RotationInfo rotation;
+        [Serializable]
+        public class RotationInfo
+        {
+            public double angle, momentum;
+        }
+
         public List<DataNode> parts;
     }
 
-    public double _dryMass = 0.0;
-    public double _pluginMass = 0.0;
-    public double mass { get => _dryMass + _pluginMass; }
+    public SpacecraftNewtonian Newtonian { get; private set; }
+
+    public List<Part> parts;
+
 
     // TODO: remove this once we have celestial body system
     [SerializeField]
@@ -38,14 +47,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private Trajectory _trajectory;
 
     public Vector2d pos { get; private set; }
-
     public Vector2d vel { get; private set; }
-
     public double altitude { get => pos.magnitude - body.radius; }
+
+
+    private GameObject _partsGameObject;
+
 
     // spacecraft control
     // TODO: move this somewhere else
-
     private float _throttle = 0.0f;
     /// <summary>
     /// spacecraft throttle (between 0.0 and 1.0)
@@ -55,8 +65,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         get => _throttle;
         set { _throttle = Mathf.Clamp01(value); }
     }
-
-    public float _steeringControl = 0.0f;
+    private float _steeringControl = 0.0f;
     /// <summary>
     /// input for spacecraft steering (between -1.0 and 1.0), positive is ccw
     /// </summary>
@@ -68,19 +77,26 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void Awake()
     {
-        // TODO: placeholder orbit, a 200km circular orbit
-        //orbit = Orbit.MakeCircularOrbit(200.0, _body);
+        Newtonian = gameObject.AddComponent<SpacecraftNewtonian>();
 
-        OnLoad(craftConfig.root);
+        IEnumerator OnLoadCoroutine(DataNode config)
+        {
+            var task = OnLoad(config);
+            yield return new WaitUntil(() => task.IsCompleted);
+        }
+        StartCoroutine(OnLoadCoroutine(craftConfig.root));
 
         pos = orbit.GetPosition(); vel = orbit.GetVelocity();
     }
 
-    public void OnLoad(DataNode config)
+    public async Task OnLoad(DataNode config)
     {
         _config = DataNodeSerialization.Deserialize<Config>(config);
 
         // TODO: initialize fields
+        Newtonian.angle = _config.rotation.angle;
+        Newtonian.angularMomentum = _config.rotation.momentum;
+
         orbit = new Orbit(
             _config.orbit.h,
             _config.orbit.e,
@@ -90,35 +106,77 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _body // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
         );
 
+        // starts asynchronous part loading
+        // we need this because we need to do operations on the part after loading is complete,
+        // so we wrap Part.OnLoadAsync in a function that returns the part itself
+        async Task<Part> LoadPartAsync(Part part, DataNode partConfig)
+        {
+            await part.OnLoadAsync(partConfig);
+            return part;
+        }
+
+        // initialize part gameobjects and begin loading
+        parts = new List<Part>();
+        _partsGameObject = new GameObject("Parts"); _partsGameObject.transform.parent = transform;
+        var tasks = new List<Task<Part>>();
         foreach (var partConfig in _config.parts)
         {
             var partGO = new GameObject(partConfig["name"].Value);
-            partGO.transform.parent = transform;
-            var part = partGO.AddComponent<Parts.Part>();
+            partGO.transform.parent = _partsGameObject.transform;
+            var part = partGO.AddComponent<Part>();
+            parts.Add(part);
             part.craft = this;
 
-            StartCoroutine(LoadPartCoroutine(part, partConfig));
+            tasks.Add(LoadPartAsync(part, partConfig));
         }
+
+        // load parts, calculate COM
+        Newtonian.dryMass = 0.0; Newtonian.dryCOM = Vector2d.zero;
+        Newtonian.pluginMass = 0.0; Newtonian.pluginCOM = Vector2d.zero;
+        while (tasks.Count > 0)
+        {
+            var finished = await Task.WhenAny(tasks);
+            tasks.Remove(finished);
+            var part = finished.Result;
+
+            Newtonian.dryMass += part.mass;
+            Newtonian.dryCOM += Newtonian.dryMass * (Vector2d)part.transform.localPosition;
+            foreach (var plugin in part.plugins)
+            {
+                if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
+                {
+                    var massivePlugin = (MassivePartPlugin)plugin;
+                    Newtonian.pluginMass += massivePlugin.Mass;
+                    massivePlugin.OnMassChanged += massChange =>
+                    {
+                        Newtonian.pluginCOM = Newtonian.pluginMass * Newtonian.pluginCOM + massChange * part.craftPos;
+                        Newtonian.pluginMass += massChange;
+                        Newtonian.pluginCOM /= Newtonian.pluginMass;
+                        RecalcMomentOfInertia();
+                    };
+                }
+            }
+        }
+        Newtonian.dryCOM /= Newtonian.dryMass;
+        Newtonian.pluginCOM /= Newtonian.pluginMass;
+        RecalcMomentOfInertia();
     }
 
-    private IEnumerator LoadPartCoroutine(Parts.Part part, DataNode partConfig)
+    /// <summary>
+    /// recalculate <c>momentOfInertia</c>, automatically called when the craft's mass / center of mass changes
+    /// </summary>
+    public void RecalcMomentOfInertia()
     {
-        var task = part.OnLoadAsync(partConfig);
-        yield return new WaitUntil(() => task.IsCompleted);
-        if (task.IsFaulted) throw task.Exception;
-
-        _dryMass += part.mass;
-        foreach (var plugin in part.plugins)
+        Newtonian.momentOfIntertia = 0.0;
+        var COM = Newtonian.CenterOfMass; // avoid recomputation of center of mass every time cuz it's relatively expensive
+        foreach (var part in parts)
         {
-            if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
-            {
-                var massivePlugin = (MassivePartPlugin)plugin;
-                _pluginMass += massivePlugin.Mass;
-                massivePlugin.OnMassChanged += massChange =>
-                {
-                    _pluginMass += massChange;
-                };
-            }
+            double mass = part.mass;
+            foreach (var plugin in part.plugins)
+                if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
+                    mass += ((MassivePartPlugin)plugin).Mass;
+
+            Newtonian.momentOfIntertia += mass * (part.craftPos - COM).magnitude;
         }
     }
 
@@ -130,21 +188,13 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private void FixedUpdate()
     {
         pos = orbit.GetPosition(); vel = orbit.GetVelocity();
+    }
 
-        if (Universe.Instance.timewarpScale == 1.0)
-        {
-            /*transform.rotation *= Quaternion.Euler(0, 0, (float)(SteeringControl * turnRate * Universe.Instance.fixedDeltaTime));
-            
-            if (Throttle > 0.0)
-            {
-                Vector2d dv = new Vector2d(transform.up.x, transform.up.y) * (Throttle * thrust * Universe.Instance.fixedDeltaTime);
-                orbit.UpdateFromStateVectors(pos, vel + dv, Universe.Instance.UT, body);
-            }*/
-        }
+    private void Update()
+    {
+        transform.position = pos - CameraFocus.Instance.FocusPos;
+        transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
-        if (ActiveCraftController.Instance.craft != this)
-        {
-            transform.position = pos - ActiveCraftController.Instance.craft.pos;
-        }
+        _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
     }
 }

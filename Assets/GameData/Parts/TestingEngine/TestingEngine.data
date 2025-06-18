@@ -3,8 +3,6 @@
 name: Testing Engine
 mass: 1.2 # t
 
-sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
-
 attachmentNodes:
   - name: top
     pos: { x: 0.0, y: 0.75 }
@@ -12,6 +10,8 @@ attachmentNodes:
     pos: { x: 0.0, y: -0.75 }
 
 plugins:
+  SpriteRendererPlugin:
+    sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
   EnginePlugin:
     isp: 316 # s
     thrust: 26.7 # kN

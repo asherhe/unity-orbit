@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceManager : MonoBehaviour
+public class ResourceManager : SingletonBehaviour<ResourceManager>
 {
-    public static ResourceManager Instance { get; private set; }
-
     [SerializeField]
     private DataObject _resourceConfig;
 
@@ -44,10 +42,9 @@ public class ResourceManager : MonoBehaviour
 
     public Dictionary<string, Resource> resources = new Dictionary<string, Resource>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null || Instance == this) Instance = this;
-        else Destroy(this);
+        base.Awake();
 
         _config = DataNodeSerialization.Deserialize<Resource[]>(_resourceConfig.root);
         foreach (var config in _config)

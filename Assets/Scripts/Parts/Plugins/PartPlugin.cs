@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -57,7 +58,12 @@ namespace Parts
         /// if the plugin is being loaded on part for the first time, this will run AFTER OnAwake().
         /// note that it is not guarenteed that this will run before OnStart().
         /// </summary>
-        public virtual void OnLoad(DataNode config) {  }
+        public virtual void OnLoad(DataNode config) { }
+        /// <summary>
+        /// called right after OnLoad() returns and intended for the same purpose, but asynchronous.
+        /// this method is suitable for putting load operations that require loading or long computations
+        /// </summary>
+        public virtual async Task OnLoadAsync(DataNode config) { }
 
         private void Awake() { OnAwake(); }
         private void Start() { OnStart(); }

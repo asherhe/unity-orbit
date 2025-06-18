@@ -38,8 +38,8 @@ namespace Parts
             [Serializable]
             public class PartTransform
             {
-                public Vector2 pos;
-                public float rot;
+                public Vector2d pos;
+                public double rot;
             }
 
             /// <summary>
@@ -91,10 +91,6 @@ namespace Parts
             /// dry mass of this part (without propellant and other mass-adding things, if applicable)
             /// </summary>
             public double mass;
-            /// <summary>
-            /// addressable path to the display sprite for this part
-            /// </summary>
-            public string sprite;
 
             /// <summary>
             /// info about this part's attachment nodes
@@ -104,7 +100,7 @@ namespace Parts
             public class AttachmentNode
             {
                 public string name;
-                public Vector2 pos;
+                public Vector2d pos;
             }
 
             /// <summary>
@@ -113,16 +109,26 @@ namespace Parts
             public DataNode plugins;
         }
 
+        /// <summary>
+        /// spacecraft this part belongs to
+        /// </summary>
         public Spacecraft craft;
 
-        public List<PartPlugin> plugins { get; private set; }
-
-        private SpriteRenderer _spriteRenderer;
+        /// <summary>
+        /// local position in craft space
+        /// </summary>
+        public Vector2d craftPos { get; private set; }
+        /// <summary>
+        /// local rotation in craft space, in degrees
+        /// </summary>
+        public double craftRot { get; private set; }
 
         /// <summary>
         /// dry mass of this part
         /// </summary>
         public double mass { get; private set; }
+
+        public List<PartPlugin> plugins { get; private set; }
 
         private void Awake()
         {
@@ -146,14 +152,8 @@ namespace Parts
             // TODO: set fields as necessary
             mass = _partDefinition.mass * 1000.0; // mt -> kg
 
-            transform.localPosition = _craftPartConfig.transform.pos;
-            transform.localEulerAngles = new Vector3(0, 0, _craftPartConfig.transform.rot);
-
-            Addressables.LoadAssetAsync<Sprite>(_partDefinition.sprite).Completed += sprite =>
-            {
-                _spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
-                _spriteRenderer.sprite = sprite.Result;
-            };
+            transform.localPosition = craftPos = _craftPartConfig.transform.pos;
+            transform.localEulerAngles = new Vector3(0.0f, 0.0f, (float)(craftRot = _craftPartConfig.transform.rot));
 
             // load plugins and set configs
             foreach (var partDefKVP in _partDefinition.plugins.KeyValuePairs)
@@ -179,6 +179,7 @@ namespace Parts
                         pluginConfig[craftKVP.Key] = craftKVP.Value;
 
                 plugin.OnLoad(pluginConfig);
+                plugin.OnLoadAsync(pluginConfig);
             }
         }
     }

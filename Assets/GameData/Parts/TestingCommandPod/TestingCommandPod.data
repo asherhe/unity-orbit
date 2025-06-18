@@ -3,8 +3,6 @@
 name: Testing Command Pod
 mass: 0.8 # t
 
-sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
-
 attachmentNodes:
   - name: top
     pos: { x: 0.0, y: 1.0 }
@@ -12,5 +10,7 @@ attachmentNodes:
     pos: { x: 0.0, y: -1.0 }
 
 plugins:
+  SpriteRendererPlugin:
+    sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
   CommandPlugin: {}
   ReactionWheelPlugin: {}

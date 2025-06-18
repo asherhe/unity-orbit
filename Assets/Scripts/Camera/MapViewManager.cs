@@ -9,11 +9,9 @@ public enum CameraView
     MapView,
 };
 
-public class MapViewManager : MonoBehaviour
+public class MapViewManager : SingletonBehaviour<MapViewManager>
 {
     private InputActions _inputActions;
-
-    public static MapViewManager Instance { get; private set; }
 
     public CameraView activeView { get; private set; } = CameraView.FlightView;
 
@@ -41,10 +39,9 @@ public class MapViewManager : MonoBehaviour
     /// </summary>
     public event Action MapToggled;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null || Instance == this) Instance = this;
-        else Destroy(this);
+        base.Awake();
 
         activeMapCamera = minimapCamera;
 

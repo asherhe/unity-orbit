@@ -498,6 +498,7 @@ GameObject:
   - component: {fileID: 519420030}
   - component: {fileID: 519420034}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -656,6 +657,18 @@ MonoBehaviour:
   mapCullingMask:
     serializedVersion: 2
     m_Bits: 119
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1071ea384820f479690364cc53dcd1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &579806096
 GameObject:
   m_ObjectHideFlags: 0
@@ -1250,7 +1263,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   craftConfig: {fileID: 7962299789135392694, guid: 2d4beb440800e57468dd500b6c11efde, type: 3}
   _dryMass: 0
+  _dryCOM:
+    x: 0
+    y: 0
   _pluginMass: 0
+  _pluginCOM:
+    x: 0
+    y: 0
   _body: {fileID: 760574026}
   _steeringControl: 0
 --- !u!4 &1567317561
