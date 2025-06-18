@@ -179,7 +179,7 @@ namespace Parts
                         pluginConfig[craftKVP.Key] = craftKVP.Value;
 
                 plugin.OnLoad(pluginConfig);
-                plugin.OnLoadAsync(pluginConfig);
+                _ = plugin.OnLoadAsync(pluginConfig); // we discard it instead of just directly calling so we dont get warning CS4014
             }
         }
     }

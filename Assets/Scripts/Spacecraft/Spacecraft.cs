@@ -34,6 +34,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     }
 
     public SpacecraftNewtonian Newtonian { get; private set; }
+    private Action _massChangeHandler;
 
     public List<Part> parts;
 
@@ -131,35 +132,30 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
 
         // load parts, calculate COM
-        Newtonian.dryMass = 0.0; Newtonian.dryCOM = Vector2d.zero;
-        Newtonian.pluginMass = 0.0; Newtonian.pluginCOM = Vector2d.zero;
+        Newtonian.OnMassChanged -= RecalcMomentOfInertia;
+        Newtonian.ZeroMass();
         while (tasks.Count > 0)
         {
             var finished = await Task.WhenAny(tasks);
             tasks.Remove(finished);
             var part = finished.Result;
 
-            Newtonian.dryMass += part.mass;
-            Newtonian.dryCOM += Newtonian.dryMass * (Vector2d)part.transform.localPosition;
+            Newtonian.AddPointMass(part.craftPos, part.mass);
             foreach (var plugin in part.plugins)
             {
                 if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
                 {
                     var massivePlugin = (MassivePartPlugin)plugin;
-                    Newtonian.pluginMass += massivePlugin.Mass;
+                    Newtonian.AddPointMass(part.craftPos, massivePlugin.Mass);
                     massivePlugin.OnMassChanged += massChange =>
                     {
-                        Newtonian.pluginCOM = Newtonian.pluginMass * Newtonian.pluginCOM + massChange * part.craftPos;
-                        Newtonian.pluginMass += massChange;
-                        Newtonian.pluginCOM /= Newtonian.pluginMass;
-                        RecalcMomentOfInertia();
+                        Newtonian.AddPointMass(part.craftPos, massChange);
                     };
                 }
             }
         }
-        Newtonian.dryCOM /= Newtonian.dryMass;
-        Newtonian.pluginCOM /= Newtonian.pluginMass;
         RecalcMomentOfInertia();
+        Newtonian.OnMassChanged += RecalcMomentOfInertia;
     }
 
     /// <summary>
@@ -168,7 +164,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public void RecalcMomentOfInertia()
     {
         Newtonian.momentOfIntertia = 0.0;
-        var COM = Newtonian.CenterOfMass; // avoid recomputation of center of mass every time cuz it's relatively expensive
         foreach (var part in parts)
         {
             double mass = part.mass;
@@ -176,7 +171,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
                 if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
                     mass += ((MassivePartPlugin)plugin).Mass;
 
-            Newtonian.momentOfIntertia += mass * (part.craftPos - COM).magnitude;
+            Newtonian.momentOfIntertia += mass * (part.craftPos - Newtonian.CenterOfMass).magnitude;
         }
     }
 

@@ -12,32 +12,25 @@ public class SpacecraftNewtonian : MonoBehaviour
     /// <summary>
     /// mass of spacecraft IGNORING part plugin masses
     /// </summary>
-    public double dryMass = 0.0;
+    private double _mass = 0.0;
     /// <summary>
     /// center of mass of spacecraft IGNORING part plugin masses
     /// </summary>
-    public Vector2d dryCOM = Vector2d.zero;
-    /// <summary>
-    /// mass of plugins
-    /// </summary>
-    public double pluginMass = 0.0;
-    /// <summary>
-    /// center of mass of plugins
-    /// </summary>
-    public Vector2d pluginCOM = Vector2d.zero;
+    private Vector2d _COM = Vector2d.zero;
 
     /// <summary>
     /// craft wet mass (w. plugin masses)
     /// </summary>
-    public double Mass { get => dryMass + pluginMass; }
+    public double Mass { get => _mass; }
     /// <summary>
     /// craft wet center of mass (w. plugin masses)
     /// 
     /// note that the determination of center of mass assumes that each part is a point mass
     /// located at wherever the specified location of the part is
     /// </summary>
-    public Vector2d CenterOfMass { get => Mass == 0 ? Vector2d.zero : (dryMass * dryCOM + pluginMass * pluginCOM) / Mass; }
+    public Vector2d CenterOfMass { get => _COM; }
 
+    public event Action OnMassChanged;
 
     /// <summary>
     /// angle of the spacecraft's local +x axis counterclockwise from the world +x axis, in radians
@@ -60,9 +53,34 @@ public class SpacecraftNewtonian : MonoBehaviour
     /// </summary>
     public double angularVelocity { get => momentOfIntertia == 0.0 ? 0.0 : angularMomentum / momentOfIntertia; }
 
+    /// <summary>
+    /// reset mass to zero
+    /// </summary>
+    public void ZeroMass()
+    { 
+        _mass = 0.0;
+        _COM = Vector2d.zero;
+        OnMassChanged?.Invoke();
+    }
+
+    /// <summary>
+    /// adds a point mass and updates center of mass, moment of inertia, etc.
+    /// 
+    /// note that SpacecraftNewtonian does not actually keep track of individual point masses,
+    /// but instead updates mass and center of mass as if a point mass was added.
+    /// </summary>
+    /// <param name="craftPos">location of mass in craft space, in meters</param>
+    /// <param name="mass">mass, in kg</param>
+    public void AddPointMass(Vector2d craftPos, double mass)
+    {
+        _COM = _mass * _COM + mass * craftPos;
+        _mass += mass;
+        _COM /= _mass;
+        OnMassChanged?.Invoke();
+    }
+
     private void FixedUpdate()
     {
-        Debug.Log($"theta={angle}; I={momentOfIntertia}; L={angularMomentum}; omega={angularVelocity}");
         angle += angularVelocity * Universe.Instance.fixedDeltaTime;
         angle = angle % (2 * Math.PI);
     }

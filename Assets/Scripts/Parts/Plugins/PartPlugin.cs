@@ -63,7 +63,7 @@ namespace Parts
         /// called right after OnLoad() returns and intended for the same purpose, but asynchronous.
         /// this method is suitable for putting load operations that require loading or long computations
         /// </summary>
-        public virtual async Task OnLoadAsync(DataNode config) { }
+        public virtual async Task OnLoadAsync(DataNode config) { await Task.CompletedTask; } // asynchronously do nothing
 
         private void Awake() { OnAwake(); }
         private void Start() { OnStart(); }
