@@ -163,7 +163,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     public void RecalcMomentOfInertia()
     {
-        Newtonian.momentOfIntertia = 0.0;
+        Newtonian.momentOfInertia = 0.0;
         foreach (var part in parts)
         {
             double mass = part.mass;
@@ -171,7 +171,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
                 if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
                     mass += ((MassivePartPlugin)plugin).Mass;
 
-            Newtonian.momentOfIntertia += mass * (part.craftPos - Newtonian.CenterOfMass).magnitude;
+            Newtonian.momentOfInertia += mass * (part.craftPos - Newtonian.CenterOfMass).magnitude;
         }
     }
 

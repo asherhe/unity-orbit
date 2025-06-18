@@ -43,7 +43,7 @@ public class SpacecraftNewtonian : MonoBehaviour
     /// located at wherever the specified location of the part is. this frankly does not work well
     /// when a heavy part is close to the center of mass (or if the craft is just one part), so TODO
     /// </summary>
-    public double momentOfIntertia;
+    public double momentOfInertia;
     /// <summary>
     /// angular momentum of this craft's rotation around its center of mass, in kg m^2 s^-1
     /// </summary>
@@ -51,13 +51,18 @@ public class SpacecraftNewtonian : MonoBehaviour
     /// <summary>
     /// angular velocity of thsi craft's rotation around its COM, in rad/s
     /// </summary>
-    public double angularVelocity { get => momentOfIntertia == 0.0 ? 0.0 : angularMomentum / momentOfIntertia; }
+    public double angularVelocity { get => momentOfInertia == 0.0 ? 0.0 : angularMomentum / momentOfInertia; }
+
+    /// <summary>
+    /// torque accumulated during this physics frame, will be applied to angular momentum during the next FixedUpdate()
+    /// </summary>
+    private double _accumulatedTorque = 0.0;
 
     /// <summary>
     /// reset mass to zero
     /// </summary>
     public void ZeroMass()
-    { 
+    {
         _mass = 0.0;
         _COM = Vector2d.zero;
         OnMassChanged?.Invoke();
@@ -79,9 +84,21 @@ public class SpacecraftNewtonian : MonoBehaviour
         OnMassChanged?.Invoke();
     }
 
+    /// <summary>
+    /// apply torque, changes the 
+    /// </summary>
+    public void ApplyTorque(double torque)
+    {
+        _accumulatedTorque += torque;
+    }
+
     private void FixedUpdate()
     {
-        angle += angularVelocity * Universe.Instance.fixedDeltaTime;
-        angle = angle % (2 * Math.PI);
+        if (momentOfInertia != 0.0)
+        {
+            angularMomentum += _accumulatedTorque * Universe.Instance.fixedDeltaTime / momentOfInertia;
+            angle += angularVelocity * Universe.Instance.fixedDeltaTime;
+            angle = angle % (2 * Math.PI);
+        }
     }
 }
