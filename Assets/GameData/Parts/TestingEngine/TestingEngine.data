@@ -42,15 +42,16 @@ plugins:
         # gradient for particle color over its lifetime
         color:
           colorKeys:
-            0.00: "#6991FF"
-            0.24: "#945FFF"
-            0.61: "#A06698"
-            1.00: "#FF492D"
+            0.00: "#FFFBBC"
+            0.37: "#FFBE5F"
+            0.66: "#A64D46"
+            0.87: "#677A8F"
           alphaKeys:
             0.00: 0.00
             0.10: 1.00
-            0.76: 1.00
+            0.81: 1.00
             1.00: 0.00
+
         size:
           0.00: 0.00
           0.02: 0.35
