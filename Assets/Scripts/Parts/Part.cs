@@ -155,6 +155,8 @@ namespace Parts
             transform.localPosition = craftPos = _craftPartConfig.transform.pos;
             transform.localEulerAngles = new Vector3(0.0f, 0.0f, (float)(craftRot = _craftPartConfig.transform.rot));
 
+            var pluginTasks = new List<Task>();
+
             // load plugins and set configs
             foreach (var partDefKVP in _partDefinition.plugins.KeyValuePairs)
             {
@@ -179,8 +181,10 @@ namespace Parts
                         pluginConfig[craftKVP.Key] = craftKVP.Value;
 
                 plugin.OnLoad(pluginConfig);
-                _ = plugin.OnLoadAsync(pluginConfig); // we discard it instead of just directly calling so we dont get warning CS4014
+                pluginTasks.Add(plugin.OnLoadAsync(pluginConfig));
             }
+
+            await Task.WhenAll(pluginTasks);
         }
     }
 

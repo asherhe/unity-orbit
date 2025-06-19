@@ -391,6 +391,12 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
         if (type == typeof(Vector2)) return ParseVector<Vector2>(2, v => new Vector2(v[0], v[1]));
         if (type == typeof(Vector3)) return ParseVector<Vector3>(3, v => new Vector3(v[0], v[1], v[2]));
         if (type == typeof(Vector4)) return ParseVector<Vector4>(4, v => new Vector4(v[0], v[1], v[2], v[3]));
+        if (type == typeof(Color)) { 
+            Color c;
+            if (!ColorUtility.TryParseHtmlString(Value, out c))
+                throw new FormatException($"Scalar node {Value} could not be converted to Color");
+            return c;
+        }
 
         throw new InvalidCastException($"Conversion of scalar node to {type} is not supported.");
     }

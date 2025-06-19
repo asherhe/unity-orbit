@@ -9,6 +9,8 @@ using UnityEngine;
 [RequireComponent(typeof(Spacecraft))]
 public class SpacecraftNewtonian : MonoBehaviour
 {
+    public Spacecraft craft { get; private set; }
+
     /// <summary>
     /// mass of spacecraft IGNORING part plugin masses
     /// </summary>
@@ -57,6 +59,10 @@ public class SpacecraftNewtonian : MonoBehaviour
     /// torque accumulated during this physics frame, will be applied to angular momentum during the next FixedUpdate()
     /// </summary>
     private double _accumulatedTorque = 0.0;
+    /// <summary>
+    /// force accumulated during this physics frame, will be applied to angular momentum during the next FixedUpdate()
+    /// </summary>
+    private Vector2d _accumulatedForce = Vector2d.zero;
 
     /// <summary>
     /// reset mass to zero
@@ -85,11 +91,25 @@ public class SpacecraftNewtonian : MonoBehaviour
     }
 
     /// <summary>
-    /// apply torque, changes the 
+    /// applies a torque to this craft, which will be actuated in the next FixedUpdate
     /// </summary>
     public void ApplyTorque(double torque)
     {
         _accumulatedTorque += torque;
+    }
+
+    /// <summary>
+    /// applies a force to this craft, which will be actuated in the next FixedUpdate
+    /// </summary>
+    public void ApplyForce(Vector2d force, Vector2d craftPos)
+    {
+        _accumulatedForce += force;
+        _accumulatedTorque += Vector2d.Cross(craftPos - CenterOfMass, force);
+    }
+
+    private void Awake()
+    {
+        craft = GetComponent<Spacecraft>();
     }
 
     private void FixedUpdate()
@@ -101,6 +121,17 @@ public class SpacecraftNewtonian : MonoBehaviour
 
             angle += angularVelocity * Universe.Instance.fixedDeltaTime;
             angle = angle % (2.0 * Math.PI);
+        }
+
+        if (Mass != 0.0 && _accumulatedForce != Vector2d.zero)
+        {
+            // craft -> body space
+            _accumulatedForce = _accumulatedForce.Rotate(angle);
+            craft.orbit.UpdateFromStateVectors(
+                craft.Pos,
+                craft.Vel + Universe.Instance.fixedDeltaTime * _accumulatedForce / Mass
+            );
+            _accumulatedForce = Vector2d.zero;
         }
     }
 }

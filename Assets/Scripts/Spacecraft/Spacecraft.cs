@@ -58,9 +58,9 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public Orbit orbit { get; set; }
     private Trajectory _trajectory;
 
-    public Vector2d pos { get; private set; }
-    public Vector2d vel { get; private set; }
-    public double altitude { get => pos.magnitude - body.radius; }
+    public Vector2d Pos { get => orbit.GetPosition(); }
+    public Vector2d Vel { get => orbit.GetVelocity(); }
+    public double altitude { get => Pos.magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.
@@ -78,10 +78,9 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         {
             var task = OnLoad(config);
             yield return new WaitUntil(() => task.IsCompleted);
+            if (task.IsFaulted) throw task.Exception;
         }
         StartCoroutine(OnLoadCoroutine(craftConfig.root));
-
-        pos = orbit.GetPosition(); vel = orbit.GetVelocity();
     }
 
     public async Task OnLoad(DataNode config)
@@ -174,14 +173,9 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _trajectory = body.AddTrajectory(this);
     }
 
-    private void FixedUpdate()
-    {
-        pos = orbit.GetPosition(); vel = orbit.GetVelocity();
-    }
-
     private void Update()
     {
-        transform.position = pos - CameraFocus.Instance.FocusPos;
+        transform.position = Pos - CameraFocus.Instance.FocusPos;
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;

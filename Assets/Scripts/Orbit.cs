@@ -65,12 +65,6 @@ public class Orbit
 
     /* orbit constructors */
 
-    // TODO: im not sure what the default behaviour should be
-    public Orbit()
-    {
-
-    }
-
     /// <summary>
     /// construct an orbit from orbital elements
     /// </summary>
@@ -159,6 +153,10 @@ public class Orbit
                 M0 = e * Math.Sinh(E) - E;
             }
         }
+    }
+    public void UpdateFromStateVectors(Vector2d pos, Vector2d vel)
+    {
+        UpdateFromStateVectors(pos, vel, Universe.Instance.UT, body);
     }
 
     /* get orbit info */

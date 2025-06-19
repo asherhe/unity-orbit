@@ -24,6 +24,11 @@ public class Vector2d
 
     /* operations on vectors */
 
+    public static bool operator ==(Vector2d v, Vector2d w) => v.x == w.x && v.y == w.y;
+    public static bool operator !=(Vector2d v, Vector2d w) => !(v==w);
+    public override bool Equals(object obj) => Equals(obj as Vector2d);
+    public override int GetHashCode() => HashCode.Combine(x, y);
+
     public static Vector2d operator +(Vector2d v, Vector2d w) => new Vector2d(v.x + w.x, v.y + w.y);
     public static Vector2d operator -(Vector2d v, Vector2d w) => new Vector2d(v.x - w.x, v.y - w.y);
     public static Vector2d operator -(Vector2d v) => new Vector2d(-v.x, -v.y);

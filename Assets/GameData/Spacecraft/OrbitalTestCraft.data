@@ -11,8 +11,8 @@ orbit:
   t0: 0
 
 rotation:
-  angle: 0.7 # rad
-  momentum: -2000 # kg m^2 s^-1
+  angle: 2.7 # rad
+  momentum: -1000 # kg m^2 s^-1
 
 parts:
   - type: TestingCommandPod

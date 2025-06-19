@@ -1262,16 +1262,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   craftConfig: {fileID: 7962299789135392694, guid: 2d4beb440800e57468dd500b6c11efde, type: 3}
-  _dryMass: 0
-  _dryCOM:
-    x: 0
-    y: 0
-  _pluginMass: 0
-  _pluginCOM:
-    x: 0
-    y: 0
+  parts: []
   _body: {fileID: 760574026}
-  _steeringControl: 0
 --- !u!4 &1567317561
 Transform:
   m_ObjectHideFlags: 0
@@ -1300,7 +1292,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4979875a4950a5a42ba28c67f1e9b8b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  throttleRate: 0.3
+  throttlingRate: 0.5
 --- !u!1 &1666144700
 GameObject:
   m_ObjectHideFlags: 0

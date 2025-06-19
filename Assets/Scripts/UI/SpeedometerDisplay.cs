@@ -16,7 +16,7 @@ public class SpeedometerDisplay : MonoBehaviour
 
     private void Update()
     {
-        double speed = ActiveCraftController.Instance.craft.vel.magnitude;
+        double speed = ActiveCraftController.Instance.craft.Vel.magnitude;
         _text.text = String.Format("{0:F1}<sprite name=\"mps\">", speed);
     }
 }

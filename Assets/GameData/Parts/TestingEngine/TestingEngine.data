@@ -14,4 +14,46 @@ plugins:
     sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
   EnginePlugin:
     isp: 316 # s
-    thrust: 26.7 # kN
+    #thrust: 26.7 # kN
+    thrust: 1000 # ridiculously large so we can see things happen
+    propellantRatio:
+      NTO: 1.5
+      Hydrazine: 1.0
+
+    plume:
+      nozzlePos: { x: 0.0, y: -0.75 }
+      nozzleSize: 1.0
+      spreadAngle: 0.0
+
+      # below are particle settings
+
+      # how long each particle lasts for, in seconds
+      lifetime: [0.2, 0.3]
+      # emission rate of plume particles, in particles/s
+      rate: [300, 500]
+      # particle properties on start
+      start:
+        # particle size, m
+        size: [0.1, 0.4]
+        # particle speed, m/s
+        speed: [20.0, 30.0]
+      # properties over time
+      life:
+        # gradient for particle color over its lifetime
+        color:
+          colorKeys:
+            0.00: "#6991FF"
+            0.24: "#945FFF"
+            0.61: "#A06698"
+            1.00: "#FF492D"
+          alphaKeys:
+            0.00: 0.00
+            0.10: 1.00
+            0.76: 1.00
+            1.00: 0.00
+        size:
+          0.00: 0.00
+          0.02: 0.35
+          0.33: 0.96
+          0.76: 0.66
+          1.00: 0.00

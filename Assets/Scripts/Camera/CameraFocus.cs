@@ -9,5 +9,5 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
     /// <summary>
     /// location of camera focus, in the active celestial body space
     /// </summary>
-    public Vector2d FocusPos { get => ActiveCraftController.Instance.craft.pos; }
+    public Vector2d FocusPos { get => ActiveCraftController.Instance.craft.Pos; }
 }
