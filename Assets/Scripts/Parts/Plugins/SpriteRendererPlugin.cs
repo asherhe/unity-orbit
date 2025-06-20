@@ -23,7 +23,7 @@ namespace Parts
 
         public override async Task OnLoadAsync(DataNode config)
         {
-            _config = DataNodeSerialization.Deserialize<Config>(config);
+            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             _spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
             var sprite = Addressables.LoadAssetAsync<Sprite>(_config.sprite);

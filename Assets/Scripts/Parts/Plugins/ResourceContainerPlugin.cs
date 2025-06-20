@@ -16,7 +16,7 @@ namespace Parts
 
         public override void OnLoad(DataNode config)
         {
-            _config = DataNodeSerialization.Deserialize<Config>(config);
+            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             double mass = 0.0;
             foreach (var kvp in _config.amount)

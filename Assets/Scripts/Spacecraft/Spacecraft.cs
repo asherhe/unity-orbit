@@ -85,7 +85,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public async Task OnLoad(DataNode config)
     {
-        _config = DataNodeSerialization.Deserialize<Config>(config);
+        _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
         // TODO: initialize fields
         Newtonian.angle = _config.rotation.angle;

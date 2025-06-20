@@ -142,12 +142,12 @@ namespace Parts
         /// </summary>
         public async Task OnLoadAsync(DataNode config)
         {
-            _craftPartConfig = DataNodeSerialization.Deserialize<CraftConfig>(config);
+            _craftPartConfig = Serialization.DataNodeSerialization.Deserialize<CraftConfig>(config);
 
             var defHandle = Addressables.LoadAssetAsync<DataObject>($"Assets/GameData/Parts/{_craftPartConfig.type}/{_craftPartConfig.type}.data");
             await defHandle.Task;
 
-            _partDefinition = DataNodeSerialization.Deserialize<PartDefinition>(defHandle.Result.root);
+            _partDefinition = Serialization.DataNodeSerialization.Deserialize<PartDefinition>(defHandle.Result.root);
 
             // TODO: set fields as necessary
             mass = _partDefinition.mass * 1000.0; // mt -> kg

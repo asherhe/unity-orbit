@@ -26,7 +26,7 @@ public class CelestialBody : MonoBehaviour
         public string surfaceMaterial; // addressable
 
         // orbital info, optional for the sun
-        [OptionalValueField]
+        [Serialization.OptionalValueField]
         public OrbitInfo orbit;
         [Serializable]
         public class OrbitInfo
@@ -40,7 +40,7 @@ public class CelestialBody : MonoBehaviour
         }
 
         // atmosphere info
-        [OptionalValueField]
+        [Serialization.OptionalValueField]
         public AtmInfo atmosphere;
         [Serializable]
         public class AtmInfo
@@ -117,7 +117,7 @@ public class CelestialBody : MonoBehaviour
     private void Awake()
     {
         /* read from config */
-        _config = DataNodeSerialization.Deserialize<CelestialBodyConfig>(configData.root);
+        _config = Serialization.DataNodeSerialization.Deserialize<CelestialBodyConfig>(configData.root);
         radius = _config.radius * 1000.0;
         GM = _config.surfaceG * radius * radius;
         mass = GM / Universe.Instance.G;

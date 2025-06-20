@@ -29,6 +29,6 @@ atmosphere:
 
   # atmospheric rendering - scattering
   material: Assets/GameData/CelestialBodies/Atmosphere.mat
-  rayleighScattering: 5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5
-  mieScattering: 7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6
+  rayleighScattering: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
+  mieScattering: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
   miePhaseG: 0.6

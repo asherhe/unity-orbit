@@ -106,7 +106,7 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
     /// checks to see if this node is of a required type and throws an error if it isn't
     /// </summary>
     /// <exception cref="InvalidOperationException">thrown if this node's type does not match <c>type</c></exception>
-    private void AssertNodeType(DataNodeType type)
+    public void AssertNodeType(DataNodeType type)
     {
         if (Type != type)
             throw new InvalidOperationException($"This operation is only valid for {type} DataNodes.");
@@ -387,52 +387,7 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
             }
         }
 
-        if (type == typeof(Vector2d)) return ParseVector2d();
-        if (type == typeof(Vector2)) return ParseVector<Vector2>(2, v => new Vector2(v[0], v[1]));
-        if (type == typeof(Vector3)) return ParseVector<Vector3>(3, v => new Vector3(v[0], v[1], v[2]));
-        if (type == typeof(Vector4)) return ParseVector<Vector4>(4, v => new Vector4(v[0], v[1], v[2], v[3]));
-        if (type == typeof(Color)) { 
-            Color c;
-            if (!ColorUtility.TryParseHtmlString(Value, out c))
-                throw new FormatException($"Scalar node {Value} could not be converted to Color");
-            return c;
-        }
-
         throw new InvalidCastException($"Conversion of scalar node to {type} is not supported.");
-    }
-
-    private Vector2d ParseVector2d()
-    {
-        var components = Value.Split(new char[] { ' ', ',' }, System.StringSplitOptions.RemoveEmptyEntries);
-        if (components.Length != 2)
-            throw new FormatException($"Expected exactly 2 components in scalar '{Value}', found {components.Length}.");
-
-        try
-        {
-            return new Vector2d(
-                double.Parse(components[0]),
-                double.Parse(components[1])
-            );
-        }
-        catch (FormatException e)
-        {
-            throw new FormatException($"At least one component of '{Value}' could not be parsed as a double.", e);
-        }
-    }
-
-    private T ParseVector<T>(int numComponents, Func<float[], T> constructor)
-    {
-        var components = Value.Split(new char[] { ' ', ',' }, System.StringSplitOptions.RemoveEmptyEntries);
-        if (components.Length != numComponents)
-            throw new FormatException($"Expected exactly {numComponents} components in scalar '{Value}', found {components.Length}.");
-
-        var vals = new float[numComponents];
-        for (int i = 0; i < numComponents; i++)
-        {
-            if (!float.TryParse(components[i], out vals[i]))
-                throw new FormatException($"Could not parse component {i} in '{Value}' as a float.");
-        }
-        return constructor(vals);
     }
 
     public override string ToString()

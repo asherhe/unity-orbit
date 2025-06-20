@@ -46,7 +46,7 @@ public class ResourceManager : SingletonBehaviour<ResourceManager>
     {
         base.Awake();
 
-        _config = DataNodeSerialization.Deserialize<Resource[]>(_resourceConfig.root);
+        _config = Serialization.DataNodeSerialization.Deserialize<Resource[]>(_resourceConfig.root);
         foreach (var config in _config)
             resources[config.type] = config;
     }

@@ -70,14 +70,18 @@ namespace Parts
         /// </summary>
         private double _thrust;
         /// <summary>
+        /// direction for engine thrust in craft space, which is the local up vector of this part
+        /// </summary>
+        private Vector2d _thrustDir;
+        /// <summary>
         /// relative ratio of propellants used in the engine.
         /// scaled so that the total propellant mass matches the expected propellant consumption from the engine.
         /// </summary>
         private Dictionary<string, double> _propRatio;
         /// <summary>
-        /// direction for engine thrust in craft space
+        /// total mass of propellant if _propRatio is consumed literally
         /// </summary>
-        private Vector2d _thrustDir;
+        private double _propRatioMass;
 
         private void Awake()
         {
@@ -89,63 +93,16 @@ namespace Parts
 
         public override void OnLoad(DataNode config)
         {
-            var deserializer = new DataNodeDeserializer();
-            deserializer.AddDeserializer(
-                typeof(ParticleSystem.MinMaxCurve),
-                node => new ParticleSystem.MinMaxCurve(node[0].As<float>(), node[1].As<float>())
-            );
-            deserializer.AddDeserializer(
-                typeof(AnimationCurve),
-                node =>
-                {
-                    var curve = new AnimationCurve();
-                    foreach (var kvp in node.KeyValuePairs)
-                    {
-                        float time, value = kvp.Value.As<float>();
-                        if (!float.TryParse(kvp.Key, out time))
-                            throw new FormatException($"Could not parse AnimationCurve time {kvp.Value} as a float.");
-                        curve.AddKey(time, value);
-                    }
-                    return curve;
-                }
-            );
-            deserializer.AddDeserializer(
-                typeof(Gradient),
-                node =>
-                {
-                    var colorNodes = node["colorKeys"];
-                    var colorKeys = new GradientColorKey[colorNodes.Count];
-                    var i = 0;
-                    foreach (var kvp in colorNodes.KeyValuePairs)
-                    {
-                        if (!float.TryParse(kvp.Key, out colorKeys[i].time))
-                            throw new FormatException($"Could not parse AnimationCurve time {kvp.Value} as a float.");
-                        colorKeys[i].color = kvp.Value.As<Color>();
-                        i++;
-                    }
-
-                    var alphaNodes = node["alphaKeys"];
-                    var alphaKeys = new GradientAlphaKey[alphaNodes.Count];
-                    i = 0;
-                    foreach (var kvp in alphaNodes.KeyValuePairs)
-                    {
-                        if (!float.TryParse(kvp.Key, out alphaKeys[i].time))
-                            throw new FormatException($"Could not parse AnimationCurve time {kvp.Value} as a float.");
-                        alphaKeys[i].alpha = kvp.Value.As<float>();
-                        i++;
-                    }
-
-                    var gradient = new Gradient();
-                    gradient.SetKeys(colorKeys, alphaKeys);
-                    return gradient;
-                }
-            );
-            _config = deserializer.Deserialize<Config>(config);
+            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             _isp = _config.isp;
             _thrust = _config.thrust * 1000.0; // kN -> N
-            _propRatio = new Dictionary<string, double>(_config.propellantRatio);
             _thrustDir = Vector2d.up.Rotate(part.craftRot * 180.0 / Math.PI);
+
+            _propRatio = new Dictionary<string, double>(_config.propellantRatio);
+            _propRatioMass = 0.0;
+            foreach (var kvp in _propRatio)
+                _propRatioMass += kvp.Value * ResourceManager.Instance.resources[kvp.Key].density;
 
             _particleGameObject.transform.localPosition = _config.plume.nozzlePos;
             _particleGameObject.transform.localRotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
@@ -190,6 +147,7 @@ namespace Parts
                 craft.Newtonian.ApplyForce(thrust * _thrustDir, part.craftPos);
 
                 var propFlow = thrust / (_isp * 9.8); // mass of propellant flow into engine
+                var propFactor = propFlow / _propRatioMass; // multiplier for propellant count to drain
             }
         }
 

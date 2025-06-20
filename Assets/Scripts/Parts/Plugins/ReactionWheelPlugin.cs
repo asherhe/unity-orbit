@@ -21,7 +21,7 @@ namespace Parts
 
         public override void OnLoad(DataNode config)
         {
-            _config = DataNodeSerialization.Deserialize<Config>(config);
+            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             _torque = _config.torque * 1000.0;
         }
