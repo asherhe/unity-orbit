@@ -355,7 +355,6 @@ namespace Parts
         /// </summary>
         public void OnCraftPartsLoaded()
         {
-            Debug.Log($"OnCraftPartsLoaded {id} - {_craftPartConfig.attachments.Length}");
             for (int i = 0; i < attachments.Length; i++)
             {
                 attachments[i] = new();
@@ -363,7 +362,6 @@ namespace Parts
                 attachments[i].node = _craftPartConfig.attachments[i].node;
                 attachments[i].atchPart = craft.GetPartByID(_craftPartConfig.attachments[i].atchPart);
                 attachments[i].atchNode = _craftPartConfig.attachments[i].atchNode;
-                Debug.Log(attachments[i].atchPart.id);
             }
         }
     }

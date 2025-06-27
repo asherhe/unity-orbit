@@ -60,6 +60,7 @@ namespace Parts
 
         private GameObject _particleGameObject;
         private ParticleSystem _particleSystem;
+        private ParticleSystem.EmissionModule _psEmission;
 
         /// <summary>
         /// specific impulse, in seconds
@@ -83,16 +84,18 @@ namespace Parts
         /// </summary>
         private double _propRatioMass;
 
-        private void Awake()
+        protected override void OnAwake()
         {
             _particleGameObject = new GameObject("Engine Plume");
             _particleGameObject.transform.parent = transform;
             _particleSystem = _particleGameObject.AddComponent<ParticleSystem>();
-            var emission = _particleSystem.emission; emission.enabled = false;
+            _psEmission = _particleSystem.emission; _psEmission.enabled = false;
         }
 
         public override void OnLoad(DataNode config)
         {
+            base.OnLoad(config);
+
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             _isp = _config.isp;
@@ -114,8 +117,8 @@ namespace Parts
             main.startSize = _config.plume.start.size;
             main.startRotationZ = new ParticleSystem.MinMaxCurve(0.0f, 2.0f * Mathf.PI);
 
-            var emission = _particleSystem.emission;
-            emission.rateOverTime = _config.plume.rate;
+            _psEmission.enabled = IsEnabled;
+            _psEmission.rateOverTime = 0;
 
             var shape = _particleSystem.shape;
             shape.enabled = true;
@@ -139,7 +142,7 @@ namespace Parts
             renderer.material = plumeMat.Result;
         }
 
-        private void FixedUpdate()
+        protected override void OnFixedUpdate()
         {
             if (craft.Control.Throttle > 0.0)
             {
@@ -165,25 +168,32 @@ namespace Parts
 
                     // apply thrust
                     craft.Newtonian.ApplyForce(thrust * _thrustDir, part.craftPos);
+                } else
+                {
+                    // shut down engine
+                    IsEnabled = false;
                 }
             }
         }
 
-        private void Update()
+        protected override void OnUpdate()
         {
-            var emission = _particleSystem.emission;
             if (craft.Control.Throttle > 0.0)
             {
-                emission.enabled = true;
-                emission.rateOverTime = new ParticleSystem.MinMaxCurve(
+                _psEmission.rateOverTime = new ParticleSystem.MinMaxCurve(
                     craft.Control.Throttle * _config.plume.rate.constantMin,
                     craft.Control.Throttle * _config.plume.rate.constantMax
                 );
             }
-            else
-            {
-                emission.enabled = false;
-            }
+        }
+
+        protected override void OnPluginEnable()
+        {
+            _psEmission.enabled = true;
+        }
+        protected override void OnPluginDisable()
+        {
+            _psEmission.enabled = false;
         }
     }
 }

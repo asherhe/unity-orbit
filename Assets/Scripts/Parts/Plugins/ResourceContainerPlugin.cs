@@ -52,6 +52,8 @@ namespace Parts
 
         public override void OnLoad(DataNode config)
         {
+            base.OnLoad(config);
+
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             double mass = 0.0;

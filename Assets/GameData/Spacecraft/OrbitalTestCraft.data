@@ -29,6 +29,14 @@ parts:
         atchPart: TestingTank_2 # attached part
         atchNode: top # attachment node of attached part
 
+    plugins:
+      SpriteRendererPlugin:
+        enabled: true
+      CommandPlugin:
+        enabled: true
+      ReactionWheelPlugin:
+        enabled: true
+
   - type: TestingTank
     id: TestingTank_2
     name: Testing Tank
@@ -48,7 +56,10 @@ parts:
         atchNode: top
 
     plugins:
+      SpriteRendererPlugin:
+        enabled: true
       ResourceContainerPlugin:
+        enabled: true
         amount:
           NTO: 3600
           Hydrazine: 2400
@@ -69,3 +80,9 @@ parts:
         node: top
         atchPart: TestingTank_2
         atchNode: bottom
+
+    plugins:
+      SpriteRendererPlugin:
+        enabled: true
+      EnginePlugin:
+        enabled: true

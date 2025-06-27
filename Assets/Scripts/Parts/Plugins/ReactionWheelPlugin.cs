@@ -21,12 +21,13 @@ namespace Parts
 
         public override void OnLoad(DataNode config)
         {
-            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
+            base.OnLoad(config);
 
+            _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
             _torque = _config.torque * 1000.0;
         }
 
-        private void FixedUpdate()
+        protected override void OnFixedUpdate()
         {
             if (craft.Control.SteeringControl == 0) return;
             var torque = _torque * craft.Control.SteeringControl;
