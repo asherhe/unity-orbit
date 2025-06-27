@@ -50,4 +50,8 @@ public class ResourceManager : SingletonBehaviour<ResourceManager>
         foreach (var config in _config)
             resources[config.type] = config;
     }
+
+    public static string GetName(string type) => Instance.resources[type].name;
+    public static double GetDensity(string type) => Instance.resources[type].density;
+    public static FlowMode GetFlow(string type) => Instance.resources[type].flow;
 }

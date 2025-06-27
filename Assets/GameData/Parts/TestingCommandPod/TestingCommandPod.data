@@ -2,6 +2,7 @@
 
 name: Testing Command Pod
 mass: 0.8 # t
+crossfeed: true
 
 attachmentNodes:
   - name: top

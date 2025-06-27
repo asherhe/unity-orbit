@@ -2,6 +2,7 @@
 
 name: Testing Tank
 mass: 0.6 # t
+crossfeed: true
 
 attachmentNodes:
   - name: top

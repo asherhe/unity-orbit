@@ -2,6 +2,7 @@
 
 name: Testing Engine
 mass: 1.2 # t
+crossfeed: true
 
 attachmentNodes:
   - name: top

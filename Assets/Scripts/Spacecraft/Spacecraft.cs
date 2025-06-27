@@ -69,6 +69,17 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     public SpacecraftControl Control { get; private set; }
 
+    /// <summary>
+    /// find the part on this craft that has the given id
+    /// </summary>
+    /// <returns>the part, if it exists on this craft. otherwise, null</returns>
+    public Part GetPartByID(string id)
+    {
+        int i = parts.FindIndex(p => p.id == id);
+        if (i == -1) return null;
+        return parts[i];
+    }
+
     private void Awake()
     {
         Newtonian = gameObject.AddComponent<SpacecraftNewtonian>();
@@ -149,6 +160,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
         RecalcMomentOfInertia();
         Newtonian.OnMassChanged += RecalcMomentOfInertia;
+
+        foreach (var part in parts) part.OnCraftPartsLoaded();
     }
 
     /// <summary>

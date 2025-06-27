@@ -102,7 +102,7 @@ namespace Parts
             _propRatio = new Dictionary<string, double>(_config.propellantRatio);
             _propRatioMass = 0.0;
             foreach (var kvp in _propRatio)
-                _propRatioMass += kvp.Value * ResourceManager.Instance.resources[kvp.Key].density;
+                _propRatioMass += kvp.Value * ResourceManager.GetDensity(kvp.Key);
 
             _particleGameObject.transform.localPosition = _config.plume.nozzlePos;
             _particleGameObject.transform.localRotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
@@ -144,10 +144,28 @@ namespace Parts
             if (craft.Control.Throttle > 0.0)
             {
                 var thrust = _thrust * craft.Control.Throttle;
-                craft.Newtonian.ApplyForce(thrust * _thrustDir, part.craftPos);
+                var propFlow = Universe.Instance.fixedDeltaTime * thrust / (_isp * 9.8); // mass of propellant flow into engine
+                var propCoeff = propFlow / _propRatioMass; // kg per propellant ratio mass
 
-                var propFlow = thrust / (_isp * 9.8); // mass of propellant flow into engine
-                var propFactor = propFlow / _propRatioMass; // multiplier for propellant count to drain
+                // scale thrust by how much propellant we are actually able to pump
+                var propFactor = 1.0; // fraction of the expected propellant we are actually able to drain
+                foreach (var kvp in _propRatio)
+                {
+                    var available = part.GetResourceAvailable(kvp.Key) * ResourceManager.GetDensity(kvp.Key);
+                    var required = propCoeff * kvp.Value;
+                    propFactor = Math.Min(available / required, propFactor);
+                }
+                thrust *= propFactor; propCoeff *= propFactor;
+
+                if (propFactor > 0.0)
+                {
+                    // drain propellant
+                    foreach (var kvp in _propRatio)
+                        part.DrainResource(kvp.Key, propCoeff * kvp.Value / ResourceManager.GetDensity(kvp.Key));
+
+                    // apply thrust
+                    craft.Newtonian.ApplyForce(thrust * _thrustDir, part.craftPos);
+                }
             }
         }
 
