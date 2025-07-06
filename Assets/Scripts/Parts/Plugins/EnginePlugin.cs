@@ -178,7 +178,8 @@ namespace Parts
 
         protected override void OnUpdate()
         {
-            if (craft.Control.Throttle > 0.0)
+            _psEmission.enabled = craft.Control.Throttle > 0.0;
+            if (_psEmission.enabled)
             {
                 _psEmission.rateOverTime = new ParticleSystem.MinMaxCurve(
                     craft.Control.Throttle * _config.plume.rate.constantMin,

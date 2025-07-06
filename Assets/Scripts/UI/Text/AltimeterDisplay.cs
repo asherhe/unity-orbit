@@ -2,19 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
-[RequireComponent(typeof(TMP_Text))]
-public class AltimeterDisplay : MonoBehaviour
+public class AltimeterDisplay : TextDisplay
 {
-    private TMP_Text _text;
-
-    private void Awake()
-    {
-        _text = GetComponent<TMP_Text>();
-    }
-
-    private void Update()
+    protected override string GetText()
     {
         double altitude = ActiveCraftController.Instance.craft.altitude;
         double log10 = Math.Log10(altitude);
@@ -34,6 +25,6 @@ public class AltimeterDisplay : MonoBehaviour
             altitude /= 1e3;
             unit = "km";
         }
-        _text.text = String.Format("{0:F0}{1}", altitude, unit);
+        return String.Format("{0:F0}{1}", altitude, unit);
     }
 }

@@ -344,10 +344,6 @@ public class DataNode : IEnumerable<DataNode>, ISerializationCallbackReceiver
     ///       as the underlying value of the enum. otherwise, it will be directly parsed as an enum
     ///     </description>
     ///   </item>
-    ///   <item>
-    ///     <term>vector types</term>
-    ///     <description>double-precision <c>Vector2d</c> as well as unity's standard single-precision vectors</description>
-    ///   </item>
     /// </list>
     /// </summary>
     /// <exception cref="InvalidCastException">thrown if the conversion to type <c>T</c> is not supported</exception>

@@ -1,0 +1,13 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class SpeedometerDisplay : TextDisplay
+{
+    protected override string GetText()
+    {
+        double speed = ActiveCraftController.Instance.craft.Vel.magnitude;
+        return String.Format("{0:F1}<sprite name=\"mps\">", speed);
+    }
+}
