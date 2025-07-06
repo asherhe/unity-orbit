@@ -25,6 +25,6 @@ public class AltimeterDisplay : TextDisplay
             altitude /= 1e3;
             unit = "km";
         }
-        return String.Format("{0:F0}{1}", altitude, unit);
+        return String.Format("ALT:{0:F0}{1}", altitude, unit);
     }
 }

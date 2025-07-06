@@ -271,7 +271,7 @@ namespace Parts
                 double groupAmt = 0.0, groupMaxAmt = 0.0;
                 foreach (var container in priorityGroup)
                 {
-                    var res = container.resources[type];
+                    var res = container.GetResource(type);
                     groupAmt += res.amount;
                     groupMaxAmt += res.maxAmount;
                 }

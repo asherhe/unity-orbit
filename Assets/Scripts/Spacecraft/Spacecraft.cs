@@ -70,6 +70,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public SpacecraftControl Control { get; private set; }
 
     /// <summary>
+    /// invoked when craft is fully loaded
+    /// </summary>
+    public event Action OnLoaded;
+    /// <summary>
+    /// invoked when the amount of resource someewhere in the craft changes
+    /// </summary>
+    public event Action<ResourceContainerPlugin, string, double> OnResourceChanged;
+
+    /// <summary>
     /// find the part on this craft that has the given id
     /// </summary>
     /// <returns>the part, if it exists on this craft. otherwise, null</returns>
@@ -135,7 +144,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             tasks.Add(LoadPartAsync(part, partConfig));
         }
 
-        // load parts, calculate COM
+        // load parts, do operations on them as they load
         Newtonian.OnMassChanged -= RecalcMomentOfInertia;
         Newtonian.ZeroMass();
         while (tasks.Count > 0)
@@ -147,6 +156,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             Newtonian.AddPointMass(part.craftPos, part.mass);
             foreach (var plugin in part.plugins)
             {
+                // update craft mass from plugin mass
                 if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
                 {
                     var massivePlugin = (MassivePartPlugin)plugin;
@@ -156,12 +166,21 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
                         Newtonian.AddPointMass(part.craftPos, massChange);
                     };
                 }
+
+                // forward resource change events
+                if (typeof(ResourceContainerPlugin).IsAssignableFrom(plugin.GetType()))
+                {
+                    var resourcePlugin = ((ResourceContainerPlugin)plugin);
+                    resourcePlugin.OnResourceChanged += (type, diff) => OnResourceChanged?.Invoke(resourcePlugin, type, diff);
+                }
             }
         }
         RecalcMomentOfInertia();
         Newtonian.OnMassChanged += RecalcMomentOfInertia;
 
         foreach (var part in parts) part.OnCraftPartsLoaded();
+
+        OnLoaded?.Invoke();
     }
 
     /// <summary>

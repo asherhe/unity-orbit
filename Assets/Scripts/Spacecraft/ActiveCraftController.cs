@@ -30,6 +30,8 @@ public class ActiveCraftController : MonoBehaviour
         if (Instance == null || Instance == this) Instance = this;
         else Destroy(this);
 
+        craft = GetComponent<Spacecraft>();
+
         _inputActions = new InputActions();
         _inputActions.Flight.Enable();
 
@@ -39,8 +41,7 @@ public class ActiveCraftController : MonoBehaviour
 
     private void Start()
     {
-        // these components are added in Spacecraft.Awake(), so we run them here
-        craft = GetComponent<Spacecraft>();
+        // added in Spacecraft.Awake(), so we get it in Start() and not Awake()
         control = GetComponent<SpacecraftControl>();
     }
 

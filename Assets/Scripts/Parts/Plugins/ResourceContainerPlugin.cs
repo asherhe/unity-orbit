@@ -29,12 +29,34 @@ namespace Parts
             /// resource containers with a higher priority on a certain resource will be drained faster than 
             /// </summary>
             public int priority = 0;
-        }
-        public Dictionary<string, Resource> resources = new();
 
+            public Resource() { }
+            public Resource(Resource other)
+            {
+                type = other.type;
+                amount = other.amount;
+                maxAmount = other.maxAmount;
+                priority = other.priority;
+            }
+        }
+        private Dictionary<string, Resource> resources = new();
+
+        public IEnumerable<string> ResourceTypes { get => resources.Keys; }
+        public IEnumerable<Resource> Resources { get => resources.Values; }
+
+        /// <summary>
+        /// get a COPY of the Resource object corresponding to a resource type
+        /// </summary>
+        public Resource GetResource(string type) => new(resources[type]);
         public double GetAmount(string type) => resources[type].amount;
         public double GetMaxAmount(string type) => resources[type].maxAmount;
         public int GetPriority(string type) => resources[type].priority;
+
+        /// <summary>
+        /// invoked when the amount of resource in this container changes.
+        /// string argument is the resource type, and double argument is the change in the resource
+        /// </summary>
+        public event Action<string, double> OnResourceChanged;
 
         /// <summary>
         /// drain some resource from this tank
@@ -48,6 +70,8 @@ namespace Parts
             res.amount -= amt;
 
             Mass -= amt * ResourceManager.GetDensity(type);
+
+            OnResourceChanged?.Invoke(type, -amt);
         }
 
         public override void OnLoad(DataNode config)
