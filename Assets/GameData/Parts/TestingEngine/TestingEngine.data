@@ -14,8 +14,9 @@ plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
   EnginePlugin:
-    isp: 316 # s
+    #isp: 316 # s
     #thrust: 26.7 # kN
+    isp: 10000 # near infinite fuel for testing
     thrust: 1000 # ridiculously large so we can see things happen
     propellantRatio:
       NTO: 1.5
