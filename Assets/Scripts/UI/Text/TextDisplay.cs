@@ -27,4 +27,26 @@ public class TextDisplay : MonoBehaviour
     {
         return "display string";
     }
+
+    public static string AddMetricPrefix(double x)
+    {
+        double log10 = Math.Log10(x);
+        String prefix = "";
+        if (log10 >= 9.0)
+        {
+            x /= 1e9;
+            prefix = "G";
+        }
+        else if (log10 >= 6.0)
+        {
+            x /= 1e6;
+            prefix = "M";
+        }
+        else if (log10 >= 3.0)
+        {
+            x /= 1e3;
+            prefix = "k";
+        }
+        return String.Format("{0:F2}{1}", x, prefix);
+    }
 }

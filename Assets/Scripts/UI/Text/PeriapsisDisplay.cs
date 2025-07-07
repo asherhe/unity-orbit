@@ -1,0 +1,14 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PeriapsisDisplay : TextDisplay
+{
+    protected override string GetText()
+    {
+        var craft = ActiveCraftController.Instance.craft;
+        double periapsis = craft.orbit.Periapsis - craft.body.radius;
+        return $"Pe:{AddMetricPrefix(periapsis)}m";
+    }
+}

@@ -55,7 +55,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public Vector2d Pos { get => orbit.GetPosition(); }
     public Vector2d Vel { get => orbit.GetVelocity(); }
-    public double altitude { get => Pos.magnitude - body.radius; }
+    public double Altitude { get => Pos.magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.

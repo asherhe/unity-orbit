@@ -25,7 +25,7 @@ public class Orbit
     /// the sign of the angular momentum obeys the right hand rule (positive is a clockwise orbit).
     /// (units <c>m^2 / s</c>)
     /// </remarks>
-    public double h;
+    public double h { get; private set; }
 
     /// <summary>
     /// eccentricity
@@ -36,7 +36,7 @@ public class Orbit
     /// a parabolic orbit has eccentricity of 1
     /// a hyperbolic orbit has eccentricity above 1
     /// </remarks>
-    public double e;
+    public double e { get; private set; }
 
     /// <summary>
     /// longitude of periapsis
@@ -46,12 +46,12 @@ public class Orbit
     /// to be more specific, it describes the angle between the +x axis to the periapsis of the orbit
     /// (angle is expressed in radians)
     /// </remarks>
-    public double omega;
+    public double omega { get; private set; }
 
     /// <summary>
     /// mean anomaly at epoch
     /// </summary>
-    public double M0;
+    public double M0 { get; private set; }
 
     /// <summary>
     /// epoch time
@@ -60,7 +60,7 @@ public class Orbit
     /// in Universal Time.
     /// (units seconds)
     /// </remarks>
-    public double t0;
+    public double t0 { get; private set; }
 
 
     /* orbit constructors */
@@ -82,6 +82,8 @@ public class Orbit
         this.omega = omega;
         this.M0 = M0;
         this.t0 = t0;
+
+        PostUpdate();
     }
 
     /// <summary>
@@ -94,23 +96,6 @@ public class Orbit
     public Orbit(Vector2d pos, Vector2d vel, double t, CelestialBody body)
     {
         UpdateFromStateVectors(pos, vel, t, body);
-    }
-
-    /// <summary>
-    /// makes a clockwise circular orbit around a given body. 
-    /// </summary>
-    /// <param name="rad">altitude of the circular orbit, in km</param>
-    /// <param name="body">celestial body this orbit should go around</param>
-    /// <returns>a new circular orbit, with the location of the orbit being at the top of the +y direction at the current UT</returns>
-    public static Orbit MakeCircularOrbit(double rad, CelestialBody body)
-    {
-        rad = rad * 1000.0 + body.radius;
-        return new Orbit(
-            -Math.Sqrt(rad * body.GM),
-            0.0, 0.0,
-            1.5 * Math.PI, Universe.Instance.UT,
-            body
-        );
     }
 
 
@@ -153,10 +138,30 @@ public class Orbit
                 M0 = e * Math.Sinh(E) - E;
             }
         }
+
+        PostUpdate();
     }
     public void UpdateFromStateVectors(Vector2d pos, Vector2d vel)
     {
         UpdateFromStateVectors(pos, vel, Universe.Instance.UT, body);
+    }
+
+    /// <summary>
+    /// calculations to run after this orbit's parameters have changed
+    /// </summary>
+    private void PostUpdate()
+    {
+        CheckSOI();
+    }
+
+    /* sphere of influence */
+
+    /// <summary>
+    /// calculate the time and 
+    /// </summary>
+    private void CheckSOI()
+    {
+
     }
 
     /* get orbit info */
@@ -165,6 +170,9 @@ public class Orbit
     /// the semimajor axis (in meters) of the orbit
     /// </summary>
     public double SemimajorAxis { get => h * h / (body.GM * (1 - e * e)); }
+
+    public double Periapsis { get => SemimajorAxis * (1 - e * e) / (1 + e); }
+    public double Apoapsis { get => SemimajorAxis * (1 - e * e) / (1 - e); }
 
     /// <summary>
     /// get mean anomaly at a given time

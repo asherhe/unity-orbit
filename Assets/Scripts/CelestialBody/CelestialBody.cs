@@ -77,7 +77,14 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// orbit of this body
     /// </summary>
     public Orbit orbit { get; private set; }
+    /// <summary>
+    /// celestial body that this body is a satellite of
+    /// </summary>
     public CelestialBody parent { get => orbit.body; }
+    /// <summary>
+    /// radius of this celestial body's SOI
+    /// </summary>
+    public double soiRadius { get; private set; }
 
     /// <summary>
     /// mass of the celestial body, in kg
@@ -131,8 +138,9 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         if (_config.orbit != null)
         {
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
+            var a = _config.orbit.semimajorAxis * 1000.0;
             orbit = new Orbit(
-                -Math.Sqrt(_config.orbit.semimajorAxis * 1000.0 * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
+                -Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
                 _config.orbit.eccentricity,
                 _config.orbit.longitudePeriapsis * Math.PI / 180.0,
                 _config.orbit.epochMeanAnom * Math.PI / 180.0,
@@ -140,6 +148,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 parent
             );
             parent.AddTrajectory(this);
+            soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))
