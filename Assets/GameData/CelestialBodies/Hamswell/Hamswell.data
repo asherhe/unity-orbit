@@ -1,31 +1,31 @@
-# Earth.data
+# Hamswell.data
 
-name: Earth
+name: Hamswell
 
 # planetary info
-radius: 6371.0 # km
-surfaceG: 9.81 # m/s^2
-dayLength: 1.0 # julian days
+radius: 3000.0 # km
+surfaceGravity: 9.8 # m/s^2
+dayLength: 24.0 # hours
 
-surfaceMaterial: Assets/GameData/CelestialBodies/Earth/Surface.mat
+surfaceMaterial: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
   parent: Sun
-  semimajorAxis: 1.496e8 # km
-  eccentricity: 0.017
-  longitudePeriapsis: 73 # deg
-  epochMeanAnom: -34 # deg
-  epochTime: 0 # s
+  semimajorAxis: 9.2e7 # km
+  eccentricity: 0.015
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
+  epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere
 atmosphere:
   # height to which we simulate atmospheric effects
-  height: 100.0 # km
+  height: 80.0 # km
 
   # pressure characteristics
   seaLevelPressure: 1.0 # atm
-  scaleHeight: 8.5 # km
+  scaleHeight: 5.0 # km
 
   # atmospheric rendering - scattering
   material: Assets/GameData/CelestialBodies/Atmosphere.mat

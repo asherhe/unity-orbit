@@ -336,5 +336,5 @@ public class Orbit
 /// </summary>
 public interface IOrbitingObject
 {
-    public Orbit orbit { get; set; }
+    public Orbit orbit { get; }
 }

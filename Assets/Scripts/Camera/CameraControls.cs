@@ -1,9 +1,10 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraControls : MonoBehaviour
+public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
 {
     private InputActions _inputActions;
 
@@ -11,7 +12,7 @@ public class CameraControls : MonoBehaviour
     public Dictionary<CameraView, Vector2> zoomBounds = new Dictionary<CameraView, Vector2>()
     {
         { CameraView.FlightView, new Vector2(0.1f, 100f) },
-        { CameraView.MapView, new Vector2(1e5f, 1e10f) },
+        { CameraView.MapView, new Vector2(1e5f, 1e12f) },
     };
     public Dictionary<CameraView, float> zoomLevels = new Dictionary<CameraView, float>()
     {
@@ -59,5 +60,56 @@ public class CameraControls : MonoBehaviour
                 Camera.main.DOOrthoSize(zoomLevel, 0.2f).SetEase(Ease.OutCubic);
             }
         }
+    }
+
+    [Serializable]
+    private class ViewZoomBound
+    {
+        public CameraView view;
+        public float min, max;
+    }
+    [SerializeField]
+    private ViewZoomBound[] _zoomBounds;
+    [Serializable]
+    private class ViewZoomLevel
+    {
+        public CameraView view;
+        public float zoomLevel;
+    }
+    [SerializeField]
+    private ViewZoomLevel []_zoomLevels;
+    public void OnBeforeSerialize()
+    {
+        int i;
+        
+        _zoomBounds = new ViewZoomBound[zoomBounds.Count];
+        i = 0;
+        foreach (var kvp in zoomBounds)
+        {
+            _zoomBounds[i] = new ViewZoomBound();
+            _zoomBounds[i].view = kvp.Key;
+            _zoomBounds[i].min = kvp.Value.x;
+            _zoomBounds[i].max = kvp.Value.y;
+            i++;
+        }
+
+        _zoomLevels = new ViewZoomLevel[zoomLevels.Count];
+        i = 0;
+        foreach(var kvp in zoomLevels)
+        {
+            _zoomLevels[i] = new ViewZoomLevel();
+            _zoomLevels[i].view = kvp.Key;
+            _zoomLevels[i].zoomLevel = kvp.Value;
+            i++;
+        }
+    }
+    public void OnAfterDeserialize()
+    {
+        zoomBounds.Clear();
+        foreach (var bound in _zoomBounds)
+            zoomBounds.Add(bound.view, new Vector2(bound.min, bound.max));
+        zoomLevels.Clear();
+        foreach (var level in _zoomLevels)
+            zoomLevels.Add(level.view, level.zoomLevel);
     }
 }

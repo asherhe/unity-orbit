@@ -5,10 +5,8 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-public class CelestialBody : MonoBehaviour
+public class CelestialBody : MonoBehaviour, IOrbitingObject
 {
-    public DataObject configData;
-
     private CelestialBodyConfig _config;
     [Serializable]
     private class CelestialBodyConfig
@@ -18,7 +16,7 @@ public class CelestialBody : MonoBehaviour
         // radius of sea level, ignores terrain
         public double radius; // km
         // gravitational acceleration at sea level
-        public double surfaceG; // m/s^2
+        public double surfaceGravity; // m/s^2
         // celestial body's rotational period
         public double dayLength; // julian days
 
@@ -71,20 +69,28 @@ public class CelestialBody : MonoBehaviour
     private GameObject _trajectoriesObject;
 
     /// <summary>
+    /// name of this celestial body, used for display and referencing
+    /// </summary>
+    public string bodyName { get; private set; }
+
+    /// <summary>
+    /// orbit of this body
+    /// </summary>
+    public Orbit orbit { get; private set; }
+    public CelestialBody parent { get => orbit.body; }
+
+    /// <summary>
     /// mass of the celestial body, in kg
     /// </summary>
     public double mass { get; private set; }
-
     /// <summary>
     /// standard gravitational parameter of the celestial body, in <c>m^3 / s^2</c>
     /// </summary>
     public double GM { get; private set; }
-
     /// <summary>
     /// radius of this celestial body, in m
     /// </summary>
     public double radius { get; private set; }
-
     /// <summary>
     /// length of a day, in seconds
     /// </summary>
@@ -94,17 +100,14 @@ public class CelestialBody : MonoBehaviour
     /// whether this celestial body has an atmosphere
     /// </summary>
     public bool hasAtmosphere { get; private set; }
-
     /// <summary>
     /// height of atmosphere (m)
     /// </summary>
     public double atmHeight { get; private set; }
-
     /// <summary>
     /// pressure at sea level (atm)
     /// </summary>
     public double atmSeaLevelPressure { get; private set; }
-
     /// <summary>
     /// scale height of atmosphere (m)
     /// </summary>
@@ -114,14 +117,30 @@ public class CelestialBody : MonoBehaviour
     public Material surfaceMaterial { get; private set; }
     public Material atmMaterial { get; private set; }
 
-    private void Awake()
+    public void LoadConfig(DataNode config)
     {
         /* read from config */
-        _config = Serialization.DataNodeSerialization.Deserialize<CelestialBodyConfig>(configData.root);
+        _config = Serialization.DataNodeSerialization.Deserialize<CelestialBodyConfig>(config);
+        bodyName = _config.name;
+
         radius = _config.radius * 1000.0;
-        GM = _config.surfaceG * radius * radius;
+        GM = _config.surfaceGravity * radius * radius;
         mass = GM / Universe.Instance.G;
-        dayLength = _config.dayLength * 86400.0;
+        dayLength = _config.dayLength * 3600.0;
+
+        if (_config.orbit != null)
+        {
+            var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
+            orbit = new Orbit(
+                -Math.Sqrt(_config.orbit.semimajorAxis * 1000.0 * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
+                _config.orbit.eccentricity,
+                _config.orbit.longitudePeriapsis * Math.PI / 180.0,
+                _config.orbit.epochMeanAnom * Math.PI / 180.0,
+                _config.orbit.epochTime,
+                parent
+            );
+            parent.AddTrajectory(this);
+        }
 
         if ((hasAtmosphere = _config.atmosphere != null))
         {
@@ -215,8 +234,8 @@ public class CelestialBody : MonoBehaviour
 
     private void Update()
     {
-        // TODO: only works for active body
-        transform.position = -CameraFocus.Instance.FocusPos;
+        // TODO: only works for active body and its direct satellites
+        transform.position = CameraFocus.Instance.GetRelativePosition(this);
     }
 
     public Trajectory AddTrajectory(IOrbitingObject o)
@@ -238,5 +257,10 @@ public class CelestialBody : MonoBehaviour
         trajectory.o = o;
 
         return trajectory;
+    }
+
+    public override string ToString()
+    {
+        return bodyName;
     }
 }

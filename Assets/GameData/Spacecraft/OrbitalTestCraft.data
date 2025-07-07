@@ -3,9 +3,9 @@
 name: Orbital Test Craft
 
 orbit:
-  parent: Earth
-  h: -5.41481780796713e10
-  e: 01.1
+  parent: Hamswell
+  h: -1.73e10
+  e: 0.08
   omega: 1
   M0: 0
   t0: 0

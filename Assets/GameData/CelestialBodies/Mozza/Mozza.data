@@ -1,0 +1,22 @@
+# Mozza.data
+
+name: Mozza
+
+# planetary info
+radius: 800.0 # km
+surfaceGravity: 2.5 # m/s^2
+dayLength: 24.0 # hours
+
+surfaceMaterial: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Hamswell
+  semimajorAxis: 1.88e5 # km
+  eccentricity: 0.062
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
+  epochTime: 0.0 # s
+
+# atmospheric data, set to false if no atmosphere
+atmosphere: false

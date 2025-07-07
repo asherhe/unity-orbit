@@ -503,7 +503,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ==RESOURCES==
+  m_text: ===RESOURCES==
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -733,7 +733,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e7cf33cbdd5d5d4ea5217c87c559c93, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  zoomSpeed: 0.15
+  zoomSpeed: 0.1
+  _zoomBounds:
+  - view: 0
+    min: 0.1
+    max: 100
+  - view: 1
+    min: 100000
+    max: 1e+12
+  _zoomLevels:
+  - view: 0
+    zoomLevel: 10
+  - view: 1
+    zoomLevel: 5000000
 --- !u!114 &519420034
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,51 +1015,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _resourceConfig: {fileID: 7962299789135392694, guid: 8646503c7b5f9e14192b2651d43a0ef6, type: 3}
---- !u!1 &760574025
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 760574027}
-  - component: {fileID: 760574026}
-  m_Layer: 0
-  m_Name: Earth
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &760574026
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760574025}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd5f1cbd5bb15384db724bfee4b41561, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  configData: {fileID: 7962299789135392694, guid: 90ad60ab92da8ee4f904178bd28a59cd, type: 3}
---- !u!4 &760574027
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 760574025}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 10}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1567317559
 GameObject:
   m_ObjectHideFlags: 0
@@ -1080,7 +1047,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   craftConfig: {fileID: 7962299789135392694, guid: 2d4beb440800e57468dd500b6c11efde, type: 3}
   parts: []
-  _body: {fileID: 760574026}
 --- !u!4 &1567317561
 Transform:
   m_ObjectHideFlags: 0
@@ -1519,6 +1485,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1976858573
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1976858575}
+  - component: {fileID: 1976858574}
+  m_Layer: 0
+  m_Name: Celestial Bodies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1976858574
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1976858573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fa481203a9664342abb3278562db663, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _celestialBodyConfigs:
+  - {fileID: 7962299789135392694, guid: 41f820d51d38b8c4d903a67d1e1dc92a, type: 3}
+  - {fileID: 7962299789135392694, guid: 90ad60ab92da8ee4f904178bd28a59cd, type: 3}
+  - {fileID: 7962299789135392694, guid: bafb656d586e25e4d98a8c755669e340, type: 3}
+--- !u!4 &1976858575
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1976858573}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2076906666
 GameObject:
   m_ObjectHideFlags: 0
@@ -1675,7 +1689,7 @@ SceneRoots:
   - {fileID: 86041700}
   - {fileID: 74904188}
   - {fileID: 619394802}
+  - {fileID: 1976858575}
   - {fileID: 1567317561}
-  - {fileID: 760574027}
   - {fileID: 579806100}
   - {fileID: 1967837826}

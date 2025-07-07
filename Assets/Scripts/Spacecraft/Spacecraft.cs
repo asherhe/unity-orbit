@@ -49,13 +49,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     private GameObject _partsGameObject;
 
-
-    // TODO: remove this once we have celestial body system
-    [SerializeField]
-    private CelestialBody _body;
-
     public CelestialBody body { get => orbit.body; }
-    public Orbit orbit { get; set; }
+    public Orbit orbit { get; private set; }
     private Trajectory _trajectory;
 
     public Vector2d Pos { get => orbit.GetPosition(); }
@@ -111,13 +106,14 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         Newtonian.angle = _config.rotation.angle;
         Newtonian.angularMomentum = _config.rotation.momentum;
 
+        var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
         orbit = new Orbit(
             _config.orbit.h,
             _config.orbit.e,
             _config.orbit.omega,
             _config.orbit.M0,
             _config.orbit.t0,
-            _body // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
+            parent // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
         );
 
         // starts asynchronous part loading
@@ -207,9 +203,14 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void Update()
     {
-        transform.position = Pos - CameraFocus.Instance.FocusPos;
+        transform.position = CameraFocus.Instance.GetRelativePosition(this);
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
+    }
+
+    public override string ToString()
+    {
+        return $"[Spacecraft {_config.name}]";
     }
 }
