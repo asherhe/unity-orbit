@@ -62,6 +62,7 @@ public class Orbit
     /// </remarks>
     public double t0 { get; private set; }
 
+    public event Action OnOrbitChanged;
 
     /* orbit constructors */
 
@@ -152,6 +153,8 @@ public class Orbit
     private void PostUpdate()
     {
         CheckSOI();
+
+        OnOrbitChanged?.Invoke();
     }
 
     /* sphere of influence */
@@ -161,7 +164,7 @@ public class Orbit
     /// </summary>
     private void CheckSOI()
     {
-
+        // TODO
     }
 
     /* get orbit info */

@@ -121,7 +121,13 @@ public class Trajectory : MonoBehaviour
         meshRenderer.material = (Material)AssetDatabase.LoadAssetAtPath("Assets/Materials/Trajectory.mat", typeof(Material));
     }
 
-    private void Update()
+    private void Start()
+    {
+        o.orbit.OnOrbitChanged += GenerateTrajectory;
+        GenerateTrajectory();
+    }
+
+    private void GenerateTrajectory()
     {
         Vector2d pos = o.orbit.GetPosition();
         const int trajectorySubdivs = 400;
