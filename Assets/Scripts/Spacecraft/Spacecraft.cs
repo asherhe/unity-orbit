@@ -43,14 +43,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// <summary>
     /// list of parts that make up this spacecraft
     /// </summary>
+    [HideInInspector]
     public List<Part> parts;
     /// <summary>
     /// parent object for all parts
     /// </summary>
     private GameObject _partsGameObject;
 
-    public CelestialBody body { get => orbit.body; }
     public Orbit orbit { get; private set; }
+    public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
 
     public Vector2d Pos { get => orbit.GetPosition(); }
@@ -115,6 +116,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
         );
+        _trajectory = body.AddTrajectory(this);
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -194,11 +196,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
             Newtonian.momentOfInertia += mass * (part.craftPos - Newtonian.CenterOfMass).magnitude;
         }
-    }
-
-    private void Start()
-    {
-        _trajectory = body.AddTrajectory(this);
     }
 
     private void Update()

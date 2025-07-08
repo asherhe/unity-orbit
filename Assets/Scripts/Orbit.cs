@@ -11,8 +11,7 @@ public class Orbit
     /// <summary>
     /// the celestial body this orbit goes around
     /// </summary>
-    public CelestialBody body;
-
+    public CelestialBody body { get; private set; }
 
     /* orbital elements */
     /* these guys are used to uniquely identify a given orbit */
@@ -62,6 +61,9 @@ public class Orbit
     /// </remarks>
     public double t0 { get; private set; }
 
+    /// <summary>
+    /// invoked when any of the orbital parameters are modified
+    /// </summary>
     public event Action OnOrbitChanged;
 
     /* orbit constructors */
@@ -128,16 +130,10 @@ public class Orbit
             pos.y /= Math.Sqrt(Math.Abs(1 - e * e));
             if (h < 0.0) pos.y = -pos.y;
 
-            if (e < 1.0)
-            {
-                double E = Math.Atan2(pos.y, pos.x);
-                M0 = E - e * Math.Sin(E);
-            }
-            else
-            {
-                double E = -Math.Atanh(pos.y / pos.x);
-                M0 = e * Math.Sinh(E) - E;
-            }
+            double E;
+            if (e < 1.0) E = Math.Atan2(pos.y, pos.x);
+            else E = -Math.Atanh(pos.y / pos.x);
+            M0 = CalcKepler(E);
         }
 
         PostUpdate();
@@ -152,6 +148,11 @@ public class Orbit
     /// </summary>
     private void PostUpdate()
     {
+        a = h * h / (body.GM * (1 - e * e));
+        periapsis = a * (1 - e * e) / (1 + e);
+        apoapsis = a * (1 - e * e) / (1 - e);
+        meanMotion = Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
+
         CheckSOI();
 
         OnOrbitChanged?.Invoke();
@@ -160,11 +161,89 @@ public class Orbit
     /* sphere of influence */
 
     /// <summary>
-    /// calculate the time and 
+    /// a time, a position, and a velocity.
+    /// </summary>
+    public class StateVector
+    {
+        public double time;
+        public Vector2d pos, vel;
+        public StateVector(double time, Vector2d pos, Vector2d vel)
+        {
+            this.time = time;
+            this.pos = pos;
+            this.vel = vel;
+        }
+    }
+
+    /// <summary>
+    /// state vectors when this orbit enters the SOI of its parent body
+    /// </summary>
+    public StateVector soiCapture;
+    /// <summary>
+    /// state vectors when this orbit leaves the SOI of its parent body
+    /// </summary>
+    public StateVector soiEscape;
+
+    /// <summary>
+    /// calculate the state vectors (time, position, velocity) of this orbit at the moments when this orbit enters or leaves the SOI.
     /// </summary>
     private void CheckSOI()
     {
-        // TODO
+        soiCapture = null; soiEscape = null;
+
+        // check if body HAS an SOI first
+        if (body.orbit == null) return;
+
+        if (e == 1.0) return; // TODO: this is for non-parabolic orbits only
+
+        // calculate eccentric anomaly at SOI radius (plus or minus)
+        var E = (a - body.soiRadius) / (a * e);
+        if (e < 1.0) E = Math.Acos(E);
+        else E = Math.Acosh(E);
+        // no SOI intersection
+        if (E == Double.NaN) return;
+
+        // the two intersection points with the SOI - one with positive (p) and one with negative (n) eccentric anomaly
+        // the next order of business is to determine the time they intersect
+        double Mp, Mn;
+        Vector2d Pp, Pn, Vp, Vn;
+        // these can probably be more optimized since a lot of calculations are repeated, but i'll deal with it later
+        Mp = CalcKepler(E);
+        Mn = CalcKepler(-E);
+        Pp = GetPositionFromEccentricAnomaly(E);
+        Pn = GetPositionFromEccentricAnomaly(-E);
+        Vp = GetVelocityFromEccentricAnomaly(E);
+        Vn = GetVelocityFromEccentricAnomaly(-E);
+
+        // change Mp and Mn to be on the same orbital period as the current mean anomaly
+        // not for hyperbolic orbits tho because those guys don't do periodic orbits
+        if (e < 1.0)
+        {
+            var M = GetMeanAnomaly(Universe.Instance.UT);
+            // whichever periapsis we are closest to
+            var Mperi = 2 * Math.PI * Math.Round(M / (2 * Math.PI));
+            Mp += Mperi; Mn += Mperi;
+        }
+
+        // calculate time to SOI
+        double tp, tn;
+        tp = t0 + (Mp - M0) / meanMotion;
+        tn = t0 + (Mn - M0) / meanMotion;
+
+        // assign SOI state vectors, ensure chronological order
+        StateVector statep, staten;
+        statep = new(tp, Pp, Vp);
+        staten = new(tn, Pn, Vn);
+        if (tp > tn)
+        {
+            soiCapture = staten;
+            soiEscape = statep;
+        }
+        else
+        {
+            soiCapture = statep;
+            soiEscape = staten;
+        }
     }
 
     /* get orbit info */
@@ -172,15 +251,20 @@ public class Orbit
     /// <summary>
     /// the semimajor axis (in meters) of the orbit
     /// </summary>
-    public double SemimajorAxis { get => h * h / (body.GM * (1 - e * e)); }
+    public double a { get; private set; }
 
-    public double Periapsis { get => SemimajorAxis * (1 - e * e) / (1 + e); }
-    public double Apoapsis { get => SemimajorAxis * (1 - e * e) / (1 - e); }
+    public double periapsis { get; private set; }
+    public double apoapsis { get; private set; }
+
+    /// <summary>
+    /// mean motion is the rate at which the mean anomaly changes
+    /// </summary>
+    public double meanMotion { get; private set; }
 
     /// <summary>
     /// get mean anomaly at a given time
     /// </summary>
-    public double GetMeanAnomaly(double UT) => M0 + (UT - t0) * Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
+    public double GetMeanAnomaly(double UT) => M0 + (UT - t0) * meanMotion;
 
     /// <summary>
     /// calculates the value of the RHS of kepler's equation.
@@ -285,20 +369,23 @@ public class Orbit
         }
         else
         {
-            double E = GetEccentricAnomaly(UT);
-
-            Vector2d pos;
-            if (e < 1.0) pos = new Vector2d(Math.Cos(E), Math.Sin(E));
-            else pos = new Vector2d(Math.Cosh(E), -Math.Sinh(E));
-
-            pos.x -= e;
-            pos.y *= Math.Sqrt(Math.Abs(1 - e * e));
-            if (h < 0.0) pos.y = -pos.y;
-
-            pos = (pos * SemimajorAxis).Rotate(omega);
-
-            return pos;
+            return GetPositionFromEccentricAnomaly(GetEccentricAnomaly(UT));
         }
+    }
+
+    private Vector2d GetPositionFromEccentricAnomaly(double E)
+    {
+        Vector2d pos;
+        if (e < 1.0) pos = new Vector2d(Math.Cos(E), Math.Sin(E));
+        else pos = new Vector2d(Math.Cosh(E), -Math.Sinh(E));
+
+        pos.x -= e;
+        pos.y *= Math.Sqrt(Math.Abs(1 - e * e));
+        if (h < 0.0) pos.y = -pos.y;
+
+        pos = (pos * a).Rotate(omega);
+
+        return pos;
     }
 
 
@@ -320,25 +407,28 @@ public class Orbit
         }
         else
         {
-            double E = GetEccentricAnomaly(UT);
-
-            Vector2d vel;
-            if (e < 1.0) vel = new Vector2d(-Math.Sin(E), Math.Cos(E));
-            else vel = new Vector2d(Math.Sinh(E), -Math.Cosh(E));
-
-            vel.x *= Math.Sqrt(Math.Abs(1 - e * e));
-            vel.y *= Math.Abs(1 - e * e);
-            if (h < 0.0) vel.y = -vel.y;
-
-            vel *= body.GM / (h * (e * (
-                e < 1.0 ?
-                Math.Cos(E) :
-                Math.Cosh(E)
-            ) - 1));
-            vel = vel.Rotate(omega);
-
-            return vel;
+            return GetVelocityFromEccentricAnomaly(GetEccentricAnomaly(UT));
         }
+    }
+
+    private Vector2d GetVelocityFromEccentricAnomaly(double E)
+    {
+        Vector2d vel;
+        if (e < 1.0) vel = new Vector2d(-Math.Sin(E), Math.Cos(E));
+        else vel = new Vector2d(Math.Sinh(E), -Math.Cosh(E));
+
+        vel.x *= Math.Sqrt(Math.Abs(1 - e * e));
+        vel.y *= Math.Abs(1 - e * e);
+        if (h < 0.0) vel.y = -vel.y;
+
+        vel *= body.GM / (h * (e * (
+            e < 1.0 ?
+            Math.Cos(E) :
+            Math.Cosh(E)
+        ) - 1));
+        vel = vel.Rotate(omega);
+
+        return vel;
     }
 }
 

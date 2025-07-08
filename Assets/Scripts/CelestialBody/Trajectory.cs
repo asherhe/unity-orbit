@@ -149,7 +149,7 @@ public class Trajectory : MonoBehaviour
         }
         double dTheta = (thetaMax - theta0) / trajectorySubdivs;
 
-        double p = o.orbit.SemimajorAxis * (1 - o.orbit.e * o.orbit.e);
+        double p = o.orbit.a * (1 - o.orbit.e * o.orbit.e);
         for (int i = 0; i < trajectorySubdivs; i++)
         {
             double theta = theta0 + i * dTheta;
