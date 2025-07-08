@@ -68,6 +68,9 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _atmObject;
     private GameObject _trajectoriesObject;
 
+    [SerializeField]
+    private GameObject _trajectoryPrefab;
+
     /// <summary>
     /// name of this celestial body, used for display and referencing
     /// </summary>
@@ -256,20 +259,16 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             _trajectoriesObject.transform.localPosition = Vector3.zero;
         }
 
-        GameObject newTrajectoryObject = new GameObject("Trajectory");
-        newTrajectoryObject.transform.parent = _trajectoriesObject.transform;
-        newTrajectoryObject.transform.localPosition = Vector3.zero;
-        newTrajectoryObject.layer = LayerMask.NameToLayer("Show in Map");
-        newTrajectoryObject.AddComponent<MeshFilter>();
-        newTrajectoryObject.AddComponent<MeshRenderer>();
-        Trajectory trajectory = newTrajectoryObject.AddComponent<Trajectory>();
-        trajectory.o = o;
-
+        var trajObject = Instantiate(_trajectoryPrefab, _trajectoriesObject.transform);
+        trajObject.name = $"Trajectory {o.ToString()}";
+        trajObject.transform.localPosition = Vector3.zero;
+        var trajectory = trajObject.GetComponent<Trajectory>();
+        trajectory.Orbit = o;
         return trajectory;
     }
 
     public override string ToString()
     {
-        return bodyName;
+        return $"[CelestialBody {bodyName}]";
     }
 }
