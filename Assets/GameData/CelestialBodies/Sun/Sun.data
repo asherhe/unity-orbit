@@ -1,6 +1,7 @@
 # Sun.data
 
 name: Sun
+color: "#EDDC4F"
 
 # planetary info
 radius: 600000.0 # km

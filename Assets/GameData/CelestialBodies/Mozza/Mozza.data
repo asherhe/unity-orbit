@@ -1,6 +1,7 @@
 # Mozza.data
 
 name: Mozza
+color: "#E3C481"
 
 # planetary info
 radius: 800.0 # km

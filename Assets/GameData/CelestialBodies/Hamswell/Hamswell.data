@@ -1,6 +1,7 @@
 # Hamswell.data
 
 name: Hamswell
+color: "#729DE0"
 
 # planetary info
 radius: 3000.0 # km

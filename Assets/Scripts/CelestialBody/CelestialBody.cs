@@ -11,7 +11,14 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     [Serializable]
     private class CelestialBodyConfig
     {
+        /// <summary>
+        /// name of this body
+        /// </summary>
         public string name;
+        /// <summary>
+        /// display color for rendering things related to this body
+        /// </summary>
+        public Color color;
 
         /// <summary>
         /// radius of the body's sea level, in kilometers
@@ -166,8 +173,10 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
-            parent.AddTrajectory(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
+
+            Trajectory traj = parent.AddTrajectory(this);
+            traj.GetComponent<MeshRenderer>().material.color = _config.color;
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))
