@@ -9,7 +9,7 @@ surfaceGravity: 9.8 # m/s^2
 dayLength: 24.0 # hours
 
 surfaceMaterial:
-  path: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
+  path: Assets/GameData/CelestialBodies/Surface.mat
   properties:
     _MainTex:
       type: Texture2D

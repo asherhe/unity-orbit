@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Atmosphere
-  m_Shader: {fileID: 4800000, guid: 053dfafeeaed592499b380133a500478, type: 3}
+  m_Name: SurfaceBlank
+  m_Shader: {fileID: 4800000, guid: 6791261e2c4bde1418f4bc57236c1576, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -41,23 +41,13 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _AtmHeight: 80000
-    - _AtmScaleHeight: 8500
-    - _AtmSeaLevelPressure: 1
     - _EnableExternalAlpha: 0
-    - _LightSamples: 8
-    - _MiePhaseG: 0.6
-    - _MieScaleHeight: 800
-    - _PlanetRad: 3000000
-    - _RayleighScaleHeight: 5000
-    - _SunIntensity: 20.664772
-    - _ViewSamples: 24
+    - _PlanetRad: 6371000
+    - _SunIntensity: 20
     m_Colors:
-    - _AtmColor: {r: 1, g: 1, b: 1, a: 1}
+    - _AmbientColor: {r: 0.079999976, g: 0.09999997, b: 0.09999997, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _MieScatteringCoeff: {r: 0.0000071, g: 0.0000071, b: 0.0000071, a: 0.0000071}
-    - _RayleighScatteringCoeff: {r: 0.000005804543, g: 0.000013562912, b: 0.000030265906, a: 0.000012619775}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SunDir: {r: -0.94002485, g: -0.34110588, b: 0, a: 0}
+    - _SunDir: {r: -1, g: 0, b: 0.2, a: 0}
   m_BuildTextureStacks: []
