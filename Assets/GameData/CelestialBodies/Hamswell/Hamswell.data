@@ -23,6 +23,9 @@ surfaceMaterial:
     _LightTex:
       type: Texture2D
       value: Assets/GameData/CelestialBodies/Hamswell/Hamswell-Lights.png
+    _LightColor:
+      type: Color
+      value: "#FFF8B133"
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:

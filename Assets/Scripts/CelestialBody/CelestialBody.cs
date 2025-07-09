@@ -92,6 +92,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
     [SerializeField]
     private GameObject _trajectoryPrefab;
+    [SerializeField]
+    private GameObject _SOIPrefab;
 
     /// <summary>
     /// name of this celestial body, used for display and referencing
@@ -288,6 +290,12 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 SetMaterialProperties(atmMeshRenderer.material);
                 _dynamicMaterials.Add(atmMeshRenderer.material);
             };
+        }
+
+        if (orbit != null)
+        {
+            var soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
+            soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 
         SetDynamicMaterialProperties();

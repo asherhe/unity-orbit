@@ -5,6 +5,7 @@ MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - _trajectoryPrefab: {fileID: 699507121306059453, guid: e13068bda67a8cc4e9ee3559d2c77cb7, type: 3}
+  - _SOIPrefab: {fileID: 5778190658763130961, guid: 6e543574305eb4c47a0dd44805226ee3, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
