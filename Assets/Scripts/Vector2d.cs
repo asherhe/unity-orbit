@@ -50,8 +50,12 @@ public class Vector2d
     /// </summary>
     public static Vector2d Cross(double w, Vector2d v) => new Vector2d(-v.y * w, v.x * w);
 
-    public double magnitude { get => Math.Sqrt(x * x + y * y); }
-    public Vector2d normalized { get => this / magnitude; }
+    /// <summary>
+    /// square of magnitude
+    /// </summary>
+    public double Magnitude2 { get => x * x + y * y; }
+    public double Magnitude { get => Math.Sqrt(Magnitude2); }
+    public Vector2d Normalized { get => this / Magnitude; }
 
     /// <summary>
     /// rotates a vector counterclockwise
@@ -76,6 +80,8 @@ public class Vector2d
     public override string ToString() => "(" + x + ", " + y + ")";
     public static implicit operator Vector2(Vector2d v) { return new Vector2((float)v.x, (float)v.y); }
     public static implicit operator Vector3(Vector2d v) { return new Vector3((float)v.x, (float)v.y, 0.0f); }
+    public static implicit operator Vector4(Vector2d v) { return new Vector4((float)v.x, (float)v.y, 0.0f, 0.0f); }
     public static explicit operator Vector2d(Vector2 v) { return new Vector2d(v.x, v.y); }
     public static explicit operator Vector2d(Vector3 v) { return new Vector2d(v.x, v.y); }
+    public static explicit operator Vector2d(Vector4 v) { return new Vector2d(v.x, v.y); }
 }

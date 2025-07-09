@@ -7,7 +7,7 @@ radius: 600000.0 # km
 surfaceGravity: 286 # m/s^2
 dayLength: 614.0 # hours
 
-surfaceMaterial: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
+surfaceMaterial: { path: Assets/GameData/CelestialBodies/Hamswell/Surface.mat }
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit: false

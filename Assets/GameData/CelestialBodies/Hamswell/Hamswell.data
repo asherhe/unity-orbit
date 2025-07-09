@@ -7,7 +7,21 @@ radius: 3000.0 # km
 surfaceGravity: 9.8 # m/s^2
 dayLength: 24.0 # hours
 
-surfaceMaterial: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
+surfaceMaterial:
+  path: Assets/GameData/CelestialBodies/Hamswell/Surface.mat
+  properties:
+    _MainTex:
+      type: Texture2D
+      value: Assets/GameData/CelestialBodies/Hamswell/Hamswell.png
+    _SpecularTex:
+      type: Texture2D
+      value: Assets/GameData/CelestialBodies/Hamswell/Hamswell-Specular.png
+    _NormalMap:
+      type: Texture2D
+      value: Assets/GameData/CelestialBodies/Hamswell/Hamswell-Normal.png
+    _LightTex:
+      type: Texture2D
+      value: Assets/GameData/CelestialBodies/Hamswell/Hamswell-Lights.png
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
@@ -28,7 +42,21 @@ atmosphere:
   scaleHeight: 5.0 # km
 
   # atmospheric rendering - scattering
-  material: Assets/GameData/CelestialBodies/Atmosphere.mat
-  rayleighScattering: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
-  mieScattering: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
-  miePhaseG: 0.6
+  material:
+    path: Assets/GameData/CelestialBodies/Atmosphere.mat
+    properties:
+      _RayleighScaleHeight:
+        type: Float
+        value: 5000
+      _MieScaleHeight:
+        type: Float
+        value: 800
+      _RayleighScatteringCoeff:
+        type: Vector
+        value: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
+      _MieScatteringCoeff:
+        type: Vector
+        value: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
+      _MiePhaseG:
+        type: Float
+        value: 0.6

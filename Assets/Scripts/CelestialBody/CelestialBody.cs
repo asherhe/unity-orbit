@@ -13,17 +13,27 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     {
         public string name;
 
-        // radius of sea level, ignores terrain
-        public double radius; // km
-        // gravitational acceleration at sea level
-        public double surfaceGravity; // m/s^2
-        // celestial body's rotational period
-        public double dayLength; // julian days
+        /// <summary>
+        /// radius of the body's sea level, in kilometers
+        /// </summary>
+        public double radius;
+        /// <summary>
+        /// gravitational acceleration at sea level, in m/s^2
+        /// </summary>
+        public double surfaceGravity;
+        /// <summary>
+        /// celestial body's rotational period, in hours
+        /// </summary>
+        public double dayLength;
 
-        // asset to use for rendering the planet's surface
-        public string surfaceMaterial; // addressable
+        /// <summary>
+        /// material config for the body's surface
+        /// </summary>
+        public MaterialUtils.MaterialProperties surfaceMaterial;
 
-        // orbital info, optional for the sun
+        /// <summary>
+        /// orbital info, optional for the sun
+        /// </summary>
         [Serialization.OptionalValueField]
         public OrbitInfo orbit;
         [Serializable]
@@ -37,29 +47,34 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             public double epochTime; // sec
         }
 
-        // atmosphere info
+        /// <summary>
+        /// config for atmosphere, if applicable
+        /// </summary>
         [Serialization.OptionalValueField]
         public AtmInfo atmosphere;
         [Serializable]
         public class AtmInfo
         {
-            // altitude above sea level to the top of atmosphere
-            // physical, optical effects are not simulated past this altitude
-            public double height; // km
-
-            public double seaLevelPressure; // atm
-            // how quickly the atmospheric pressure drops as altitude increases
-            // this is the altitude at which air pressure is 1/e of sea level
-            public double scaleHeight; // km
-
-            // rendering config
-
-            // material for rendering atmospheric scattering
-            public string material; // addressable
-            // atmospheric scattering parameters
-            public Vector4 rayleighScattering;
-            public Vector4 mieScattering;
-            public float miePhaseG;
+            /// <summary>
+            /// altitude above sea level to the top of atmosphere.
+            /// physical, optical effects are not simulated past this altitude.
+            /// in kilometers.
+            /// </summary>
+            public double height;
+            /// <summary>
+            /// atmospheric pressure at sea level. in atm
+            /// </summary>
+            public double seaLevelPressure;
+            /// <summary>
+            /// how quickly the atmospheric pressure drops as altitude increases.
+            /// this is the altitude at which air pressure is 1/e of sea level.
+            /// in kilometers.
+            /// </summary>
+            public double scaleHeight;
+            /// <summary>
+            /// material config for the atmospheric material
+            /// </summary>
+            public MaterialUtils.MaterialProperties material;
         }
     }
 
@@ -126,6 +141,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /* rendering parameters */
     public Material surfaceMaterial { get; private set; }
     public Material atmMaterial { get; private set; }
+    private List<Material> _dynamicMaterials;
 
     public void LoadConfig(DataNode config)
     {
@@ -168,18 +184,37 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         MakeDisplay(_displayObject);
     }
 
-    // configure a shader's values to match the celestial body's
-    private void SetShaderValues(Material m)
+    /// <summary>
+    /// set celestial body-wide shader properties
+    /// </summary>
+    private void SetMaterialProperties(Material m)
     {
         m.SetFloat("_PlanetRad", (float)radius);
         m.SetFloat("_AtmHeight", (float)atmHeight);
         m.SetFloat("_AtmSeaLevelPressure", (float)atmSeaLevelPressure);
-        m.SetFloat("_AtmScaleHeight", (float)atmScaleHeight);
-        if (_config.atmosphere != null)
+    }
+    /// <summary>
+    /// set shader properties that change every frame
+    /// </summary>
+    private void SetDynamicMaterialProperties()
+    {
+        // some placeholder values for these or else we get CS0165
+        float sunIntensity = 20.0f;
+        Vector4 sunDirection = Vector4.zero;
+        if (orbit != null)
         {
-            m.SetVector("_RayleighScatteringCoeff", _config.atmosphere.rayleighScattering);
-            m.SetVector("_MieScatteringCoeff", _config.atmosphere.mieScattering);
-            m.SetFloat("_MiePhaseG", _config.atmosphere.miePhaseG);
+            var heliocentric = orbit.GetHeliocentricPosition();
+            sunIntensity = (float)(1.7e23 / heliocentric.Magnitude2);
+            sunDirection = -heliocentric.Normalized;
+            sunDirection.z = 0.2f; sunDirection.w = 0.0f;
+        }
+        foreach (var m in _dynamicMaterials)
+        {
+            if (orbit != null)
+            {
+                m.SetFloat("_SunIntensity", sunIntensity);
+                m.SetVector("_SunDir", sunDirection);
+            }
         }
     }
 
@@ -209,6 +244,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         quadMesh.triangles = tris;
         quadMesh.uv = uvs;
 
+        _dynamicMaterials = new();
+
         _surfaceObject = new GameObject("Surface");
         _surfaceObject.transform.parent = displayObject.transform;
         _surfaceObject.transform.localPosition = Vector3.forward * 550.0f;
@@ -216,10 +253,14 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         MeshFilter surfaceMeshFilter = _surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = _surfaceObject.AddComponent<MeshRenderer>();
-        Addressables.LoadAssetAsync<Material>(_config.surfaceMaterial).Completed += m =>
+        Addressables.LoadAssetAsync<Material>(_config.surfaceMaterial.path).Completed += m =>
         {
             surfaceMeshRenderer.material = surfaceMaterial = m.Result;
-            SetShaderValues(surfaceMeshRenderer.material);
+            MaterialUtils.SetMaterialProperties(surfaceMeshRenderer.material, _config.surfaceMaterial.properties);
+            if (hasAtmosphere)
+                MaterialUtils.SetMaterialProperties(surfaceMeshRenderer.material, _config.atmosphere.material.properties);
+            SetMaterialProperties(surfaceMeshRenderer.material);
+            _dynamicMaterials.Add(surfaceMeshRenderer.material);
         };
 
         if (hasAtmosphere)
@@ -231,12 +272,16 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             MeshFilter atmMeshFilter = _atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = _atmObject.AddComponent<MeshRenderer>();
-            Addressables.LoadAssetAsync<Material>(_config.atmosphere.material).Completed += m =>
+            Addressables.LoadAssetAsync<Material>(_config.atmosphere.material.path).Completed += m =>
             {
                 atmMeshRenderer.material = atmMaterial = m.Result;
-                SetShaderValues(atmMeshRenderer.material);
+                MaterialUtils.SetMaterialProperties(atmMeshRenderer.material, _config.atmosphere.material.properties);
+                SetMaterialProperties(atmMeshRenderer.material);
+                _dynamicMaterials.Add(atmMeshRenderer.material);
             };
         }
+
+        SetDynamicMaterialProperties();
     }
 
     private void FixedUpdate()
@@ -246,8 +291,9 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
     private void Update()
     {
-        // TODO: only works for active body and its direct satellites
         transform.position = CameraFocus.Instance.GetRelativePosition(this);
+
+        SetDynamicMaterialProperties();
     }
 
     public Trajectory AddTrajectory(IOrbitingObject o)

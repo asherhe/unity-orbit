@@ -9,7 +9,7 @@ Shader "Planet"
         _LightColor ("Light Color", Color) = (1,1,1,0.2)
         _AmbientColor ("Ambient Color", Color) = (0.08,0.1,0.1)
         // sun & atmosphere settings
-        _SunDir ("Sun Direction", Vector) = (-1,0,0.2,1)
+        _SunDir ("Sun Direction", Vector) = (-1,0,0.2,0)
         _SunIntensity ("Sun Intensity", Float) = 20
         _PlanetRad ("Planet Radius (m)", Float) = 6371000
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000

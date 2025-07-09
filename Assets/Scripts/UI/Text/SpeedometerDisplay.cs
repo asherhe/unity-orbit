@@ -7,7 +7,7 @@ public class SpeedometerDisplay : TextDisplay
 {
     protected override string GetText()
     {
-        double speed = ActiveCraftController.Instance.craft.Vel.magnitude;
+        double speed = ActiveCraftController.Instance.craft.Vel.Magnitude;
         return String.Format("VEL:{0:F1}<sprite name=\"mps\">", speed);
     }
 }

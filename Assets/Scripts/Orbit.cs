@@ -111,8 +111,8 @@ public class Orbit
         h = Vector2d.Cross(pos, vel);
 
         // eccentricity vector, points in the direction of periapsis
-        Vector2d eccVec = Vector2d.Cross(vel, h) / body.GM - pos.normalized;
-        e = eccVec.magnitude;
+        Vector2d eccVec = Vector2d.Cross(vel, h) / body.GM - pos.Normalized;
+        e = eccVec.Magnitude;
 
         omega = Math.Atan2(eccVec.y, eccVec.x);
 
@@ -429,6 +429,16 @@ public class Orbit
         vel = vel.Rotate(omega);
 
         return vel;
+    }
+
+    /// <summary>
+    /// get the current position of this orbit, with the sun at the origin
+    /// </summary>
+    public Vector2d GetHeliocentricPosition()
+    {
+        var parentPos = Vector2d.zero;
+        if (body.orbit != null) parentPos = body.orbit.GetHeliocentricPosition();
+        return parentPos + GetPosition();
     }
 }
 
