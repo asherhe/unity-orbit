@@ -30,7 +30,7 @@ public class TextDisplay : MonoBehaviour
 
     public static string AddMetricPrefix(double x)
     {
-        double log10 = Math.Log10(x);
+        double log10 = Math.Log10(Math.Abs(x));
         String prefix = "";
         if (log10 >= 9.0)
         {
