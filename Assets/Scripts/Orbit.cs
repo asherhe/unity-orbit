@@ -1,3 +1,4 @@
+using MathNet.Numerics.RootFinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -330,56 +331,37 @@ public class Orbit
          *   e>1:  M = e sinh E - E
          */
 
-        const int NEWTON_ITERS = 10, // surprisingly 10 is quite enough for most cases
-                  BISECT_ITERS = 60; // double has 53 fractional bits
-
-        /*
-         * ROOT FINDING ALGORITHMS
-         * we have a choice between using newton's method and the bisection method to find roots.
-         * newton's method often converges faster, but fails in regions where slope is near zero.
-         * bisection converges slower compared to newton but gives far more consistent results.
-         * 
-         * note that for bisection, since kepler's equation k(E) is always monotonically increasing, we only have to
-         * worry about k(low) <= M < k(mid)
-         * 
-         * my experiments show that
-         *  - FOR ELLIPTICAL ORBITS: newton is pretty stable for e<0.95. use bisection otherwise
-         *  (bisection range is mean anomaly plus or minus PI)
-         *  - FOR HYPERBOLIC ORBITS: newton works for |M|<2PI, but past that, results are
-         *  kinda sketchy because of how steep kepler's equation becomes. bisection range
-         *  is between 0 and M+1 or M-1 if M is positive or negative, respectively.
-         */
-
-        if ((0.95 < e && e < 1.0) || (e > 1.0 && Math.Abs(M) < 2 * Math.PI))
+        double left, right;
+        var normM = M;
+        if (e < 1.0)
         {
-            // bisection method
-            double left, right;
-            if (e < 1.0) { left = M - Math.PI; right = M + Math.PI; }
-            else
-            {
-                if (M > 0.0) { left = 0; right = M + 1; }
-                else { left = M - 1; right = 0; }
-            }
-
-            double leftM = CalcKepler(left);
-            for (int i = 0; i < BISECT_ITERS; i++)
-            {
-                double mid = (left + right) / 2;
-                if (leftM <= M && M < CalcKepler(mid))
-                    right = mid;
-                else
-                {
-                    left = mid;
-                    leftM = CalcKepler(left);
-                }
-            }
-            return left;
+            left = 0;
+            right = 2 * Math.PI;
+            // normalized M for elliptical orbits
+            // when M is really big, RobustNewtonRaphson will fail to converge because the smallest
+            // precision of the floating point format will exceed the given accuracy. to fix this,
+            // we normalize the mean anomaly to [0, 2*PI] so that values stay relatively small.
+            normM = MathUtils.Mod(normM, 2 * Math.PI);
+        }
+        else
+        {
+            if (M > 0.0) { left = 0; right = M + 1; }
+            else { left = M - 1; right = 0; }
         }
 
-        // newton's method
-        double E = M;
-        for (int i = 0; i < NEWTON_ITERS; i++)
-            E -= (CalcKepler(E) - M) / CalcDKepler(E);
+        double E = RobustNewtonRaphson.FindRoot(
+            E => CalcKepler(E) - normM,
+            CalcDKepler,
+            left, right,
+            accuracy: 1e-12,
+            maxIterations: 90,
+            subdivision: 10
+        );
+
+        // revert to original orbital period
+        if (e < 1.0)
+            E += 2 * Math.PI * Math.Floor(M / (2 * Math.PI)); 
+
         return E;
     }
 

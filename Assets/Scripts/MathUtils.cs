@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,5 +11,9 @@ public class MathUtils {
     /// </summary>
     public static int Mod(int a, int b) {
         return a - b * (int)Mathf.Floor((float)a / b);
+    }
+    public static double Mod(double a, double b)
+    {
+        return a - b * (int)Math.Floor(a / b);
     }
 }
