@@ -116,7 +116,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
         );
-        _trajectory = TrajectoryManager.Instance.AddTrajectory(this);
+        _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
+        _trajectory.name = $"Trajectory {this}";
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,

@@ -181,7 +181,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory traj = TrajectoryManager.Instance.AddTrajectory(this);
+            Trajectory traj = TrajectoryManager.Instance.AddTrajectory(orbit);
+            traj.name = $"Trajectory {this}";
             traj.GetComponent<MeshRenderer>().material.color = _config.color;
         }
 

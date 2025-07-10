@@ -11,16 +11,13 @@ public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
     /// add a new trajectory to display
     /// </summary>
     /// <returns>newly created trajectory component</returns>
-    public Trajectory AddTrajectory(IOrbitingObject o)
+    public Trajectory AddTrajectory(Orbit o)
     {
-        if (o.orbit == null)
-            throw new ArgumentException("Expected an object with an orbit.");
-
         var trajObject = Instantiate(trajectoryPrefab, transform);
-        trajObject.name = $"Trajectory {o.ToString()}";
+        //trajObject.name = $"Trajectory {o.ToString()}";
         trajObject.transform.localPosition = Vector3.zero;
         var trajectory = trajObject.GetComponent<Trajectory>();
-        trajectory.OrbitingObj = o;
+        trajectory.Orbit = o;
         return trajectory;
     }
 }

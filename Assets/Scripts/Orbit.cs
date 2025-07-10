@@ -280,7 +280,6 @@ public class Orbit
         nextEncounter = null;
         foreach (var b in body.satellites)
         {
-            Debug.Log(b);
             var encounters = GetEncounters(b.orbit);
             foreach (var e in encounters)
                 if (nextEncounter == null || e.state.time < nextEncounter.state.time)
@@ -323,8 +322,6 @@ public class Orbit
         if (body != o.body)
             throw new ArgumentException("Orbit o must share the same body as this orbit.");
 
-        Debug.Log($"GetEncounters tStart={tStart} tEnd={tEnd}");
-
         // derivative of distance
         double DDistance(double t) => 2.0 * Vector2d.Dot(
             GetPosition(t) - o.GetPosition(t),
@@ -343,8 +340,6 @@ public class Orbit
             var t1 = t0 + dt;
             d0 = DDistance(t0);
             var d1 = DDistance(t1);
-
-            Debug.Log($"{t0}-{t1} {d0}->{d1}");
 
             // inflection point found
             if (d0 * d1 <= 0.0)

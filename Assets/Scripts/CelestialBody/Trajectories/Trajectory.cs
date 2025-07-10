@@ -9,20 +9,19 @@ public class Trajectory : MonoBehaviour
     private TrajectoryMesh trajectoryMesh;
     private MeshFilter meshFilter;
 
-    private IOrbitingObject _orbitObj;
-    public IOrbitingObject OrbitingObj
+    private Orbit _orbit;
+    public Orbit Orbit
     {
-        get => _orbitObj;
+        get => _orbit;
         set
         {
-            if (_orbitObj == value) return;
-            if (_orbitObj != null) _orbitObj.orbit.OnOrbitChanged -= GenerateTrajectory;
-            _orbitObj = value;
-            _orbitObj.orbit.OnOrbitChanged += GenerateTrajectory;
+            if (_orbit == value) return;
+            if (_orbit != null) _orbit.OnOrbitChanged -= GenerateTrajectory;
+            _orbit = value;
+            _orbit.OnOrbitChanged += GenerateTrajectory;
             GenerateTrajectory();
         }
     }
-    public Orbit Orbit { get => OrbitingObj.orbit; }
 
     private void Awake()
     {
