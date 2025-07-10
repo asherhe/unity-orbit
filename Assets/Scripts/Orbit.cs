@@ -150,11 +150,11 @@ public class Orbit
     /// </summary>
     private void PostUpdate()
     {
-        a = h * h / (body.GM * (1 - e * e));
-        periapsis = a * (1 - e * e) / (1 + e);
-        apoapsis = a * (1 - e * e) / (1 - e);
-        meanMotion = Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
-        period = 2 * Math.PI / meanMotion;
+        A = h * h / (body.GM * (1 - e * e));
+        Periapsis = A * (1 - e * e) / (1 + e);
+        Apoapsis = A * (1 - e * e) / (1 - e);
+        MeanMotion = Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
+        Period = 2 * Math.PI / MeanMotion;
 
         CheckSOI();
         CheckEncounters();
@@ -201,7 +201,7 @@ public class Orbit
         if (e == 1.0) return; // TODO: this is for non-parabolic orbits only
 
         // calculate eccentric anomaly at SOI radius (plus or minus)
-        var E = (a - body.soiRadius) / (a * e);
+        var E = (A - body.soiRadius) / (A * e);
         if (e < 1.0) E = Math.Acos(E);
         else E = Math.Acosh(E);
         // no SOI intersection
@@ -231,8 +231,8 @@ public class Orbit
 
         // calculate time to SOI
         double tp, tn;
-        tp = t0 + (Mp - M0) / meanMotion;
-        tn = t0 + (Mn - M0) / meanMotion;
+        tp = t0 + (Mp - M0) / MeanMotion;
+        tn = t0 + (Mn - M0) / MeanMotion;
 
         // assign SOI state vectors, ensure chronological order
         StateVector statep, staten;
@@ -292,7 +292,7 @@ public class Orbit
     public List<Encounter> GetEncounters(Orbit o, double UT)
     {
         if (e < 1.0)
-            return GetEncounters(o, UT, UT + period);
+            return GetEncounters(o, UT, UT + Period);
         else if (e == 1.0)
             throw new NotImplementedException();
         else
@@ -301,9 +301,9 @@ public class Orbit
             {
                 // end time is when x=-o.apoapsis in this hyperbola's perifocal frame
                 // probably involves some eccanom magic to find that time
-                var E = Math.Acosh(o.apoapsis / a - e);
+                var E = Math.Acosh(o.Apoapsis / A - e);
                 var M = CalcKepler(E);
-                var t = t0 + Math.Abs((M - M0) / meanMotion); // abs to find the later one
+                var t = t0 + Math.Abs((M - M0) / MeanMotion); // abs to find the later one
                 if (UT > t) return new();
                 else return GetEncounters(o, UT, t);
             }
@@ -390,25 +390,25 @@ public class Orbit
     /// <summary>
     /// the semimajor axis (in meters) of the orbit
     /// </summary>
-    public double a { get; private set; }
+    public double A { get; private set; }
 
-    public double periapsis { get; private set; }
-    public double apoapsis { get; private set; }
+    public double Periapsis { get; private set; }
+    public double Apoapsis { get; private set; }
 
     /// <summary>
     /// orbital period in seconds
     /// </summary>
-    public double period { get; private set; }
+    public double Period { get; private set; }
 
     /// <summary>
     /// mean motion is the rate at which the mean anomaly changes
     /// </summary>
-    public double meanMotion { get; private set; }
+    public double MeanMotion { get; private set; }
 
     /// <summary>
     /// get mean anomaly at a given time
     /// </summary>
-    public double GetMeanAnomaly(double UT) => M0 + (UT - t0) * meanMotion;
+    public double GetMeanAnomaly(double UT) => M0 + (UT - t0) * MeanMotion;
 
     /// <summary>
     /// calculates the value of the RHS of kepler's equation.
@@ -522,7 +522,7 @@ public class Orbit
         pos.y *= Math.Sqrt(Math.Abs(1 - e * e));
         if (h < 0.0) pos.y = -pos.y;
 
-        pos = (pos * a).Rotate(omega);
+        pos = (pos * A).Rotate(omega);
 
         return pos;
     }
