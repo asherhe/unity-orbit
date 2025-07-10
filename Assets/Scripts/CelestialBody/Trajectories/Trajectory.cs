@@ -1,10 +1,75 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
+
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+public class Trajectory : MonoBehaviour
+{
+    private TrajectoryMesh trajectoryMesh;
+    private MeshFilter meshFilter;
+
+    private IOrbitingObject _orbit;
+    public IOrbitingObject Orbit
+    {
+        get => _orbit;
+        set
+        {
+            if (_orbit == value) return;
+            if (_orbit != null) _orbit.orbit.OnOrbitChanged -= GenerateTrajectory;
+            _orbit = value;
+            _orbit.orbit.OnOrbitChanged += GenerateTrajectory;
+            GenerateTrajectory();
+        }
+    }
+
+    private void Awake()
+    {
+        trajectoryMesh = new TrajectoryMesh();
+        meshFilter = GetComponent<MeshFilter>();
+        meshFilter.mesh = trajectoryMesh.mesh;
+    }
+
+    public void GenerateTrajectory()
+    {
+        Vector2d pos = Orbit.orbit.GetPosition();
+        const int trajectorySubdivs = 400;
+        List<Vector2> points = new List<Vector2>(trajectorySubdivs);
+
+        double theta0, thetaMax;
+        if (Orbit.orbit.e <= 1.0)
+        {
+            theta0 = 0;
+            thetaMax = theta0 + 2 * Math.PI * (Orbit.orbit.h > 0.0 ? 1 : -1);
+            trajectoryMesh.loop = true;
+        }
+        else
+        {
+            double asymptote = Math.Acos(-1.0 / Orbit.orbit.e);
+            theta0 = Orbit.orbit.omega + asymptote;
+            thetaMax = Orbit.orbit.omega - asymptote;
+            trajectoryMesh.loop = false;
+        }
+        double dTheta = (thetaMax - theta0) / trajectorySubdivs;
+
+        double p = Orbit.orbit.a * (1 - Orbit.orbit.e * Orbit.orbit.e);
+        for (int i = 0; i < trajectorySubdivs; i++)
+        {
+            double theta = theta0 + i * dTheta;
+            double r = p / (1.0 + (float)Orbit.orbit.e * Math.Cos(theta - Orbit.orbit.omega));
+            if (r > 0.0)
+                points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
+        }
+
+        trajectoryMesh.SetPointList(points);
+        trajectoryMesh.UpdateMesh();
+    }
+
+    private void LateUpdate()
+    {
+        transform.position = Orbit.orbit.body.transform.position;
+    }
+}
 
 class TrajectoryMesh
 {
@@ -100,73 +165,5 @@ class TrajectoryMesh
         mesh.uv4 = data;
         mesh.triangles = tris;
         mesh.bounds = bounds;
-    }
-}
-
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
-public class Trajectory : MonoBehaviour
-{
-    private TrajectoryMesh trajectoryMesh;
-    private MeshFilter meshFilter;
-
-    private IOrbitingObject _orbit;
-    public IOrbitingObject Orbit
-    {
-        get => _orbit;
-        set
-        {
-            if (_orbit == value) return;
-            if (_orbit != null) _orbit.orbit.OnOrbitChanged -= GenerateTrajectory;
-            _orbit = value;
-            _orbit.orbit.OnOrbitChanged += GenerateTrajectory;
-            GenerateTrajectory();
-        }
-    }
-
-    private void Awake()
-    {
-        trajectoryMesh = new TrajectoryMesh();
-        meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = trajectoryMesh.mesh;
-    }
-
-    public void GenerateTrajectory()
-    {
-        Vector2d pos = Orbit.orbit.GetPosition();
-        const int trajectorySubdivs = 400;
-        List<Vector2> points = new List<Vector2>(trajectorySubdivs);
-
-        double theta0, thetaMax;
-        if (Orbit.orbit.e <= 1.0)
-        {
-            theta0 = 0;
-            thetaMax = theta0 + 2 * Math.PI * (Orbit.orbit.h > 0.0 ? 1 : -1);
-            trajectoryMesh.loop = true;
-        }
-        else
-        {
-            double asymptote = Math.Acos(-1.0 / Orbit.orbit.e);
-            theta0 = Orbit.orbit.omega + asymptote;
-            thetaMax = Orbit.orbit.omega - asymptote;
-            trajectoryMesh.loop = false;
-        }
-        double dTheta = (thetaMax - theta0) / trajectorySubdivs;
-
-        double p = Orbit.orbit.a * (1 - Orbit.orbit.e * Orbit.orbit.e);
-        for (int i = 0; i < trajectorySubdivs; i++)
-        {
-            double theta = theta0 + i * dTheta;
-            double r = p / (1.0 + (float)Orbit.orbit.e * Math.Cos(theta - Orbit.orbit.omega));
-            if (r > 0.0)
-                points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
-        }
-
-        trajectoryMesh.SetPointList(points);
-        trajectoryMesh.UpdateMesh();
-    }
-
-    private void LateUpdate()
-    {
-        transform.position = Orbit.orbit.body.transform.position;
     }
 }
