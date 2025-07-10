@@ -106,6 +106,7 @@ public class Orbit
     {
         // https://en.wikipedia.org/wiki/Orbit_determination#Orbit_Determination_from_a_State_Vector
 
+        this.body = body;
         t0 = t;
 
         h = Vector2d.Cross(pos, vel);
@@ -439,6 +440,27 @@ public class Orbit
         var parentPos = Vector2d.zero;
         if (body.orbit != null) parentPos = body.orbit.GetHeliocentricPosition();
         return parentPos + GetPosition();
+    }
+
+    /// <summary>
+    /// check for SOI escapes, captures, etc., and update this orbit's state accordingly
+    /// </summary>
+    /// <returns>true this orbit switched celestial bodies, false otherwise</returns>
+    public bool CheckBodyChange() => CheckBodyChange(Universe.Instance.UT);
+    public bool CheckBodyChange(double UT)
+    {
+        if (soiEscape != null && UT >= soiEscape.time)
+        {
+            var t = soiEscape.time;
+            UpdateFromStateVectors(
+                body.orbit.GetPosition(t) + GetPosition(t),
+                body.orbit.GetVelocity(t) + GetVelocity(t),
+                t,
+                body.parent
+            );
+            return true;
+        }
+        return false;
     }
 }
 

@@ -130,7 +130,7 @@ public class Trajectory : MonoBehaviour
         meshFilter.mesh = trajectoryMesh.mesh;
     }
 
-    private void GenerateTrajectory()
+    public void GenerateTrajectory()
     {
         Vector2d pos = Orbit.orbit.GetPosition();
         const int trajectorySubdivs = 400;

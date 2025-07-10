@@ -198,6 +198,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (orbit.CheckBodyChange())
+        {
+            // transfer trajectory to new body
+            body.AddTrajectory(_trajectory);
+        }
+    }
+
     private void Update()
     {
         transform.position = CameraFocus.Instance.GetRelativePosition(this);
