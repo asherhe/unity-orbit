@@ -20,7 +20,7 @@ public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
         trajObject.name = $"Trajectory {o.ToString()}";
         trajObject.transform.localPosition = Vector3.zero;
         var trajectory = trajObject.GetComponent<Trajectory>();
-        trajectory.Orbit = o;
+        trajectory.OrbitingObj = o;
         return trajectory;
     }
 }
