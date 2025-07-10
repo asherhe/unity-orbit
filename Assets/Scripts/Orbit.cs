@@ -247,6 +247,28 @@ public class Orbit
         }
     }
 
+    /* encounters */
+    public class Encounter
+    {
+        /// <summary>
+        /// the orbit we have an encounter with
+        /// </summary>
+        public Orbit other;
+        /// <summary>
+        /// state of THIS orbit at the encounter
+        /// </summary>
+        public StateVector state;
+        /// <summary>
+        /// distance at encounter
+        /// </summary>
+        public double distance;
+    }
+
+    public List<Encounter> GetEncounters(Orbit o)
+    {
+        throw new NotImplementedException();
+    }
+
     /* get orbit info */
 
     /// <summary>
@@ -336,11 +358,17 @@ public class Orbit
                 else { left = M - 1; right = 0; }
             }
 
+            double leftM = CalcKepler(left);
             for (int i = 0; i < BISECT_ITERS; i++)
             {
                 double mid = (left + right) / 2;
-                if (CalcKepler(left) <= M && M < CalcKepler(mid)) right = mid;
-                else left = mid;
+                if (leftM <= M && M < CalcKepler(mid))
+                    right = mid;
+                else
+                {
+                    left = mid;
+                    leftM = CalcKepler(left);
+                }
             }
             return left;
         }
