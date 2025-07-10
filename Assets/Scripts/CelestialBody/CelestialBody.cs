@@ -106,6 +106,10 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// </summary>
     public CelestialBody parent { get => orbit.body; }
     /// <summary>
+    /// natural satellites of this body
+    /// </summary>
+    public List<CelestialBody> satellites;
+    /// <summary>
     /// radius of this celestial body's SOI
     /// </summary>
     public double soiRadius { get; private set; }
@@ -160,6 +164,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         mass = GM / Universe.Instance.G;
         dayLength = _config.dayLength * 3600.0;
 
+        satellites = new();
+
         if (_config.orbit != null)
         {
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
@@ -172,6 +178,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
+            parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
             Trajectory traj = TrajectoryManager.Instance.AddTrajectory(this);

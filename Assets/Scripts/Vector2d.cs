@@ -37,6 +37,11 @@ public class Vector2d
     public static Vector2d operator /(Vector2d v, double k) => new Vector2d(v.x / k, v.y / k);
 
     /// <summary>
+    /// dot product between two vectors
+    /// </summary>
+    public static double Dot(Vector2d v, Vector2d w) => v.x * w.x + v.y * w.y;
+
+    /// <summary>
     /// cross product between two vectors
     /// </summary>
     /// <returns>"z-component" of the cross product</returns>

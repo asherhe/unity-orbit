@@ -154,8 +154,10 @@ public class Orbit
         periapsis = a * (1 - e * e) / (1 + e);
         apoapsis = a * (1 - e * e) / (1 - e);
         meanMotion = Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
+        period = 2 * Math.PI / meanMotion;
 
         CheckSOI();
+        CheckEncounters();
 
         OnOrbitChanged?.Invoke();
     }
@@ -263,14 +265,124 @@ public class Orbit
         /// distance at encounter
         /// </summary>
         public double distance;
+
+        public Encounter(Orbit o, StateVector state, double distance)
+        {
+            other = o;
+            this.state = state;
+            this.distance = distance;
+        }
+    }
+    public Encounter nextEncounter { get; private set; }
+
+    public void CheckEncounters()
+    {
+        nextEncounter = null;
+        foreach (var b in body.satellites)
+        {
+            Debug.Log(b);
+            var encounters = GetEncounters(b.orbit);
+            foreach (var e in encounters)
+                if (nextEncounter == null || e.state.time < nextEncounter.state.time)
+                    nextEncounter = e;
+        }
+    }
+
+    public List<Encounter> GetEncounters(Orbit o) => GetEncounters(o, Universe.Instance.UT);
+    public List<Encounter> GetEncounters(Orbit o, double UT)
+    {
+        if (e < 1.0)
+            return GetEncounters(o, UT, UT + period);
+        else if (e == 1.0)
+            throw new NotImplementedException();
+        else
+        {
+            if (o.e < 1.0)
+            {
+                // end time is when x=-o.apoapsis in this hyperbola's perifocal frame
+                // probably involves some eccanom magic to find that time
+                var E = Math.Acosh(o.apoapsis / a - e);
+                var M = CalcKepler(E);
+                var t = t0 + Math.Abs((M - M0) / meanMotion); // abs to find the later one
+                if (UT > t) return new();
+                else return GetEncounters(o, UT, t);
+            }
+            else
+            {
+                // TODO
+                throw new NotImplementedException();
+            }
+        }
     }
 
     /// <summary>
     /// gets a list of all encounters with the given orbit
     /// </summary>
-    public List<Encounter> GetEncounters(Orbit o)
+    public List<Encounter> GetEncounters(Orbit o, double tStart, double tEnd, int brackets = 100)
     {
-        throw new NotImplementedException();
+        if (body != o.body)
+            throw new ArgumentException("Orbit o must share the same body as this orbit.");
+
+        Debug.Log($"GetEncounters tStart={tStart} tEnd={tEnd}");
+
+        // derivative of distance
+        double DDistance(double t) => 2.0 * Vector2d.Dot(
+            GetPosition(t) - o.GetPosition(t),
+            GetVelocity(t) - o.GetVelocity(t)
+        );
+
+        // find local minima of distance function -> find zeroes of DDistance, then confirm it is local minimum
+
+        var encounters = new List<Encounter>();
+        var dt = (tEnd - tStart) / brackets;
+
+        // search for brackets where extrema exist
+        double t0 = tStart, d0;
+        for (int i = 0; i < brackets; i++)
+        {
+            var t1 = t0 + dt;
+            d0 = DDistance(t0);
+            var d1 = DDistance(t1);
+
+            Debug.Log($"{t0}-{t1} {d0}->{d1}");
+
+            // inflection point found
+            if (d0 * d1 <= 0.0)
+            {
+                double t = 0.0;
+                try
+                {
+                    t = Brent.FindRoot(
+                        DDistance,
+                        t0, t1,
+                        accuracy: 1e-12,
+                        maxIterations: 100
+                    );
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
+
+                // check if local minimum
+                const double STEP = 1e-6;
+                if ((DDistance(t + 0.5 * STEP) - DDistance(t - 0.5 * STEP)) / STEP > 0.0)
+                {
+                    Vector2d pos = GetPosition(t), vel = GetVelocity(t),
+                         opos = o.GetPosition(t), ovel = o.GetVelocity(t);
+                    encounters.Add(new Encounter(
+                        o,
+                        new StateVector(t, pos, vel),
+                        (pos - opos).Magnitude
+                    ));
+                }
+            }
+
+            t0 = t1;
+            d0 = d1;
+        }
+
+        return encounters;
     }
 
     /* get orbit info */
@@ -282,6 +394,11 @@ public class Orbit
 
     public double periapsis { get; private set; }
     public double apoapsis { get; private set; }
+
+    /// <summary>
+    /// orbital period in seconds
+    /// </summary>
+    public double period { get; private set; }
 
     /// <summary>
     /// mean motion is the rate at which the mean anomaly changes
@@ -349,18 +466,26 @@ public class Orbit
             else { left = M - 1; right = 0; }
         }
 
-        double E = RobustNewtonRaphson.FindRoot(
-            E => CalcKepler(E) - normM,
-            CalcDKepler,
-            left, right,
-            accuracy: 1e-12,
-            maxIterations: 90,
-            subdivision: 10
-        );
+        double E = 0.0;
+        try
+        {
+            E = RobustNewtonRaphson.FindRoot(
+                E => CalcKepler(E) - normM,
+                CalcDKepler,
+                left, right,
+                accuracy: 1e-12,
+                maxIterations: 90,
+                subdivision: 10
+            );
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
 
         // revert to original orbital period
         if (e < 1.0)
-            E += 2 * Math.PI * Math.Floor(M / (2 * Math.PI)); 
+            E += 2 * Math.PI * Math.Floor(M / (2 * Math.PI));
 
         return E;
     }
