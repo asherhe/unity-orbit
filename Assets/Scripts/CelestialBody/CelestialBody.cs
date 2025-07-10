@@ -88,10 +88,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _displayObject;
     private GameObject _surfaceObject;
     private GameObject _atmObject;
-    private GameObject _trajectoriesObject;
 
-    [SerializeField]
-    private GameObject _trajectoryPrefab;
     [SerializeField]
     private GameObject _SOIPrefab;
 
@@ -177,7 +174,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             );
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory traj = parent.AddTrajectory(this);
+            Trajectory traj = TrajectoryManager.Instance.AddTrajectory(this);
             traj.GetComponent<MeshRenderer>().material.color = _config.color;
         }
 
@@ -311,44 +308,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         transform.position = CameraFocus.Instance.GetRelativePosition(this);
 
         SetDynamicMaterialProperties();
-    }
-
-    /// <summary>
-    /// add a new trajectory display for a satellite to this body
-    /// </summary>
-    /// <returns>newly created trajectory</returns>
-    public Trajectory AddTrajectory(IOrbitingObject o)
-    {
-        if (o.orbit != null && o.orbit.body != this)
-            throw new ArgumentException("Expected a direct satellite of celestial body.");
-
-        if (_trajectoriesObject == null)
-        {
-            _trajectoriesObject = new GameObject("Trajectories");
-            _trajectoriesObject.transform.parent = transform;
-            _trajectoriesObject.transform.localPosition = Vector3.zero;
-        }
-
-        var trajObject = Instantiate(_trajectoryPrefab, _trajectoriesObject.transform);
-        trajObject.name = $"Trajectory {o.ToString()}";
-        trajObject.transform.localPosition = Vector3.zero;
-        var trajectory = trajObject.GetComponent<Trajectory>();
-        trajectory.Orbit = o;
-        return trajectory;
-    }
-
-    /// <summary>
-    /// transfer a preexisting Trajectory object to this celestial body
-    /// </summary>
-    /// <returns>the trajectory that was transferred</returns>
-    public Trajectory AddTrajectory(Trajectory t)
-    {
-        if (t.Orbit.orbit != null && t.Orbit.orbit.body != this)
-            throw new ArgumentException("Expected a direct satellite of celestial body.");
-
-        t.transform.parent = _trajectoriesObject.transform;
-        t.transform.localPosition = Vector3.zero;
-        return t;
     }
 
     public override string ToString()

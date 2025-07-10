@@ -164,4 +164,9 @@ public class Trajectory : MonoBehaviour
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
     }
+
+    private void LateUpdate()
+    {
+        transform.position = Orbit.orbit.body.transform.position;
+    }
 }
