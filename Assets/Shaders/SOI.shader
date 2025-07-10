@@ -64,10 +64,9 @@ Shader "SOI"
                 float4 dist = float4(0,0,0,0);
                 for (int i = 0; i < 4; i++)
                     dist[i] = distance(samples[i], centerSS);
-                float a = 0.25 * (dist.x+dist.y+dist.z+dist.w);
-                a /= radSS; // normalize to radius
-                a = (a - 0.8) / 0.4; // [0.8, 1.2] -> [0, 1]
-                OUT.alpha = saturate(a);
+                dist /= radSS; // normalize to radius
+                dist = saturate((dist - 0.8) / 0.4); // [0.8, 1.2] -> [0, 1]
+                OUT.alpha = 0.25 * (dist.x+dist.y+dist.z+dist.w);
 
                 return OUT;
             }
