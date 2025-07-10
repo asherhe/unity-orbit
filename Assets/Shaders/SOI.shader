@@ -39,12 +39,6 @@ Shader "SOI"
                 float alpha : TEXCOORD1;
             };
 
-            // maps a range [a, b] to a range [c, d] by linearly tranforming x
-            float remap(float x, float a, float b, float c, float d)
-            {
-                return (x-a) * (d-c) / (b-a) + c;
-            }
- 
             Varyings vert(Attributes IN)
             {
                 Varyings OUT;
@@ -60,10 +54,21 @@ Shader "SOI"
                 // half the size of the largest screen dimension
                 float halfScreen = max(_ScreenParams.x, _ScreenParams.y);
 
-                float sizeAlpha = saturate(remap(radSS/halfScreen, 1.5, 1, 0, 1));
-                sizeAlpha *= sizeAlpha;
-                float distAlpha = saturate(remap((length(centerSS)+halfScreen)/radSS, 1, 1.2, 0, 1));
-                OUT.alpha = saturate(sizeAlpha+distAlpha);
+                // sample distance from center at screen corners
+                float2 samples[4] = {
+                    _ScreenParams.xy,
+                    float2(-_ScreenParams.x, _ScreenParams.y),
+                    -_ScreenParams.xy,
+                    float2(_ScreenParams.x, -_ScreenParams.y),
+                };
+                float4 dist = float4(0,0,0,0);
+                for (int i = 0; i < 4; i++)
+                    dist[i] = distance(samples[i], centerSS);
+                float a = 0.25 * (dist.x+dist.y+dist.z+dist.w);
+                a /= radSS; // normalize to radius
+                a = (a - 0.8) / 0.4; // [0.8, 1.2] -> [0, 1]
+                OUT.alpha = saturate(a);
+
                 return OUT;
             }
 
