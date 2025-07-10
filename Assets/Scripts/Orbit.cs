@@ -264,6 +264,9 @@ public class Orbit
         public double distance;
     }
 
+    /// <summary>
+    /// gets a list of all encounters with the given orbit
+    /// </summary>
     public List<Encounter> GetEncounters(Orbit o)
     {
         throw new NotImplementedException();
