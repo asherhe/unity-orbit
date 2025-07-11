@@ -157,7 +157,7 @@ public class Orbit
         Period = 2 * Math.PI / MeanMotion;
 
         CheckSOI();
-        CheckEncounters();
+        CheckCaptures();
 
         OnOrbitChanged?.Invoke();
     }
@@ -266,24 +266,16 @@ public class Orbit
         /// </summary>
         public double distance;
 
+        /// <summary>
+        /// the object that <c>other</c> belongs to, used internally to keep tabs on encounters
+        /// </summary>
+        public IOrbitingObject orbitingObject;
+
         public Encounter(Orbit o, StateVector state, double distance)
         {
             other = o;
             this.state = state;
             this.distance = distance;
-        }
-    }
-    public Encounter nextEncounter { get; private set; }
-
-    public void CheckEncounters()
-    {
-        nextEncounter = null;
-        foreach (var b in body.satellites)
-        {
-            var encounters = GetEncounters(b.orbit);
-            foreach (var e in encounters)
-                if (nextEncounter == null || e.state.time < nextEncounter.state.time)
-                    nextEncounter = e;
         }
     }
 
@@ -378,6 +370,63 @@ public class Orbit
         }
 
         return encounters;
+    }
+
+    /* SOI captures */
+
+    /// <summary>
+    /// the state of this orbit at the time of the next capture
+    /// </summary>
+    public StateVector nextCapture { get; private set; }
+    /// <summary>
+    /// the celestial body that will capture this orbit
+    /// </summary>
+    public CelestialBody nextCaptureBody { get; private set; }
+
+    private void CheckCaptures()
+    {
+        nextCapture = null; nextCaptureBody = null;
+
+        Encounter captureEncounter = null;
+        foreach (var satellite in body.satellites)
+        {
+            var encounters = GetEncounters(satellite.orbit);
+            foreach (var e in encounters)
+                if (e.distance < satellite.soiRadius && (captureEncounter == null || e.state.time < captureEncounter.state.time))
+                {
+                    captureEncounter = e;
+                    captureEncounter.orbitingObject = satellite;
+                }
+        }
+        if (captureEncounter == null) return;
+
+        var b = (CelestialBody)captureEncounter.orbitingObject;
+        var o = captureEncounter.other;
+        var t = captureEncounter.state.time;
+
+        // estimated time to traverse the SOI radius
+        var soiTrav = b.soiRadius / captureEncounter.state.vel.Magnitude;
+
+        // distance to SOI edge
+        double SOIDistance(double t) => (GetPosition(t) - o.GetPosition(t)).Magnitude - b.soiRadius;
+
+        double captureTime = 0;
+        try
+        {
+            captureTime = Brent.FindRoot(
+                SOIDistance,
+                t - 2 * soiTrav, t,
+                accuracy: 1e-12,
+                maxIterations: 100
+            );
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+
+        nextCapture = new(captureTime, GetPosition(captureTime), GetVelocity(captureTime));
+        nextCaptureBody = b;
     }
 
     /* get orbit info */
@@ -584,12 +633,23 @@ public class Orbit
     {
         if (soiEscape != null && UT >= soiEscape.time)
         {
+            Debug.Log("soi escape");
             var t = soiEscape.time;
             UpdateFromStateVectors(
-                body.orbit.GetPosition(t) + GetPosition(t),
-                body.orbit.GetVelocity(t) + GetVelocity(t),
-                t,
-                body.parent
+                body.orbit.GetPosition(t) + soiEscape.pos,
+                body.orbit.GetVelocity(t) + soiEscape.vel,
+                t, body.parent
+            );
+            return true;
+        }
+        if (nextCapture != null && UT >= nextCapture.time)
+        {
+            Debug.Log("soi capture");
+            var t = nextCapture.time;
+            UpdateFromStateVectors(
+                nextCapture.pos - nextCaptureBody.orbit.GetPosition(t),
+                nextCapture.vel - nextCaptureBody.orbit.GetVelocity(t),
+                t, nextCaptureBody
             );
             return true;
         }
