@@ -22,7 +22,7 @@ public class Orbit
     /// may occasionally be referred to as just "angular momentum".
     /// </summary>
     /// <remarks>
-    /// the sign of the angular momentum obeys the right hand rule (positive is a clockwise orbit).
+    /// the sign of the angular momentum obeys the right hand rule (positive is a counterclockwise orbit).
     /// (units <c>m^2 / s</c>)
     /// </remarks>
     public double h { get; private set; }
@@ -127,14 +127,14 @@ public class Orbit
         }
         else
         {
-            pos *= body.GM * (1 - e * e) / (h * h); // 1/a
+            pos /= A;
             pos.x += e;
-            pos.y /= Math.Sqrt(Math.Abs(1 - e * e));
+            pos.y /= Math.Sqrt(BetaSquared);
             if (h < 0.0) pos.y = -pos.y;
 
             double E;
             if (e < 1.0) E = Math.Atan2(pos.y, pos.x);
-            else E = -Math.Atanh(pos.y / pos.x);
+            else E = Math.Atanh(pos.y / pos.x);
             M0 = CalcKepler(E);
         }
 
@@ -151,9 +151,10 @@ public class Orbit
     private void PostUpdate()
     {
         A = h * h / (body.GM * (1 - e * e));
-        Periapsis = A * (1 - e * e) / (1 + e);
-        Apoapsis = A * (1 - e * e) / (1 - e);
-        MeanMotion = Math.Abs(body.GM * body.GM * (1.0 - e * e) / (h * h * h));
+        Periapsis = A * (1 - e);
+        Apoapsis = (e < 1.0) ? (A * (1 + e)) : double.PositiveInfinity; // betasquared is fine because we know e<1
+        BetaSquared = Math.Abs(1 - e * e); // 1-e^2 for elliptical, e^2-1 for hyperbolic
+        MeanMotion = Math.Sqrt(body.GM / Math.Abs(A * A * A));
         Period = 2 * Math.PI / MeanMotion;
 
         CheckSOI();
@@ -326,11 +327,10 @@ public class Orbit
         var dt = (tEnd - tStart) / brackets;
 
         // search for brackets where extrema exist
-        double t0 = tStart, d0;
+        double t0 = tStart, d0 = DDistance(t0);
         for (int i = 0; i < brackets; i++)
         {
             var t1 = t0 + dt;
-            d0 = DDistance(t0);
             var d1 = DDistance(t1);
 
             // inflection point found
@@ -440,6 +440,11 @@ public class Orbit
     public double Apoapsis { get; private set; }
 
     /// <summary>
+    /// commonly used value in calculations. equal to 1-e^2 when e<1 and e^2-1 when e>1
+    /// </summary>
+    public double BetaSquared { get; private set; }
+
+    /// <summary>
     /// orbital period in seconds
     /// </summary>
     public double Period { get; private set; }
@@ -461,6 +466,7 @@ public class Orbit
     /// <param name="E">eccentric anomaly</param>
     private double CalcKepler(double E)
     {
+        if (double.IsNaN(E)) return double.NaN;
         if (e < 1.0) return E - e * Math.Sin(E);
         else if (e > 1.0) return e * Math.Sinh(E) - E;
         else return 0.0; // kepler's equation doesn't apply to parabolic orbits
@@ -471,8 +477,9 @@ public class Orbit
     /// <param name="E">eccentric anomaly</param>
     private double CalcDKepler(double E)
     {
+        if (double.IsNaN(E)) return double.NaN;
         if (e < 1.0) return 1 - e * Math.Cos(E);
-        else if (e > 1.0) return e * Math.Cosh(E);
+        else if (e > 1.0) return e * Math.Cosh(E) - 1;
         else return 0; // kepler's equation doesn't apply to parabolic orbits
     }
 
@@ -506,8 +513,8 @@ public class Orbit
         }
         else
         {
-            if (M > 0.0) { left = 0; right = M + 1; }
-            else { left = M - 1; right = 0; }
+            left = Math.Min(0, M - 1);
+            right = Math.Max(0, M + 1);
         }
 
         double E = 0.0;
@@ -560,10 +567,10 @@ public class Orbit
     {
         Vector2d pos;
         if (e < 1.0) pos = new Vector2d(Math.Cos(E), Math.Sin(E));
-        else pos = new Vector2d(Math.Cosh(E), -Math.Sinh(E));
+        else pos = new Vector2d(Math.Cosh(E), Math.Sinh(E));
 
         pos.x -= e;
-        pos.y *= Math.Sqrt(Math.Abs(1 - e * e));
+        pos.y *= Math.Sqrt(BetaSquared);
         if (h < 0.0) pos.y = -pos.y;
 
         pos = (pos * A).Rotate(omega);
@@ -598,10 +605,10 @@ public class Orbit
     {
         Vector2d vel;
         if (e < 1.0) vel = new Vector2d(-Math.Sin(E), Math.Cos(E));
-        else vel = new Vector2d(Math.Sinh(E), -Math.Cosh(E));
+        else vel = new Vector2d(Math.Sinh(E), Math.Cosh(E));
 
-        vel.x *= Math.Sqrt(Math.Abs(1 - e * e));
-        vel.y *= Math.Abs(1 - e * e);
+        vel.x *= Math.Sqrt(BetaSquared);
+        vel.y *= BetaSquared;
         if (h < 0.0) vel.y = -vel.y;
 
         vel *= body.GM / (h * (e * (
@@ -646,11 +653,13 @@ public class Orbit
         {
             Debug.Log("soi capture");
             var t = nextCapture.time;
+            Debug.Log($"p={GetPosition(t)} v={GetVelocity(t)}");
             UpdateFromStateVectors(
                 nextCapture.pos - nextCaptureBody.orbit.GetPosition(t),
                 nextCapture.vel - nextCaptureBody.orbit.GetVelocity(t),
                 t, nextCaptureBody
             );
+            Debug.Log($"p={GetPosition(t) + body.orbit.GetPosition(t)} v={GetVelocity(t) + body.orbit.GetVelocity(t)}");
             return true;
         }
         return false;
