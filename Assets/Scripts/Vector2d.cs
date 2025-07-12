@@ -12,29 +12,23 @@ public class Vector2d
 {
     public double x, y;
 
-    public Vector2d()
-    {
-        x = 0; y = 0;
-    }
-
-    public Vector2d(double x, double y)
-    {
-        this.x = x; this.y = y;
-    }
+    public Vector2d() { x = 0; y = 0; }
+    public Vector2d(Vector2d v) { x = v.x; y = v.y; }
+    public Vector2d(double x, double y) { this.x = x; this.y = y; }
 
     /* operations on vectors */
 
     public static bool operator ==(Vector2d v, Vector2d w) => v.x == w.x && v.y == w.y;
-    public static bool operator !=(Vector2d v, Vector2d w) => !(v==w);
+    public static bool operator !=(Vector2d v, Vector2d w) => !(v == w);
     public override bool Equals(object obj) => Equals(obj as Vector2d);
     public override int GetHashCode() => HashCode.Combine(x, y);
 
-    public static Vector2d operator +(Vector2d v, Vector2d w) => new Vector2d(v.x + w.x, v.y + w.y);
-    public static Vector2d operator -(Vector2d v, Vector2d w) => new Vector2d(v.x - w.x, v.y - w.y);
-    public static Vector2d operator -(Vector2d v) => new Vector2d(-v.x, -v.y);
-    public static Vector2d operator *(Vector2d v, double k) => new Vector2d(v.x * k, v.y * k);
-    public static Vector2d operator *(double k, Vector2d v) => new Vector2d(v.x * k, v.y * k);
-    public static Vector2d operator /(Vector2d v, double k) => new Vector2d(v.x / k, v.y / k);
+    public static Vector2d operator +(Vector2d v, Vector2d w) => new(v.x + w.x, v.y + w.y);
+    public static Vector2d operator -(Vector2d v, Vector2d w) => new(v.x - w.x, v.y - w.y);
+    public static Vector2d operator -(Vector2d v) => new(-v.x, -v.y);
+    public static Vector2d operator *(Vector2d v, double k) => new(v.x * k, v.y * k);
+    public static Vector2d operator *(double k, Vector2d v) => new(v.x * k, v.y * k);
+    public static Vector2d operator /(Vector2d v, double k) => new(v.x / k, v.y / k);
 
     /// <summary>
     /// dot product between two vectors
@@ -49,11 +43,11 @@ public class Vector2d
     /// <summary>
     /// cross product between a vector and a z-component
     /// </summary>
-    public static Vector2d Cross(Vector2d v, double w) => new Vector2d(v.y * w, -v.x * w);
+    public static Vector2d Cross(Vector2d v, double w) => new(v.y * w, -v.x * w);
     /// <summary>
     /// cross product between a z-component and a vector
     /// </summary>
-    public static Vector2d Cross(double w, Vector2d v) => new Vector2d(-v.y * w, v.x * w);
+    public static Vector2d Cross(double w, Vector2d v) => new(-v.y * w, v.x * w);
 
     /// <summary>
     /// square of magnitude
@@ -76,11 +70,11 @@ public class Vector2d
     }
 
 
-    public static Vector2d zero => new Vector2d(0.0, 0.0);
-    public static Vector2d up => new Vector2d(0.0, 1.0);
-    public static Vector2d down => new Vector2d(0.0, -1.0);
-    public static Vector2d left => new Vector2d(-1.0, 0.0);
-    public static Vector2d right => new Vector2d(1.0, 0.0);
+    public static Vector2d zero => new(0.0, 0.0);
+    public static Vector2d up => new(0.0, 1.0);
+    public static Vector2d down => new(0.0, -1.0);
+    public static Vector2d left => new(-1.0, 0.0);
+    public static Vector2d right => new(1.0, 0.0);
 
     public override string ToString() => "(" + x + ", " + y + ")";
     public static implicit operator Vector2(Vector2d v) { return new Vector2((float)v.x, (float)v.y); }
