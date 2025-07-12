@@ -1,0 +1,201 @@
+using MathNet.Numerics.RootFinding;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+namespace Orbit
+{
+    public class KeplerianPropagator
+    {
+        public OrbitState Orbit { get; private set; }
+
+        public KeplerianPropagator(OrbitState orbit)
+        {
+            Orbit = orbit;
+        }
+
+        // ik this is not good practice but i'm planning to switch to universal variable formulation later
+        // so all of these will become fields in a few commits
+        public double GM { get => Orbit.GM; }
+        public double h { get => Orbit.h; }
+        public double e { get => Orbit.e; }
+        public double omega { get => Orbit.omega; }
+        public double M0 { get => Orbit.M0; }
+        public double t0 { get => Orbit.t0; }
+        public double a { get => Orbit.A; }
+        public double betaSquared { get => Orbit.BetaSquared; }
+
+        /// <summary>
+        /// get mean anomaly at a given time
+        /// </summary>
+        public double GetMeanAnomaly(double t) => M0 + (t - t0) * Orbit.MeanMotion;
+
+        /// <summary>
+        /// calculates the value of the RHS of kepler's equation.
+        /// used to solve for eccentric anomaly.
+        /// </summary>
+        /// <param name="E">eccentric anomaly</param>
+        public double CalcKepler(double E)
+        {
+            if (e < 1) return E - e * Math.Sin(E);
+            else if (e > 1) return e * Math.Sinh(E) - E;
+            else return 0; // kepler's equation doesn't apply to parabolic orbits
+        }
+        /// <summary>
+        /// the derivative of CalcKepler
+        /// </summary>
+        /// <param name="E">eccentric anomaly</param>
+        public double CalcDKepler(double E)
+        {
+            if (e < 1) return 1 - e * Math.Cos(E);
+            else if (e > 1) return e * Math.Cosh(E) - 1;
+            else return 0; // kepler's equation doesn't apply to parabolic orbits
+        }
+
+        /// <summary>
+        /// get eccentric anomaly at a given time
+        /// </summary>
+        public double GetEccentricAnomaly(double t) => GetEccentricAnomalyFromMeanAnomaly(GetMeanAnomaly(t));
+        public double GetEccentricAnomalyFromMeanAnomaly(double M)
+        {
+            if (e == 1.0) throw new InvalidOperationException("Cannot calculate the eccentric anomaly of a parabolic orbit.");
+            if (M == 0.0) return 0.0;
+            if (e == 0.0) return M;
+
+            /*
+             * find eccentric anomaly by solving for E in kepler's equation
+             * 
+             *   e<1:  M = E - e sin E
+             *   e>1:  M = e sinh E - E
+             */
+
+            double left, right;
+            if (e < 1)
+            {
+                left = 0;
+                right = 2 * Math.PI;
+                // normalize to [0, 2PI]
+                M = MathUtils.Mod(M, 2 * Math.PI);
+            }
+            else
+            {
+                left = Math.Min(0, M - 1);
+                right = Math.Max(0, M + 1);
+            }
+
+            double E = 0.0;
+            try
+            {
+                E = RobustNewtonRaphson.FindRoot(
+                    E => CalcKepler(E) - M,
+                    CalcDKepler,
+                    left, right,
+                    accuracy: 1e-12,
+                    maxIterations: 90,
+                    subdivision: 10
+                );
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+
+            return E;
+        }
+
+        public double GetTrueAnomaly(double t) => GetTrueAnomalyFromMeanAnomaly(GetMeanAnomaly(t));
+        public double GetTrueAnomalyFromMeanAnomaly(double M)
+        {
+            if (e < 1)
+            {
+                throw new NotImplementedException();
+            }
+            else if (e > 1)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var z = Math.Cbrt(3 * M + Math.Sqrt(1 + 9 * M * M));
+                var nu = 2 * Math.Atan(z - 1 / z);
+                return nu;
+            }
+        }
+
+        /// <summary>
+        /// get the position (in world space) of the orbit at a given time
+        /// </summary>
+        /// <returns>position of orbit, in meters</returns>
+        public Vector2d GetPosition(double t)
+        {
+            Vector2d pos;
+            if (e < 1)
+            {
+                var E = GetEccentricAnomaly(t);
+                pos = new(
+                    a * (Math.Cos(E) - e),
+                    a * Math.Sqrt(betaSquared) * Math.Sin(E)
+                );
+            }
+            else if (e > 1)
+            {
+                var F = GetEccentricAnomaly(t);
+                pos = new(
+                    -a * (e - Math.Cosh(F)),
+                    -a * Math.Sqrt(betaSquared) * Math.Sinh(F)
+                );
+            }
+            else
+            {
+                var nu = GetTrueAnomaly(t);
+                var r = h * h / (GM * (1 + Math.Cos(nu)));
+                pos = new(
+                    r * Math.Cos(nu),
+                    r * Math.Sin(nu)
+                );
+            }
+
+            return Orbit.PerifocalToBody(pos);
+        }
+
+        /// <summary>
+        /// get the velocity (in world space) of the orbit at a given time
+        /// </summary>
+        /// <returns>velocity of orbit, in meters</returns>
+        public Vector2d GetVelocity(double t)
+        {
+            Vector2d vel;
+            if (e < 1)
+            {
+                var E = GetEccentricAnomaly(t);
+                var r = a * (1 - e * Math.Cos(E));
+                vel = new(
+                    -Math.Sin(E),
+                    Math.Sqrt(betaSquared) * Math.Cos(E)
+                );
+                vel *= Math.Sqrt(GM * a) / r;
+            }
+            else if (e > 1)
+            {
+                var F = GetEccentricAnomaly(t);
+                var r = -a * (e * Math.Cosh(F) - 1);
+                vel = new(
+                    -Math.Sinh(F),
+                    Math.Sqrt(betaSquared) * Math.Cosh(F)
+                );
+                vel *= Math.Sqrt(GM * -a) / r;
+            }
+            else
+            {
+                var nu = GetTrueAnomaly(t);
+                vel = new(
+                    -Math.Sin(nu),
+                    1 + Math.Cos(nu)
+                );
+                vel *= GM / h;
+            }
+            return Orbit.PerifocalToBody(vel);
+        }
+    }
+}

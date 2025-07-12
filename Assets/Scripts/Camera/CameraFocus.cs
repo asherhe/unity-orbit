@@ -1,3 +1,4 @@
+using Orbit;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,13 +48,13 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
         focusNode = focusPath.Last;
         while (focusNode.Value != common)
         {
-            focusPos += focusNode.Value.orbit.GetPosition();
+            focusPos += new KeplerianPropagator(focusNode.Value.orbit).GetPosition(Universe.Instance.UT);
             focusNode = focusNode.Previous;
         }
         objNode = objPath.Last;
         while (objNode.Value != common)
         {
-            objPos += objNode.Value.orbit.GetPosition();
+            objPos += new KeplerianPropagator(objNode.Value.orbit).GetPosition(Universe.Instance.UT);
             objNode = objNode.Previous;
         }
 

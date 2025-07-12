@@ -1,3 +1,4 @@
+using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
     /// add a new trajectory to display
     /// </summary>
     /// <returns>newly created trajectory component</returns>
-    public Trajectory AddTrajectory(Orbit o)
+    public Trajectory AddTrajectory(OrbitState o)
     {
         var trajObject = Instantiate(trajectoryPrefab, transform);
         //trajObject.name = $"Trajectory {o.ToString()}";
