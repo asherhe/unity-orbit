@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(FollowTransform))]
 public class Trajectory : MonoBehaviour
 {
     private TrajectoryMesh trajectoryMesh;
     private MeshFilter meshFilter;
+    private FollowTransform follow;
 
     private Orbit _orbit;
     public Orbit Orbit
@@ -18,6 +19,7 @@ public class Trajectory : MonoBehaviour
             if (_orbit == value) return;
             if (_orbit != null) _orbit.OnOrbitChanged -= GenerateTrajectory;
             _orbit = value;
+            follow.follow = Orbit.body.transform;
             _orbit.OnOrbitChanged += GenerateTrajectory;
             GenerateTrajectory();
         }
@@ -28,6 +30,7 @@ public class Trajectory : MonoBehaviour
         trajectoryMesh = new TrajectoryMesh();
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = trajectoryMesh.mesh;
+        follow = GetComponent<FollowTransform>();
     }
 
     public void GenerateTrajectory()
@@ -63,11 +66,6 @@ public class Trajectory : MonoBehaviour
 
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
-    }
-
-    private void LateUpdate()
-    {
-        transform.position = Orbit.body.transform.position;
     }
 }
 

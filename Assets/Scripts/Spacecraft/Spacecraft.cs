@@ -8,6 +8,11 @@ using UnityEngine;
 
 public class Spacecraft : MonoBehaviour, IOrbitingObject
 {
+    /// <summary>
+    /// invoked when a spacecraft instance is loaded from config
+    /// </summary>
+    public static event Action<Spacecraft> OnSpacecraftLoaded;
+
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
     [Serializable]
@@ -32,6 +37,11 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
         public List<DataNode> parts;
     }
+
+    /// <summary>
+    /// the name of this spacecraft
+    /// </summary>
+    public string craftName { get; private set; }
 
     /// <summary>
     /// deals with newtonian physics.
@@ -102,6 +112,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public async Task OnLoad(DataNode config)
     {
         _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
+
+        craftName = _config.name;
 
         // TODO: initialize fields
         Newtonian.angle = _config.rotation.angle;
@@ -180,6 +192,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         foreach (var part in parts) part.OnCraftPartsLoaded();
 
         OnLoaded?.Invoke();
+        OnSpacecraftLoaded?.Invoke(this);
     }
 
     /// <summary>
@@ -217,6 +230,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public override string ToString()
     {
-        return $"[Spacecraft {_config.name}]";
+        return $"[Spacecraft {craftName}]";
     }
 }
