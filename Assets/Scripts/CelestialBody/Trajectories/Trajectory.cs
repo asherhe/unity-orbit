@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(FollowTransform))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(UI.FollowTransform))]
 public class Trajectory : MonoBehaviour
 {
     private TrajectoryMesh trajectoryMesh;
     private MeshFilter meshFilter;
-    private FollowTransform follow;
+    private UI.FollowTransform follow;
 
     private Orbit _orbit;
     public Orbit Orbit
