@@ -8,28 +8,75 @@ namespace Orbit
 {
     public class KeplerianPropagator
     {
-        public OrbitState Orbit { get; private set; }
-
-        public KeplerianPropagator(OrbitState orbit)
+        /// <summary>
+        /// constructs a new keplerian propagator from orbital elements
+        /// </summary>
+        /// <param name="GM">standard gravitational parameter, m^3/s^2</param>
+        /// <param name="h">angular momentum, m^2/s</param>
+        /// <param name="e">eccentricity</param>
+        /// <param name="omega">longitude of periapsis, in radians</param>
+        /// <param name="M0">mean anomaly at epoch, in radians</param>
+        /// <param name="t0">epoch time, in seconds</param>
+        public KeplerianPropagator(
+            double GM,
+            double h,
+            double e,
+            double omega,
+            double M0,
+            double t0
+        )
         {
-            Orbit = orbit;
+            this.GM = GM;
+            this.h = h;
+            this.e = e;
+            this.omega = omega;
+            this.M0 = M0;
+            this.t0 = t0;
+
+            a = h * h / (GM * (1 - e * e));
+            betaSquared = Math.Abs(1 - e * e); // 1-e^2 for elliptical, e^2-1 for hyperbolic
+            if (e == 1)
+                meanMotion = GM * GM / (h * h * h);
+            else
+                meanMotion = Math.Sqrt(GM / Math.Abs(a * a * a));
         }
 
-        // ik this is not good practice but i'm planning to switch to universal variable formulation later
-        // so all of these will become fields in a few commits
-        public double GM { get => Orbit.GM; }
-        public double h { get => Orbit.h; }
-        public double e { get => Orbit.e; }
-        public double omega { get => Orbit.omega; }
-        public double M0 { get => Orbit.M0; }
-        public double t0 { get => Orbit.t0; }
-        public double a { get => Orbit.A; }
-        public double betaSquared { get => Orbit.BetaSquared; }
+        public double GM;
+        public double h;
+        public double e;
+        public double omega;
+        public double M0;
+        public double t0;
+
+        // derived values
+        public double a;
+        public double betaSquared;
+        public double meanMotion;
+
+        /// <summary>
+        /// converts a vector from body space to perifocal space
+        /// </summary>
+        public Vector2d BodyToPerifocal(Vector2d vbody)
+        {
+            var perifocal = vbody.Rotate(-omega);
+            if (h < 0) perifocal.y = -perifocal.y;
+            return perifocal;
+        }
+        /// <summary>
+        /// converts a vector from body space to perifocal space
+        /// </summary>
+        public Vector2d PerifocalToBody(Vector2d vperifocal)
+        {
+            var body = new Vector2d(vperifocal);
+            if (h < 0) body.y = -body.y;
+            body = body.Rotate(omega);
+            return body;
+        }
 
         /// <summary>
         /// get mean anomaly at a given time
         /// </summary>
-        public double GetMeanAnomaly(double t) => M0 + (t - t0) * Orbit.MeanMotion;
+        public double GetMeanAnomaly(double t) => M0 + (t - t0) * meanMotion;
 
         /// <summary>
         /// calculates the value of the RHS of kepler's equation.
@@ -156,7 +203,7 @@ namespace Orbit
                 );
             }
 
-            return Orbit.PerifocalToBody(pos);
+            return PerifocalToBody(pos);
         }
 
         /// <summary>
@@ -195,7 +242,7 @@ namespace Orbit
                 );
                 vel *= GM / h;
             }
-            return Orbit.PerifocalToBody(vel);
+            return PerifocalToBody(vel);
         }
     }
 }

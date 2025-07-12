@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 namespace Orbit
 {
@@ -20,8 +21,17 @@ namespace Orbit
         /// </summary>
         public double GM { get => body.GM; }
 
-        /* orbital elements */
-        /* these guys are used to uniquely identify a given orbit */
+        public double t0 { get; private set; }
+        public Vector2d p0 { get; private set; }
+        public Vector2d v0 { get; private set; }
+
+        /// <summary>
+        /// invoked when any of the orbital parameters are modified
+        /// </summary>
+        public event Action OnStateChanged;
+
+
+        /* derived orbital parameters */
 
         /// <summary>
         /// specific angular momentum around the parent body.
@@ -60,20 +70,24 @@ namespace Orbit
         public double M0 { get; private set; }
 
         /// <summary>
-        /// epoch time
+        /// the semimajor axis (in meters) of the orbit
         /// </summary>
-        /// <remarks>
-        /// in Universal Time.
-        /// (units seconds)
-        /// </remarks>
-        public double t0 { get; private set; }
+        public double a { get; private set; }
 
         /// <summary>
-        /// invoked when any of the orbital parameters are modified
+        /// periapsis distance from central body
         /// </summary>
-        public event Action OnStateChanged;
+        public double periapsis { get; private set; }
+        /// <summary>
+        /// apoapsis distance from central body
+        /// </summary>
+        public double apoapsis { get; private set; }
 
-        /* orbit constructors */
+        /// <summary>
+        /// orbital period in seconds
+        /// </summary>
+        public double period { get; private set; }
+
 
         /// <summary>
         /// construct an orbit from orbital elements
@@ -87,11 +101,10 @@ namespace Orbit
         public OrbitState(double h, double e, double omega, double M0, double t0, CelestialBody body)
         {
             this.body = body;
-            this.h = h;
-            this.e = e;
-            this.omega = omega;
-            this.M0 = M0;
             this.t0 = t0;
+            var kprop = new KeplerianPropagator(body.GM, h, e, omega, M0, t0);
+            p0 = kprop.GetPosition(t0);
+            v0 = kprop.GetVelocity(t0);
 
             PostUpdate();
         }
@@ -107,6 +120,21 @@ namespace Orbit
         {
             UpdateFromStateVectors(pos, vel, t, body);
         }
+
+        public void UpdateFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
+        {
+            this.body = body;
+            t0 = t;
+            p0 = pos;
+            v0 = vel;
+
+            PostUpdate();
+        }
+        public void UpdateFromStateVectors(Vector2d pos, Vector2d vel)
+        {
+            UpdateFromStateVectors(pos, vel, Universe.Instance.UT, body);
+        }
+
 
         /// <summary>
         /// converts a vector from body space to perifocal space
@@ -128,23 +156,28 @@ namespace Orbit
             return body;
         }
 
-        public void UpdateFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
+
+        /// <summary>
+        /// calculations to run after this orbit's parameters have changed
+        /// </summary>
+        private void PostUpdate()
         {
-            // https://en.wikipedia.org/wiki/Orbit_determination#Orbit_Determination_from_a_State_Vector
-
-            this.body = body;
-            t0 = t;
-
-            h = Vector2d.Cross(pos, vel);
+            h = Vector2d.Cross(p0, v0);
 
             // eccentricity vector, points in the direction of periapsis
-            Vector2d eccVec = Vector2d.Cross(vel, h) / GM - pos.Normalized;
+            Vector2d eccVec = Vector2d.Cross(v0, h) / GM - p0.Normalized;
             e = eccVec.Magnitude;
 
             omega = Math.Atan2(eccVec.y, eccVec.x);
 
+            a = h * h / (GM * (1 - e * e));
+            periapsis = a * (1 - e);
+            apoapsis = (e < 1) ? (a * (1 + e)) : double.PositiveInfinity; // betasquared is fine because we know e<1
+
+            period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
+
             // position in the perifocal plane
-            pos = BodyToPerifocal(pos);
+            var pos = BodyToPerifocal(p0);
 
             // true anomaly, range [-PI, PI]
             var nu = Math.Atan2(pos.y, pos.x);
@@ -213,55 +246,6 @@ namespace Orbit
                 double D = Math.Tan(0.5 * nu);
                 M0 = 0.5 * D + D * D * D / 6.0;
             }
-
-            PostUpdate();
-        }
-        public void UpdateFromStateVectors(Vector2d pos, Vector2d vel)
-        {
-            UpdateFromStateVectors(pos, vel, Universe.Instance.UT, body);
-        }
-
-
-        /* get orbit info */
-
-        /// <summary>
-        /// the semimajor axis (in meters) of the orbit
-        /// </summary>
-        public double A { get; private set; }
-
-        public double Periapsis { get; private set; }
-        public double Apoapsis { get; private set; }
-
-        /// <summary>
-        /// commonly used value in calculations. equal to 1-e^2 when e<1 and e^2-1 when e>1
-        /// </summary>
-        public double BetaSquared { get; private set; }
-
-        /// <summary>
-        /// orbital period in seconds
-        /// </summary>
-        public double Period { get; private set; }
-
-        /// <summary>
-        /// mean motion is the rate at which the mean anomaly changes
-        /// </summary>
-        public double MeanMotion { get; private set; }
-
-
-        /// <summary>
-        /// calculations to run after this orbit's parameters have changed
-        /// </summary>
-        private void PostUpdate()
-        {
-            A = h * h / (GM * (1 - e * e));
-            Periapsis = A * (1 - e);
-            Apoapsis = (e < 1) ? (A * (1 + e)) : double.PositiveInfinity; // betasquared is fine because we know e<1
-            BetaSquared = Math.Abs(1 - e * e); // 1-e^2 for elliptical, e^2-1 for hyperbolic
-            if (e == 1)
-                MeanMotion = GM * GM / (h * h * h);
-            else
-                MeanMotion = Math.Sqrt(GM / Math.Abs(A * A * A));
-            Period = 2 * Math.PI / MeanMotion;
 
             OnStateChanged?.Invoke();
         }

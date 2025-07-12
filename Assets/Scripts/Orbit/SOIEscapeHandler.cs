@@ -42,7 +42,7 @@ namespace Orbit
             if (orbit.e == 1.0) throw new NotImplementedException(); // TODO: this is for non-parabolic orbits only
 
             // calculate eccentric anomaly at SOI radius (plus or minus)
-            var E = (orbit.A - orbit.body.soiRadius) / (orbit.A * orbit.e);
+            var E = (orbit.a - orbit.body.soiRadius) / (orbit.a * orbit.e);
             if (orbit.e < 1.0) E = Math.Acos(E);
             else E = Math.Acosh(E);
             // no SOI intersection

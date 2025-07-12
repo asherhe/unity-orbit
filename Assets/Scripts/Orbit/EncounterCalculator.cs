@@ -48,7 +48,7 @@ namespace Orbit
         public List<Encounter> GetEncounters(OrbitState o, double t)
         {
             if (orbit.e < 1.0)
-                return GetEncounters(o, t, t + orbit.Period);
+                return GetEncounters(o, t, t + orbit.period);
             else if (orbit.e == 1.0)
                 throw new NotImplementedException();
             else
@@ -57,7 +57,7 @@ namespace Orbit
                 {
                     // end time is when x=-o.apoapsis in this hyperbola's perifocal frame
                     // probably involves some eccanom magic to find that time
-                    var E = Math.Acosh(o.Apoapsis / orbit.A - orbit.e);
+                    var E = Math.Acosh(o.apoapsis / orbit.a - orbit.e);
                     var M = _prop.CalcKepler(E);
                     var tEnd = orbit.t0 + Math.Abs((M - orbit.M0) / orbit.MeanMotion); // abs to find the later one
                     if (t > tEnd) return new();

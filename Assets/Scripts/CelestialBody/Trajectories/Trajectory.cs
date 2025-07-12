@@ -57,7 +57,7 @@ public class Trajectory : MonoBehaviour
         }
         double dTheta = (thetaMax - theta0) / trajectorySubdivs;
 
-        double p = Orbit.A * (1 - Orbit.e * Orbit.e);
+        double p = Orbit.a * (1 - Orbit.e * Orbit.e);
         for (int i = 0; i < trajectorySubdivs; i++)
         {
             double theta = theta0 + i * dTheta;
