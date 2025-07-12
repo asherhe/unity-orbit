@@ -23,11 +23,11 @@ namespace Orbit
         /// <summary>
         /// state of orbit at the place where it enters the SOI
         /// </summary>
-        public StateVector soiCapture;
+        public StateVectors soiCapture;
         /// <summary>
         /// state of orbit at the place where it exits the SOI
         /// </summary>
-        public StateVector soiEscape;
+        public StateVectors soiEscape;
 
         /// <summary>
         /// calculate the state vectors (time, position, velocity) of this orbit at the moments when this orbit enters or leaves the SOI.
@@ -69,7 +69,7 @@ namespace Orbit
             tn = orbit.t0 + (Mn - orbit.M0) / orbit.MeanMotion;
 
             // assign SOI state vectors, ensure chronological order
-            StateVector statep, staten;
+            StateVectors statep, staten;
             statep = new(tp, _prop.GetPosition(tp), _prop.GetVelocity(tp));
             staten = new(tn, _prop.GetPosition(tn), _prop.GetVelocity(tn));
             if (tp > tn)

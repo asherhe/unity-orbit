@@ -103,8 +103,8 @@ namespace Orbit
             this.body = body;
             this.t0 = t0;
             var kprop = new KeplerianPropagator(body.GM, h, e, omega, M0, t0);
-            p0 = kprop.GetPosition(t0);
-            v0 = kprop.GetVelocity(t0);
+            var state = kprop.GetStateVectors(t0);
+            p0 = state.pos; v0 = state.vel;
 
             PostUpdate();
         }
@@ -254,11 +254,11 @@ namespace Orbit
     /// <summary>
     /// a time, a position, and a velocity.
     /// </summary>
-    public class StateVector
+    public class StateVectors
     {
         public double time;
         public Vector2d pos, vel;
-        public StateVector(double time, Vector2d pos, Vector2d vel)
+        public StateVectors(double time, Vector2d pos, Vector2d vel)
         {
             this.time = time;
             this.pos = pos;

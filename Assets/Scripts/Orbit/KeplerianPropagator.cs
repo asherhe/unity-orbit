@@ -171,78 +171,111 @@ namespace Orbit
         }
 
         /// <summary>
-        /// get the position (in world space) of the orbit at a given time
+        /// get the position of this orbit from some anomaly, depending on the orbit type
         /// </summary>
-        /// <returns>position of orbit, in meters</returns>
-        public Vector2d GetPosition(double t)
+        /// <param name="anomaly">eccentric anomaly when e<1, true anomaly when e=0, and hyperbolic eccentric anomaly when e>1</param>
+        /// <returns>position vector</returns>
+        private Vector2d GetPositionFromAnomaly(double t, double anomaly)
         {
             Vector2d pos;
             if (e < 1)
             {
-                var E = GetEccentricAnomaly(t);
                 pos = new(
-                    a * (Math.Cos(E) - e),
-                    a * Math.Sqrt(betaSquared) * Math.Sin(E)
+                    a * (Math.Cos(anomaly) - e),
+                    a * Math.Sqrt(betaSquared) * Math.Sin(anomaly)
                 );
             }
             else if (e > 1)
             {
-                var F = GetEccentricAnomaly(t);
                 pos = new(
-                    -a * (e - Math.Cosh(F)),
-                    -a * Math.Sqrt(betaSquared) * Math.Sinh(F)
+                    -a * (e - Math.Cosh(anomaly)),
+                    -a * Math.Sqrt(betaSquared) * Math.Sinh(anomaly)
                 );
             }
             else
             {
-                var nu = GetTrueAnomaly(t);
-                var r = h * h / (GM * (1 + Math.Cos(nu)));
+                var r = h * h / (GM * (1 + Math.Cos(anomaly)));
                 pos = new(
-                    r * Math.Cos(nu),
-                    r * Math.Sin(nu)
+                    r * Math.Cos(anomaly),
+                    r * Math.Sin(anomaly)
                 );
             }
 
             return PerifocalToBody(pos);
         }
-
         /// <summary>
-        /// get the velocity (in world space) of the orbit at a given time
+        /// get the velocity of this orbit from some anomaly, depending on the orbit type
         /// </summary>
-        /// <returns>velocity of orbit, in meters</returns>
-        public Vector2d GetVelocity(double t)
+        /// <param name="anomaly">eccentric anomaly when e<1, true anomaly when e=0, and hyperbolic eccentric anomaly when e>1</param>
+        /// <returns>position vector</returns>
+        private Vector2d GetVelocityFromAnomaly(double t, double anomaly)
         {
             Vector2d vel;
             if (e < 1)
             {
-                var E = GetEccentricAnomaly(t);
-                var r = a * (1 - e * Math.Cos(E));
+                var r = a * (1 - e * Math.Cos(anomaly));
                 vel = new(
-                    -Math.Sin(E),
-                    Math.Sqrt(betaSquared) * Math.Cos(E)
+                    -Math.Sin(anomaly),
+                    Math.Sqrt(betaSquared) * Math.Cos(anomaly)
                 );
                 vel *= Math.Sqrt(GM * a) / r;
             }
             else if (e > 1)
             {
-                var F = GetEccentricAnomaly(t);
-                var r = -a * (e * Math.Cosh(F) - 1);
+                var r = -a * (e * Math.Cosh(anomaly) - 1);
                 vel = new(
-                    -Math.Sinh(F),
-                    Math.Sqrt(betaSquared) * Math.Cosh(F)
+                    -Math.Sinh(anomaly),
+                    Math.Sqrt(betaSquared) * Math.Cosh(anomaly)
                 );
                 vel *= Math.Sqrt(GM * -a) / r;
             }
             else
             {
-                var nu = GetTrueAnomaly(t);
                 vel = new(
-                    -Math.Sin(nu),
-                    1 + Math.Cos(nu)
+                    -Math.Sin(anomaly),
+                    1 + Math.Cos(anomaly)
                 );
                 vel *= GM / h;
             }
             return PerifocalToBody(vel);
+        }
+        /// <summary>
+        /// get the relevant anomaly for orbital propagation (E for ellipses, nu for parabolas, and F for hyperbolas)
+        /// </summary>
+        private double GetAnomaly(double t)
+        {
+            if (e < 1) return GetEccentricAnomaly(t);
+            else if (e > 1) return GetEccentricAnomaly(t);
+            else return GetTrueAnomaly(t);
+        }
+
+        /// <summary>
+        /// get the position (in world space) of the orbit at a given time
+        /// </summary>
+        /// <returns>position of orbit, in meters</returns>
+        public Vector2d GetPosition(double t) => GetPositionFromAnomaly(t, GetAnomaly(t));
+
+        /// <summary>
+        /// get the velocity (in world space) of the orbit at a given time
+        /// </summary>
+        /// <returns>velocity of orbit, in meters</returns>
+        public Vector2d GetVelocity(double t) => GetVelocityFromAnomaly(t, GetAnomaly(t));
+
+        /// <summary>
+        /// get the state vectors at a given time.
+        /// </summary>
+        /// <remarks>
+        /// if you need to get both position and velocity, prefer this over calling GetPosition and GetVelocity
+        /// separately because the two methods will have redundant calculations.
+        /// </remarks>
+        public StateVectors GetStateVectors(double t)
+        {
+            var anomaly = GetAnomaly(t);
+            return new(
+                t,
+                GetPositionFromAnomaly(t, GetAnomaly(t)),
+                GetVelocityFromAnomaly(t, GetAnomaly(t))
+            );
         }
     }
 }

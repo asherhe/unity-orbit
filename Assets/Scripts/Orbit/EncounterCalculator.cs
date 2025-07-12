@@ -26,7 +26,7 @@ namespace Orbit
             /// <summary>
             /// state of THIS orbit at the encounter
             /// </summary>
-            public StateVector state;
+            public StateVectors state;
             /// <summary>
             /// distance at encounter
             /// </summary>
@@ -37,7 +37,7 @@ namespace Orbit
             /// </summary>
             public IOrbitingObject orbitingObject;
 
-            public Encounter(OrbitState o, StateVector state, double distance)
+            public Encounter(OrbitState o, StateVectors state, double distance)
             {
                 other = o;
                 this.state = state;
@@ -125,7 +125,7 @@ namespace Orbit
                              opos = oprop.GetPosition(t), ovel = oprop.GetVelocity(t);
                         encounters.Add(new Encounter(
                             o,
-                            new StateVector(t, pos, vel),
+                            new StateVectors(t, pos, vel),
                             (pos - opos).Magnitude
                         ));
                     }

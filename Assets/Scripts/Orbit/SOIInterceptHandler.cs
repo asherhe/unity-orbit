@@ -25,7 +25,7 @@ namespace Orbit
         /// <summary>
         /// the state of this orbit at the time of the next capture
         /// </summary>
-        public StateVector nextCapture { get; private set; }
+        public StateVectors nextCapture { get; private set; }
         /// <summary>
         /// the celestial body that will capture this orbit
         /// </summary>
