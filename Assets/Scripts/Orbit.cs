@@ -458,8 +458,9 @@ public class Orbit
             MeanMotion = Math.Sqrt(GM / Math.Abs(A * A * A));
         Period = 2 * Math.PI / MeanMotion;
 
-        CheckSOI();
-        CheckCaptures();
+        // CheckSOI();
+        // CheckCaptures();
+        // ^ TODO: i keep getting flooded by errors because of these, commenting out for now
 
         OnOrbitChanged?.Invoke();
     }

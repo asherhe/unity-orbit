@@ -22,7 +22,9 @@ public class SpacecraftIcon : MonoBehaviour
     private void Awake()
     {
         _follow = GetComponent<FollowTransform>();
+
         // in case _craft was set in inspector
-        Craft = _craft;
+        if (_craft != null)
+            Craft = _craft;
     }
 }
