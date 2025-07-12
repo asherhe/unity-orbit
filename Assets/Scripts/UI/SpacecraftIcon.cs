@@ -2,29 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(FollowTransform))]
-public class SpacecraftIcon : MonoBehaviour
+namespace UI
 {
-    private FollowTransform _follow;
-
-    [SerializeField]
-    private Spacecraft _craft;
-    public Spacecraft Craft
+    [RequireComponent(typeof(FollowTransform))]
+    public class SpacecraftIcon : MonoBehaviour
     {
-        get => _craft;
-        set
+        private FollowTransform _follow;
+
+        [SerializeField]
+        private Spacecraft _craft;
+        public Spacecraft Craft
         {
-            _craft = value;
-            _follow.follow = _craft.transform;
+            get => _craft;
+            set
+            {
+                _craft = value;
+                _follow.follow = _craft.transform;
+            }
         }
-    }
 
-    private void Awake()
-    {
-        _follow = GetComponent<FollowTransform>();
+        private void Awake()
+        {
+            _follow = GetComponent<FollowTransform>();
 
-        // in case _craft was set in inspector
-        if (_craft != null)
-            Craft = _craft;
+            // in case _craft was set in inspector
+            if (_craft != null)
+                Craft = _craft;
+        }
     }
 }

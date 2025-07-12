@@ -1,14 +1,16 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PeriapsisDisplay : TextDisplay
+namespace UI
 {
-    protected override string GetText()
+    public class PeriapsisDisplay : TextDisplay
     {
-        var craft = ActiveCraftController.Instance.craft;
-        double periapsis = craft.orbit.Periapsis - craft.body.radius;
-        return $"Pe:{AddMetricPrefix(periapsis)}m";
+        protected override string GetText()
+        {
+            var craft = ActiveCraftController.Instance.craft;
+            double periapsis = craft.orbit.Periapsis - craft.body.radius;
+            return $"Pe:{AddMetricPrefix(periapsis)}m";
+        }
     }
 }

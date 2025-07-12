@@ -3,21 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
-public class MinimapDisplay : MonoBehaviour
+namespace UI
 {
-    private RectTransform _rectTransform;
-
-    private void Awake()
+    public class MinimapDisplay : MonoBehaviour
     {
-        _rectTransform = GetComponent<RectTransform>();
-        MapViewManager.Instance.MapToggled += ToggleMinimap;
-    }
+        private RectTransform _rectTransform;
 
-    private void ToggleMinimap()
-    {
-        _rectTransform.DOAnchorPosX(
-            MapViewManager.Instance.activeView == CameraView.MapView ? 200.0f : -10.0f,
-            0.25f
-        ).SetEase(MapViewManager.Instance.activeView == CameraView.MapView ? Ease.InCubic : Ease.OutCubic);
+        private void Awake()
+        {
+            _rectTransform = GetComponent<RectTransform>();
+            MapViewManager.Instance.MapToggled += ToggleMinimap;
+        }
+
+        private void ToggleMinimap()
+        {
+            _rectTransform.DOAnchorPosX(
+                MapViewManager.Instance.activeView == CameraView.MapView ? 200.0f : -10.0f,
+                0.25f
+            ).SetEase(MapViewManager.Instance.activeView == CameraView.MapView ? Ease.InCubic : Ease.OutCubic);
+        }
     }
 }

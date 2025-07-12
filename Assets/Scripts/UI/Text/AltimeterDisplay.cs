@@ -1,13 +1,15 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AltimeterDisplay : TextDisplay
+namespace UI
 {
-    protected override string GetText()
+    public class AltimeterDisplay : TextDisplay
     {
-        double altitude = ActiveCraftController.Instance.craft.Altitude;
-        return $"ALT:{AddMetricPrefix(altitude)}m";
+        protected override string GetText()
+        {
+            double altitude = ActiveCraftController.Instance.craft.Altitude;
+            return $"ALT:{AddMetricPrefix(altitude)}m";
+        }
     }
 }

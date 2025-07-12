@@ -1,14 +1,16 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Apoapsis : TextDisplay
+namespace UI
 {
-    protected override string GetText()
+    public class Apoapsis : TextDisplay
     {
-        var craft = ActiveCraftController.Instance.craft;
-        double apoapsis = craft.orbit.Apoapsis - craft.body.radius;
-        return $"Ap:{AddMetricPrefix(apoapsis)}m";
+        protected override string GetText()
+        {
+            var craft = ActiveCraftController.Instance.craft;
+            double apoapsis = craft.orbit.Apoapsis - craft.body.radius;
+            return $"Ap:{AddMetricPrefix(apoapsis)}m";
+        }
     }
 }

@@ -4,64 +4,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[RequireComponent(typeof(VerticalLayoutGroup))]
-public class ResourceTable : MonoBehaviour
+namespace UI
 {
-    private Spacecraft _craft;
-
-    [SerializeField]
-    private GameObject _rowPrefab;
-
-    private Dictionary<string, ResourceRow> _rows = new();
-
-    private void Awake()
+    [RequireComponent(typeof(VerticalLayoutGroup))]
+    public class ResourceTable : MonoBehaviour
     {
-        _craft = ActiveCraftController.Instance.craft;
-        _craft.OnLoaded += GenerateTable;
-    }
+        private Spacecraft _craft;
 
-    private void GenerateTable()
-    {
-        Dictionary<string, ResourceContainerPlugin.Resource> resources = new();
-        foreach (var part in _craft.parts)
+        [SerializeField]
+        private GameObject _rowPrefab;
+
+        private Dictionary<string, ResourceRow> _rows = new();
+
+        private void Awake()
         {
-            foreach (var plugin in part.plugins)
+            _craft = ActiveCraftController.Instance.craft;
+            _craft.OnLoaded += GenerateTable;
+        }
+
+        private void GenerateTable()
+        {
+            Dictionary<string, ResourceContainerPlugin.Resource> resources = new();
+            foreach (var part in _craft.parts)
             {
-                if (typeof(ResourceContainerPlugin).IsAssignableFrom(plugin.GetType()))
+                foreach (var plugin in part.plugins)
                 {
-                    foreach (var resource in ((ResourceContainerPlugin)plugin).Resources)
+                    if (typeof(ResourceContainerPlugin).IsAssignableFrom(plugin.GetType()))
                     {
-                        ResourceContainerPlugin.Resource tableResource;
-                        if (!resources.ContainsKey(resource.type))
+                        foreach (var resource in ((ResourceContainerPlugin)plugin).Resources)
                         {
-                            tableResource = new ResourceContainerPlugin.Resource(resource);
-                            resources.Add(resource.type, tableResource);
-                        }
-                        else
-                        {
-                            tableResource = resources[resource.type];
-                            tableResource.amount += resource.amount;
-                            tableResource.maxAmount += resource.maxAmount;
+                            ResourceContainerPlugin.Resource tableResource;
+                            if (!resources.ContainsKey(resource.type))
+                            {
+                                tableResource = new ResourceContainerPlugin.Resource(resource);
+                                resources.Add(resource.type, tableResource);
+                            }
+                            else
+                            {
+                                tableResource = resources[resource.type];
+                                tableResource.amount += resource.amount;
+                                tableResource.maxAmount += resource.maxAmount;
+                            }
                         }
                     }
                 }
             }
+
+            foreach (var resource in resources.Values)
+            {
+                var rowGameObject = Instantiate(_rowPrefab, transform);
+                var resourceRow = rowGameObject.GetComponent<ResourceRow>();
+                resourceRow.Name = ResourceManager.GetName(resource.type);
+                resourceRow.Amount = resource.amount;
+                resourceRow.MaxAmount = resource.maxAmount;
+
+                _rows.Add(resource.type, resourceRow);
+            }
+
+            _craft.OnResourceChanged += (resourceContainer, type, diff) =>
+            {
+                _rows[type].Amount += diff;
+            };
         }
-
-        foreach (var resource in resources.Values)
-        {
-            var rowGameObject = Instantiate(_rowPrefab, transform);
-            var resourceRow = rowGameObject.GetComponent<ResourceRow>();
-            resourceRow.Name = ResourceManager.GetName(resource.type);
-            resourceRow.Amount = resource.amount;
-            resourceRow.MaxAmount = resource.maxAmount;
-
-            _rows.Add(resource.type, resourceRow);
-        }
-
-        _craft.OnResourceChanged += (resourceContainer, type, diff) =>
-        {
-            _rows[type].Amount += diff;
-        };
     }
 }

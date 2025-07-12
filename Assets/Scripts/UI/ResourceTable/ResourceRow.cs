@@ -4,52 +4,55 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class ResourceRow : MonoBehaviour
+namespace UI
 {
-    [SerializeField]
-    private TMP_Text _nameText;
-    [SerializeField]
-    private TMP_Text _amountText;
-
-    private string _name;
-    public string Name
+    public class ResourceRow : MonoBehaviour
     {
-        get => _name;
-        set
+        [SerializeField]
+        private TMP_Text _nameText;
+        [SerializeField]
+        private TMP_Text _amountText;
+
+        private string _name;
+        public string Name
         {
-            _name = value;
-            _nameText.text = _name;
+            get => _name;
+            set
+            {
+                _name = value;
+                _nameText.text = _name;
+            }
         }
-    }
 
-    private double _amount;
-    public double Amount
-    {
-        get => _amount;
-        set
+        private double _amount;
+        public double Amount
         {
-            _amount = value;
-            GenerateAmountText();
+            get => _amount;
+            set
+            {
+                _amount = value;
+                GenerateAmountText();
+            }
         }
-    }
 
-    private double _maxAmount;
-    public double MaxAmount
-    {
-        get => _maxAmount;
-        set
+        private double _maxAmount;
+        public double MaxAmount
         {
-            _maxAmount = value;
-            GenerateAmountText();
+            get => _maxAmount;
+            set
+            {
+                _maxAmount = value;
+                GenerateAmountText();
+            }
         }
-    }
 
-    private void GenerateAmountText()
-    {
-        int decimalDigits = 0;
-        if (MaxAmount < 100.0)
-            decimalDigits = 2 - (int)Math.Floor(Math.Log10(MaxAmount)); // 3 digits of precision
+        private void GenerateAmountText()
+        {
+            int decimalDigits = 0;
+            if (MaxAmount < 100.0)
+                decimalDigits = 2 - (int)Math.Floor(Math.Log10(MaxAmount)); // 3 digits of precision
 
-        _amountText.text = $"{Amount.ToString("F" + decimalDigits)}/{MaxAmount.ToString("F" + decimalDigits)}";
+            _amountText.text = $"{Amount.ToString("F" + decimalDigits)}/{MaxAmount.ToString("F" + decimalDigits)}";
+        }
     }
 }

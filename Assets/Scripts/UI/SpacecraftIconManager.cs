@@ -2,20 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpacecraftIconManager : MonoBehaviour
+namespace UI
 {
-    [SerializeField]
-    private GameObject _iconPrefab;
-
-    private void Awake()
+    public class SpacecraftIconManager : MonoBehaviour
     {
-        Spacecraft.OnSpacecraftLoaded += CreateIcon;
-    }
+        [SerializeField]
+        private GameObject _iconPrefab;
 
-    private void CreateIcon(Spacecraft craft)
-    {
-        var icon = Instantiate(_iconPrefab, transform);
-        icon.name = $"Icon ({craft.name})";
-        icon.GetComponent<SpacecraftIcon>().Craft = craft;
+        private void Awake()
+        {
+            Spacecraft.OnSpacecraftLoaded += CreateIcon;
+        }
+
+        private void CreateIcon(Spacecraft craft)
+        {
+            var icon = Instantiate(_iconPrefab, transform);
+            icon.name = $"Icon ({craft.name})";
+            icon.GetComponent<SpacecraftIcon>().Craft = craft;
+        }
     }
 }
