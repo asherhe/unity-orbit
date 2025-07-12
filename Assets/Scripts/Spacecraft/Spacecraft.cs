@@ -201,14 +201,14 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
+        //if (orbit.nextCapture != null)
+        //    Debug.Log($"{orbit.nextCaptureBody} (soi {orbit.nextCaptureBody.soiRadius}): distance to body {(orbit.nextCaptureBody.orbit.GetPosition() - Pos).Magnitude}; time {Universe.Instance.UT - orbit.nextCapture.time}; distance to capture {(Pos - orbit.nextCapture.pos).Magnitude}");
+        Debug.DrawRay(Vector3.zero, Vel);
         orbit.CheckBodyChange();
     }
 
     private void Update()
     {
-        //if (orbit.nextCapture != null)
-        //    Debug.Log($"{orbit.nextCaptureBody} (soi {orbit.nextCaptureBody.soiRadius}): distance to body {(orbit.nextCaptureBody.orbit.GetPosition() - Pos).Magnitude}; time {Universe.Instance.UT - orbit.nextCapture.time}; distance to capture {(Pos - orbit.nextCapture.pos).Magnitude}");
-
         transform.position = CameraFocus.Instance.GetRelativePosition(this);
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
