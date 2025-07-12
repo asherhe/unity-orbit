@@ -36,7 +36,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         /// <summary>
         /// material config for the body's surface
         /// </summary>
-        public MaterialUtils.MaterialProperties surfaceMaterial;
+        public MaterialProperties surfaceMaterial;
 
         /// <summary>
         /// orbital info, optional for the sun
@@ -81,7 +81,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             /// <summary>
             /// material config for the atmospheric material
             /// </summary>
-            public MaterialUtils.MaterialProperties material;
+            public MaterialProperties material;
         }
     }
 
@@ -269,12 +269,12 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         MeshFilter surfaceMeshFilter = _surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = _surfaceObject.AddComponent<MeshRenderer>();
-        Addressables.LoadAssetAsync<Material>(_config.surfaceMaterial.path).Completed += m =>
+        _config.surfaceMaterial.LoadMaterial(); _config.surfaceMaterial.OnMaterialLoaded += m =>
         {
-            surfaceMeshRenderer.material = surfaceMaterial = m.Result;
-            MaterialUtils.SetMaterialProperties(surfaceMeshRenderer.material, _config.surfaceMaterial.properties);
+            surfaceMeshRenderer.material = surfaceMaterial = m;
+            _config.surfaceMaterial.SetMaterialProperties(surfaceMeshRenderer.material);
             if (hasAtmosphere)
-                MaterialUtils.SetMaterialProperties(surfaceMeshRenderer.material, _config.atmosphere.material.properties);
+                _config.atmosphere.material.SetMaterialProperties(surfaceMeshRenderer.material);
             SetMaterialProperties(surfaceMeshRenderer.material);
             _dynamicMaterials.Add(surfaceMeshRenderer.material);
         };
@@ -288,10 +288,10 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             MeshFilter atmMeshFilter = _atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = _atmObject.AddComponent<MeshRenderer>();
-            Addressables.LoadAssetAsync<Material>(_config.atmosphere.material.path).Completed += m =>
+            _config.atmosphere.material.LoadMaterial(); _config.atmosphere.material.OnMaterialLoaded += m =>
             {
-                atmMeshRenderer.material = atmMaterial = m.Result;
-                MaterialUtils.SetMaterialProperties(atmMeshRenderer.material, _config.atmosphere.material.properties);
+                atmMeshRenderer.material = atmMaterial = m;
+                _config.atmosphere.material.SetMaterialProperties(atmMeshRenderer.material);
                 SetMaterialProperties(atmMeshRenderer.material);
                 _dynamicMaterials.Add(atmMeshRenderer.material);
             };

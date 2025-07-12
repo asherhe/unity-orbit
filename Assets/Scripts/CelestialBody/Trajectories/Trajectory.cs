@@ -30,7 +30,7 @@ public class Trajectory : MonoBehaviour
         trajectoryMesh = new TrajectoryMesh();
         meshFilter = GetComponent<MeshFilter>();
         meshFilter.mesh = trajectoryMesh.mesh;
-        follow = GetComponent<FollowTransform>();
+        follow = GetComponent<UI.FollowTransform>();
     }
 
     public void GenerateTrajectory()

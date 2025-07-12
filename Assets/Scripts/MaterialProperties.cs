@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-public class MaterialUtils
+[Serializable]
+public class MaterialProperties
 {
     public enum PropertyType
     {
@@ -25,25 +26,42 @@ public class MaterialUtils
         public PropertyType type;
         public DataNode value;
     }
-    [Serializable]
-    public class MaterialProperties
+
+    /// <summary>
+    /// path to addressable material
+    /// </summary>
+    public string path;
+    /// <summary>
+    /// properties of the material to assign by default
+    /// </summary>
+    public Dictionary<string, Property> properties;
+
+    /// <summary>
+    /// the material referenced by this MaterialProperties object
+    /// </summary>
+    public Material Material { get; private set; }
+    /// <summary>
+    /// invoked when LoadMaterial() finishes loading. comes with the loaded material as an argument
+    /// </summary>
+    public event Action<Material> OnMaterialLoaded;
+
+    /// <summary>
+    /// load the material at the addressable path <c>path</c>
+    /// </summary>
+    public void LoadMaterial()
     {
-        /// <summary>
-        /// path to addressable material
-        /// </summary>
-        public string path;
-        /// <summary>
-        /// properties of the material to assign by default
-        /// </summary>
-        public Dictionary<string, Property> properties;
+        Addressables.LoadAssetAsync<Material>(path).Completed += m =>
+        {
+            Material = m.Result;
+            OnMaterialLoaded?.Invoke(Material);
+        };
     }
 
     /// <summary>
     /// set the shader properties on a material based on the given properties
     /// </summary>
     /// <param name="m">material instance to assign properties on (note: not the material asset)</param>
-    /// <param name="properties">shader properties to assign</param>
-    public static void SetMaterialProperties(Material m, Dictionary<string, Property> properties)
+    public void SetMaterialProperties(Material m)
     {
         if (properties == null) return;
         foreach (var kvp in properties)
