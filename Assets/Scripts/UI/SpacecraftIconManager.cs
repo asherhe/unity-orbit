@@ -16,6 +16,6 @@ public class SpacecraftIconManager : MonoBehaviour
     {
         var icon = Instantiate(_iconPrefab, transform);
         icon.name = $"Icon ({craft.name})";
-        icon.GetComponent<FollowTransform>().follow = craft.transform;
+        icon.GetComponent<SpacecraftIcon>().Craft = craft;
     }
 }
