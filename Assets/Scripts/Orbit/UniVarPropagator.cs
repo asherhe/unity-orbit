@@ -80,7 +80,7 @@ namespace Orbit
             // if we use a fixed tolerance then the root finder will often "fail" to converge
             // because the desired tolerance is much more precise than what can be represented,
             // especially with precision loss through mathematical operations
-            var accuracy = Math.Abs(DUniversalKepler(chi0)) * 1e-12;
+            var accuracy = Math.Abs(DUniversalKepler(chi0)) * 1e-8;
 
             var chi = NewtonRaphson.FindRootNearGuess(
                 chi => UniversalKepler(chi) - dtsqrtGM,
