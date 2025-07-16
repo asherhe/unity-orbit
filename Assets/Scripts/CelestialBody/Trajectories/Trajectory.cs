@@ -12,7 +12,7 @@ public class Trajectory : MonoBehaviour
     private UI.FollowTransform follow;
 
     private OrbitState _orbit;
-    private KeplerianPropagator _prop;
+    private UniVarPropagator _prop;
     public OrbitState Orbit
     {
         get => _orbit;
@@ -21,7 +21,7 @@ public class Trajectory : MonoBehaviour
             if (_orbit == value) return;
             if (_orbit != null) _orbit.OnStateChanged -= GenerateTrajectory;
             _orbit = value;
-            _prop = new KeplerianPropagator(_orbit);
+            _prop = new UniVarPropagator(_orbit);
             follow.follow = Orbit.body.transform;
             _orbit.OnStateChanged += GenerateTrajectory;
             GenerateTrajectory();

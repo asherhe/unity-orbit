@@ -34,6 +34,22 @@ namespace Orbit
         /* derived orbital parameters */
 
         /// <summary>
+        /// distance from body at epoch, the magnitude of p0
+        /// </summary>
+        public double r0 { get; private set; }
+        /// <summary>
+        /// magnitude of radial velocity at epoch
+        /// </summary>
+        public double vr0 { get; private set; }
+        /// <summary>
+        /// reciprocal semimajor axis, used to determine orbit shape
+        /// <para>alpha>0 is elliptical</para>
+        /// <para>alpha=0 is parabolic</para>
+        /// <para>alpha<0 is hyperbolic</para>
+        /// </summary>
+        public double alpha { get; private set; }
+
+        /// <summary>
         /// specific angular momentum around the parent body.
         /// may occasionally be referred to as just "angular momentum".
         /// </summary>
@@ -162,6 +178,11 @@ namespace Orbit
         /// </summary>
         private void PostUpdate()
         {
+            r0 = p0.Magnitude;
+            vr0 = Vector2d.Dot(p0, v0) / r0;
+            alpha = 2 / r0 - v0.Magnitude2 / GM;
+            a = 1 / alpha;
+
             h = Vector2d.Cross(p0, v0);
 
             // eccentricity vector, points in the direction of periapsis
@@ -170,7 +191,6 @@ namespace Orbit
 
             omega = Math.Atan2(eccVec.y, eccVec.x);
 
-            a = h * h / (GM * (1 - e * e));
             periapsis = a * (1 - e);
             apoapsis = (e < 1) ? (a * (1 + e)) : double.PositiveInfinity; // betasquared is fine because we know e<1
 

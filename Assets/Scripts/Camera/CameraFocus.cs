@@ -48,13 +48,13 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
         focusNode = focusPath.Last;
         while (focusNode.Value != common)
         {
-            focusPos += new KeplerianPropagator(focusNode.Value.orbit).GetPosition(Universe.Instance.UT);
+            focusPos += new UniVarPropagator(focusNode.Value.orbit).GetPosition(Universe.Instance.UT);
             focusNode = focusNode.Previous;
         }
         objNode = objPath.Last;
         while (objNode.Value != common)
         {
-            objPos += new KeplerianPropagator(objNode.Value.orbit).GetPosition(Universe.Instance.UT);
+            objPos += new UniVarPropagator(objNode.Value.orbit).GetPosition(Universe.Instance.UT);
             objNode = objNode.Previous;
         }
 

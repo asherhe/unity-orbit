@@ -61,7 +61,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private GameObject _partsGameObject;
 
     public OrbitState orbit { get; private set; }
-    private KeplerianPropagator _prop;
+    private UniVarPropagator _prop;
     private SOIEscapeHndler _soiEsc;
     private SOIInterceptHandler _soiInt;
 
@@ -130,7 +130,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent
         );
-        _prop = new KeplerianPropagator(orbit);
+        _prop = new UniVarPropagator(orbit);
         _soiEsc = new SOIEscapeHndler(orbit);
         _soiInt = new SOIInterceptHandler(orbit);
         orbit.OnStateChanged += _soiEsc.CheckSOITimes;

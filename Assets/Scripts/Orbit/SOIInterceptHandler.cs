@@ -12,14 +12,14 @@ namespace Orbit
     public class SOIInterceptHandler
     {
         public OrbitState orbit;
-        private KeplerianPropagator _prop;
+        private UniVarPropagator _prop;
         private EncounterCalculator _enc;
 
         public SOIInterceptHandler(OrbitState orbit)
         {
             this.orbit = orbit;
-            _prop = new(orbit);
-            _enc = new(orbit);
+            _prop = new UniVarPropagator(orbit);
+            _enc = new EncounterCalculator(orbit);
         }
 
         /// <summary>

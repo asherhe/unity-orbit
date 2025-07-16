@@ -11,12 +11,12 @@ namespace Orbit
     public class SOIEscapeHndler
     {
         public OrbitState orbit;
-        private KeplerianPropagator _prop;
+        private UniVarPropagator _prop;
 
         public SOIEscapeHndler(OrbitState orbit)
         {
             this.orbit = orbit;
-            _prop = new(orbit);
+            _prop = new UniVarPropagator(orbit);
         }
 
 
@@ -34,6 +34,9 @@ namespace Orbit
         /// </summary>
         public void CheckSOITimes()
         {
+            throw new NotImplementedException();
+
+            /*
             soiCapture = null; soiEscape = null;
 
             // check if body HAS an SOI first
@@ -80,6 +83,7 @@ namespace Orbit
             {
                 soiCapture = statep; soiEscape = staten;
             }
+            */
         }
 
         public void EscapeSOI()

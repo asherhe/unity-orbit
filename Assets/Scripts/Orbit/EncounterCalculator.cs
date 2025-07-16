@@ -9,12 +9,12 @@ namespace Orbit
     public class EncounterCalculator
     {
         public OrbitState orbit;
-        private KeplerianPropagator _prop;
+        private UniVarPropagator _prop;
 
         public EncounterCalculator(OrbitState orbit)
         {
             this.orbit = orbit;
-            _prop = new(orbit);
+            _prop = new UniVarPropagator(orbit);
         }
 
         public class Encounter
@@ -47,6 +47,9 @@ namespace Orbit
 
         public List<Encounter> GetEncounters(OrbitState o, double t)
         {
+            throw new NotImplementedException();
+
+            /*
             if (orbit.e < 1.0)
                 return GetEncounters(o, t, t + orbit.period);
             else if (orbit.e == 1.0)
@@ -69,6 +72,7 @@ namespace Orbit
                     throw new NotImplementedException();
                 }
             }
+            */
         }
 
         /// <summary>
@@ -79,7 +83,7 @@ namespace Orbit
             if (orbit.body != o.body)
                 throw new ArgumentException("Orbit o must share the same body as this EncounterCalculator's orbit.");
 
-            var oprop = new KeplerianPropagator(o);
+            var oprop = new UniVarPropagator(o);
 
             // derivative of distance
             double DDistance(double t) => 2.0 * Vector2d.Dot(

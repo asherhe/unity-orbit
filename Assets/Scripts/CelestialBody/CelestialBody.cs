@@ -101,7 +101,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// orbit of this body
     /// </summary>
     public OrbitState orbit { get; private set; }
-    private KeplerianPropagator _prop;
+    private UniVarPropagator _prop;
 
     /// <summary>
     /// celestial body that this body is a satellite of
@@ -183,7 +183,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
-            _prop = new KeplerianPropagator(orbit);
+            _prop = new UniVarPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
