@@ -34,8 +34,6 @@ namespace Orbit
         /// </summary>
         public void CheckSOITimes()
         {
-            throw new NotImplementedException();
-
             /*
             soiCapture = null; soiEscape = null;
 

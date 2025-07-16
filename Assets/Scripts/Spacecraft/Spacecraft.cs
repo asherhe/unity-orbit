@@ -133,8 +133,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _prop = new UniVarPropagator(orbit);
         _soiEsc = new SOIEscapeHndler(orbit);
         _soiInt = new SOIInterceptHandler(orbit);
-        orbit.OnStateChanged += _soiEsc.CheckSOITimes;
-        orbit.OnStateChanged += _soiInt.CheckSOIIntercepts;
+        //orbit.OnStateChanged += _soiEsc.CheckSOITimes;
+        //orbit.OnStateChanged += _soiInt.CheckSOIIntercepts;
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";

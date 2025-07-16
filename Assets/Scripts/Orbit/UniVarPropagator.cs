@@ -74,15 +74,22 @@ namespace Orbit
         {
             var dtsqrtGM = dt * Math.Sqrt(GM);
             var chi0 = dtsqrtGM * Math.Abs(alpha);
-            var lower = dtsqrtGM / orbit.periapsis;
-            var upper = dtsqrtGM / orbit.apoapsis;
+            var lower = dtsqrtGM / orbit.apoapsis;
+            var upper = dtsqrtGM / orbit.periapsis;
+            // scale with kepler's equation to actually allow convergence to happen
+            // if we use a fixed tolerance then the root finder will often "fail" to converge
+            // because the desired tolerance is much more precise than what can be represented,
+            // especially with precision loss through mathematical operations
+            var accuracy = Math.Abs(DUniversalKepler(chi0)) * 1e-12;
 
             var chi = NewtonRaphson.FindRootNearGuess(
                 chi => UniversalKepler(chi) - dtsqrtGM,
                 DUniversalKepler,
-                chi0, /*lower, upper,*/
-                accuracy: 1e-12, maxIterations: 50
+                chi0, lower - 1, upper + 1,
+                accuracy: accuracy,
+                maxIterations: 50
             );
+
 
             return chi;
         }
@@ -102,6 +109,8 @@ namespace Orbit
         public Vector2d GetPosition(double t)
         {
             var dt = t - t0;
+            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+
             var chi = GetChi(dt);
             var z = alpha * chi * chi;
             return GetPosition(dt, chi, stumpff_C(z), stumpff_S(z));
@@ -109,6 +118,8 @@ namespace Orbit
         public Vector2d GetVelocity(double t)
         {
             var dt = t - t0;
+            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+
             var chi = GetChi(dt);
             var z = alpha * chi * chi;
             var C = stumpff_C(z);
