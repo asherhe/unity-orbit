@@ -11,10 +11,16 @@ namespace UI
         /// </summary>
         public Transform follow;
 
+        public bool shouldFollowPosition = true;
+        public bool shouldFollowRotation = false;
+
         private void LateUpdate()
         {
             if (follow != null)
-                transform.position = follow.position;
+            {
+                if (shouldFollowPosition) transform.position = follow.position;
+                if (shouldFollowRotation) transform.rotation = follow.rotation;
+            }
         }
     }
 }
