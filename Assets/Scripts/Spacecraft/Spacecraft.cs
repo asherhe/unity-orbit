@@ -133,7 +133,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _prop = new UniVarPropagator(orbit);
         _soiEsc = new SOIEscapeHndler(orbit);
         _soiInt = new SOIInterceptHandler(orbit);
-        //orbit.OnStateChanged += _soiEsc.CheckSOITimes;
+        orbit.OnStateChanged += _soiEsc.CheckSOITimes;
         //orbit.OnStateChanged += _soiInt.CheckSOIIntercepts;
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
@@ -228,6 +228,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private void FixedUpdate()
     {
         var UT = Universe.Instance.UT;
+
         if (_soiEsc.soiEscape != null && UT >= _soiEsc.soiEscape.time)
             _soiEsc.EscapeSOI();
         if (_soiInt.nextCapture != null && UT >= _soiInt.nextCapture.time)

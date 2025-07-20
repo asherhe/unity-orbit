@@ -94,7 +94,7 @@ namespace Orbit
             return chi;
         }
 
-        private Vector2d GetPosition(double dt, double chi, double C, double S)
+        public Vector2d GetPosition(double dt, double chi, double C, double S)
         {
             return
                 p0 * (1 - chi * chi * C / r0) +

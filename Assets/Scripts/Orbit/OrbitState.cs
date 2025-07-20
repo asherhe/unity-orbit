@@ -84,6 +84,18 @@ namespace Orbit
         /// mean anomaly at epoch
         /// </summary>
         public double M0 { get; private set; }
+        /// <summary>
+        /// eccentric anomaly at epoch, only available for e<1
+        /// </summary>
+        public double E0 { get; private set; }
+        /// <summary>
+        /// true anomaly at epoch
+        /// </summary>
+        public double nu0 { get; private set; }
+        /// <summary>
+        /// hyperbolic eccentric anomaly at epoch, only availale for e>1
+        /// </summary>
+        public double F0 { get; private set; }
 
         /// <summary>
         /// the semimajor axis (in meters) of the orbit
@@ -200,13 +212,45 @@ namespace Orbit
             var pos = BodyToPerifocal(p0);
 
             // true anomaly, range [-PI, PI]
-            var nu = Math.Atan2(pos.y, pos.x);
+            nu0 = Math.Atan2(pos.y, pos.x);
 
             if (e == 0.0)
             {
-                M0 = nu;
+                M0 = nu0;
             }
             else if (e < 1.0)
+            {
+                E0 = CalcAnomaly(nu0);
+                M0 = E0 - e * Math.Sin(E0);
+            }
+            else if (e > 1.0)
+            {
+                F0 = CalcAnomaly(nu0);
+                M0 = e * Math.Sinh(F0) - F0;
+            }
+            else
+            {
+                // parabolic
+                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
+
+                // pretty stable compared to elliptical and hyperbolic orbits
+                // as usual, some floating point trouble at infinity but that's alright
+
+                double D = Math.Tan(0.5 * nu0);
+                M0 = 0.5 * D + D * D * D / 6.0;
+            }
+
+            OnStateChanged?.Invoke();
+        }
+
+        /// <summary>
+        /// calculate the relevant anomaly for any orbits
+        /// </summary>
+        /// <param name="nu">true anomaly</param>
+        /// <returns>eccentric anomaly when e<1, true anomaly when e=1, hyperbolic eccentric anomaly when e>1</returns>
+        public double CalcAnomaly(double nu)
+        {
+            if (e < 1.0)
             {
                 // elliptical orbit
                 // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/elliptical-orbits.html
@@ -232,7 +276,7 @@ namespace Orbit
                     Math.Cos(0.5 * nu) * Math.Sqrt(1 + e)
                 );
                 if (E < 0) E += 2 * Math.PI;
-                M0 = E - e * Math.Sin(E);
+                return E;
             }
             else if (e > 1.0)
             {
@@ -253,21 +297,12 @@ namespace Orbit
 
                 var F = 2 * Math.Asinh(Math.Sin(0.5 * nu) * Math.Sqrt((e - 1) / (1 + e * Math.Cos(nu))));
                 if (nu < 0) F = -F;
-                M0 = e * Math.Sinh(F) - F;
+                return F;
             }
             else
             {
-                // parabolic
-                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
-
-                // pretty stable compared to elliptical and hyperbolic orbits
-                // as usual, some floating point trouble at infinity but that's alright
-
-                double D = Math.Tan(0.5 * nu);
-                M0 = 0.5 * D + D * D * D / 6.0;
+                return nu;
             }
-
-            OnStateChanged?.Invoke();
         }
     }
 

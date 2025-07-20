@@ -1,3 +1,5 @@
+using MathNet.Numerics;
+using MathNet.Numerics.RootFinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,54 +36,73 @@ namespace Orbit
         /// </summary>
         public void CheckSOITimes()
         {
-            /*
             soiCapture = null; soiEscape = null;
 
             // check if body HAS an SOI first
             if (orbit.body.orbit == null) return;
 
-            if (orbit.e == 1.0) throw new NotImplementedException(); // TODO: this is for non-parabolic orbits only
+            if (orbit.apoapsis < orbit.body.soiRadius) return;
 
-            // calculate eccentric anomaly at SOI radius (plus or minus)
-            var E = (orbit.a - orbit.body.soiRadius) / (orbit.a * orbit.e);
-            if (orbit.e < 1.0) E = Math.Acos(E);
-            else E = Math.Acosh(E);
-            // no SOI intersection
-            if (E == double.NaN) return;
+            var rsoi = orbit.body.soiRadius;
+            var e = orbit.e; var a = orbit.a;
 
-            // the two intersection points with the SOI - one with positive (p) and one with negative (n) eccentric anomaly
-            // the next order of business is to determine the time they intersect
-            var Mp = _prop.CalcKepler(E);
-            var Mn = _prop.CalcKepler(-E);
+            // determine true anomaly at SOI intersection
+            var nu = Math.Acos(((e == 1.0 ? orbit.h / orbit.GM : a * (1 - e * e)) / rsoi - 1) / e);
+            var anomaly = orbit.CalcAnomaly(nu);
 
-            // change Mp and Mn to be on the same orbital period as the current mean anomaly
-            // not for hyperbolic orbits tho because those guys don't do periodic orbits
-            if (orbit.e < 1.0)
+            // prepare to calculate universal anomaly
+            double coeff = 0, anomaly0 = 0;
+            if (e < 1)
             {
-                var M = _prop.GetMeanAnomaly(Universe.Instance.UT);
-                // whichever periapsis we are closest to
-                var Mperi = 2 * Math.PI * Math.Round(M / (2 * Math.PI));
-                Mp += Mperi; Mn += Mperi;
+                coeff = Math.Sqrt(a);
+                anomaly0 = orbit.E0;
+            }
+            else if (e > 1)
+            {
+                coeff = Math.Sqrt(-a);
+                anomaly0 = orbit.F0;
+            }
+            else if (e == 1)
+            {
+                coeff = orbit.h / Math.Sqrt(orbit.GM);
+                anomaly = Math.Tan(0.5 * nu);
+                anomaly0 = Math.Tan(0.5 * orbit.nu0);
             }
 
-            // calculate time to SOI
-            double tp, tn;
-            tp = orbit.t0 + (Mp - orbit.M0) / orbit.MeanMotion;
-            tn = orbit.t0 + (Mn - orbit.M0) / orbit.MeanMotion;
+            var chi1 = coeff * (anomaly - anomaly0);
+            var chi2 = coeff * (-anomaly - anomaly0);
 
-            // assign SOI state vectors, ensure chronological order
-            StateVectors statep, staten;
-            statep = new(tp, _prop.GetPosition(tp), _prop.GetVelocity(tp));
-            staten = new(tn, _prop.GetPosition(tn), _prop.GetVelocity(tn));
-            if (tp > tn)
+            // determine dt from universal anomaly via universal kepler's equation
+            double dtFromChi(double chi)
             {
-                soiCapture = staten; soiEscape = statep;
+                double r0 = orbit.r0, vr0 = orbit.vr0, alpha = orbit.alpha;
+                var z = alpha * chi * chi;
+                var sqrtGM = Math.Sqrt(orbit.GM);
+                return r0 * vr0 * chi * chi * _prop.stumpff_C(z) / orbit.GM +
+                    (1 - alpha * r0) * chi * chi * chi * _prop.stumpff_S(z) / sqrtGM +
+                    r0 * chi / sqrtGM;
             }
-            else
+
+            var t1 = orbit.t0 + dtFromChi(chi1);
+            var t2 = orbit.t0 + dtFromChi(chi2);
+            if (t1 > t2) (t1, t2) = (t2, t1);
+
+            StateVectors stateFromChi (double chi, double t)
             {
-                soiCapture = statep; soiEscape = staten;
+                var z = orbit.alpha * chi * chi;
+                var dt = t - orbit.t0;
+                var C = _prop.stumpff_C(z);
+                var S = _prop.stumpff_S(z);
+
+                var p = _prop.GetPosition(dt, chi, C, S);
+                var v = _prop.GetVelocity(chi, z, C, S, p.Magnitude);
+                return new StateVectors(t, p, v);
             }
-            */
+
+            soiCapture = stateFromChi(chi1, t1);
+            soiEscape = stateFromChi(chi2, t2);
+
+            Debug.Log(soiEscape.time);
         }
 
         public void EscapeSOI()
