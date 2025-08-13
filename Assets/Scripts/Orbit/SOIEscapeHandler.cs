@@ -101,8 +101,6 @@ namespace Orbit
 
             soiCapture = stateFromChi(chi1, t1);
             soiEscape = stateFromChi(chi2, t2);
-
-            Debug.Log(soiEscape.time);
         }
 
         public void EscapeSOI()

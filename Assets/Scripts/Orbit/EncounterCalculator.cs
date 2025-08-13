@@ -28,6 +28,10 @@ namespace Orbit
             /// </summary>
             public StateVectors state;
             /// <summary>
+            /// state of OTHER orbit at the encounter
+            /// </summary>
+            public StateVectors otherState;
+            /// <summary>
             /// distance at encounter
             /// </summary>
             public double distance;
@@ -37,42 +41,38 @@ namespace Orbit
             /// </summary>
             public IOrbitingObject orbitingObject;
 
-            public Encounter(OrbitState o, StateVectors state, double distance)
+            public Encounter(OrbitState o, StateVectors state, StateVectors otherState, double distance)
             {
                 other = o;
                 this.state = state;
+                this.otherState = otherState;
                 this.distance = distance;
             }
         }
 
         public List<Encounter> GetEncounters(OrbitState o, double t)
         {
-            throw new NotImplementedException();
-
-            /*
-            if (orbit.e < 1.0)
-                return GetEncounters(o, t, t + orbit.period);
-            else if (orbit.e == 1.0)
-                throw new NotImplementedException();
-            else
+            static void setTBounds(OrbitState o, double t, ref double tStart, ref double tEnd)
             {
                 if (o.e < 1.0)
                 {
-                    // end time is when x=-o.apoapsis in this hyperbola's perifocal frame
-                    // probably involves some eccanom magic to find that time
-                    var E = Math.Acosh(o.apoapsis / orbit.a - orbit.e);
-                    var M = _prop.CalcKepler(E);
-                    var tEnd = orbit.t0 + Math.Abs((M - orbit.M0) / orbit.MeanMotion); // abs to find the later one
-                    if (t > tEnd) return new();
-                    else return GetEncounters(o, t, tEnd);
+                    tStart = Math.Min(t, tStart);
+                    tEnd = Math.Max(t + o.period, tEnd);
                 }
                 else
                 {
-                    // TODO
-                    throw new NotImplementedException();
+                    // todo: determine appropriate scaling factor for this
+                    double tWindow = 4.0 * Math.Sqrt(1.0 / (o.GM * Math.Abs(o.alpha * o.alpha * o.alpha)));
+                    tStart = Math.Min(t - tWindow, tStart);
+                    tEnd = Math.Max(t + tWindow, tEnd);
                 }
             }
-            */
+
+            double tStart = t, tEnd = t;
+            setTBounds(orbit, t, ref tStart, ref tEnd);
+            setTBounds(o, t, ref tStart, ref tEnd);
+
+            return GetEncounters(o, tStart, tEnd);
         }
 
         /// <summary>
@@ -130,6 +130,7 @@ namespace Orbit
                         encounters.Add(new Encounter(
                             o,
                             new StateVectors(t, pos, vel),
+                            new StateVectors(t, opos, ovel),
                             (pos - opos).Magnitude
                         ));
                     }
