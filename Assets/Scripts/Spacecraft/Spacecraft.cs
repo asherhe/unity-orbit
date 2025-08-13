@@ -1,3 +1,4 @@
+using Orbit;
 using Parts;
 using System;
 using System.Collections;
@@ -59,13 +60,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     private GameObject _partsGameObject;
 
-    public Orbit orbit { get; private set; }
+    public OrbitState orbit { get; private set; }
+    private UniVarPropagator _prop;
+    private SOIEscapeHndler _soiEsc;
+    private SOIInterceptHandler _soiInt;
+
     public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
 
-    public Vector2d Pos { get => orbit.GetPosition(); }
-    public Vector2d Vel { get => orbit.GetVelocity(); }
-    public double Altitude { get => Pos.Magnitude - body.radius; }
+    public double Altitude { get => GetPosition().Magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.
@@ -119,14 +122,20 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         Newtonian.angularMomentum = _config.rotation.momentum;
 
         var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
-        orbit = new Orbit(
+        orbit = new OrbitState(
             _config.orbit.h,
             _config.orbit.e,
             _config.orbit.omega,
             _config.orbit.M0,
             _config.orbit.t0,
-            parent // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
+            parent
         );
+        _prop = new UniVarPropagator(orbit);
+        _soiEsc = new SOIEscapeHndler(orbit);
+        _soiInt = new SOIInterceptHandler(orbit);
+        orbit.OnStateChanged += _soiEsc.CheckSOITimes;
+        orbit.OnStateChanged += _soiInt.CheckSOIIntercepts;
+
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";
 
@@ -211,12 +220,19 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
+    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
+    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
+    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
+    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
+
     private void FixedUpdate()
     {
-        //if (orbit.nextCapture != null)
-        //    Debug.Log($"{orbit.nextCaptureBody} (soi {orbit.nextCaptureBody.soiRadius}): distance to body {(orbit.nextCaptureBody.orbit.GetPosition() - Pos).Magnitude}; time {Universe.Instance.UT - orbit.nextCapture.time}; distance to capture {(Pos - orbit.nextCapture.pos).Magnitude}");
-        Debug.DrawRay(Vector3.zero, Vel);
-        orbit.CheckBodyChange();
+        var UT = Universe.Instance.UT;
+
+        if (_soiEsc.soiEscape != null && UT >= _soiEsc.soiEscape.time)
+            _soiEsc.EscapeSOI();
+        if (_soiInt.nextCapture != null && UT >= _soiInt.nextCapture.time)
+            _soiInt.InterceptSOI();
     }
 
     private void Update()

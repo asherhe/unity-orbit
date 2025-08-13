@@ -24,6 +24,8 @@ namespace UI
         private void Awake()
         {
             _follow = GetComponent<FollowTransform>();
+            _follow.shouldFollowPosition = true;
+            _follow.shouldFollowRotation = true;
 
             // in case _craft was set in inspector
             if (_craft != null)

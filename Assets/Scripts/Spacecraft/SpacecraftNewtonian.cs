@@ -128,8 +128,8 @@ public class SpacecraftNewtonian : MonoBehaviour
             // craft -> body space
             _accumulatedForce = _accumulatedForce.Rotate(angle);
             craft.orbit.UpdateFromStateVectors(
-                craft.Pos,
-                craft.Vel + Universe.Instance.fixedDeltaTime * _accumulatedForce / Mass
+                craft.GetPosition(),
+                craft.GetVelocity() + Universe.Instance.fixedDeltaTime * _accumulatedForce / Mass
             );
             _accumulatedForce = Vector2d.zero;
         }
