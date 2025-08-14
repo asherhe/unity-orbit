@@ -22,7 +22,6 @@ public class Trajectory : MonoBehaviour
             if (_orbit != null) _orbit.OnStateChanged -= GenerateTrajectory;
             _orbit = value;
             _prop = new UniVarPropagator(_orbit);
-            follow.follow = Orbit.body.transform;
             _orbit.OnStateChanged += GenerateTrajectory;
             GenerateTrajectory();
         }
@@ -38,6 +37,8 @@ public class Trajectory : MonoBehaviour
 
     public void GenerateTrajectory()
     {
+        follow.follow = Orbit.body.transform;
+
         const int trajectorySubdivs = 400;
         List<Vector2> points = new(trajectorySubdivs);
 
