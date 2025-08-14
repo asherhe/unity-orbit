@@ -72,6 +72,7 @@ namespace Orbit
         /// </summary>
         public double GetChi(double dt)
         {
+            Debug.Log($"p0={p0}; v0={v0}; t0={t0}");
             var dtsqrtGM = dt * Math.Sqrt(GM);
             var chi0 = dtsqrtGM * Math.Abs(alpha);
             var lower = dtsqrtGM / orbit.apoapsis;
@@ -87,7 +88,7 @@ namespace Orbit
                 DUniversalKepler,
                 chi0, lower - 1, upper + 1,
                 accuracy: accuracy,
-                maxIterations: 50
+                maxIterations: 100
             );
 
 

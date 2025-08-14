@@ -87,7 +87,7 @@ namespace Orbit
             var t2 = orbit.t0 + dtFromChi(chi2);
             if (t1 > t2) (t1, t2) = (t2, t1);
 
-            StateVectors stateFromChi (double chi, double t)
+            StateVectors stateFromChi(double chi, double t)
             {
                 var z = orbit.alpha * chi * chi;
                 var dt = t - orbit.t0;
