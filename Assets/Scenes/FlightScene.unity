@@ -2274,6 +2274,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _celestialBodyConfigs:
   - {fileID: 7962299789135392694, guid: 41f820d51d38b8c4d903a67d1e1dc92a, type: 3}
+  - {fileID: 7962299789135392694, guid: 5a6f4f9d4e80b7445bd137a79507ae37, type: 3}
+  - {fileID: 7962299789135392694, guid: 595e329576e89b040942d157774d1487, type: 3}
+  - {fileID: 7962299789135392694, guid: 8159d3501dbc9bd488ce0ce09936c45e, type: 3}
+  - {fileID: 7962299789135392694, guid: 5e4b57ae263588c46a1f073e7554496c, type: 3}
   - {fileID: 7962299789135392694, guid: 90ad60ab92da8ee4f904178bd28a59cd, type: 3}
   - {fileID: 7962299789135392694, guid: bafb656d586e25e4d98a8c755669e340, type: 3}
 --- !u!4 &1976858575

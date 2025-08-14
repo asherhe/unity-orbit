@@ -1,12 +1,12 @@
-# Pyrov.data
+# Yerf.data
 
-name: Pyrov
-color: "#F0A777"
+name: Yerf
+color: "#e0cd77"
 
 # planetary info
-radius: 1200.0 # km
-surfaceGravity: 3.6 # m/s^2
-dayLength: 1051.1 # hours
+radius: 2000.0 # km
+surfaceGravity: 5.9 # m/s^2
+dayLength: 16.7 # hours
 
 surfaceMaterial:
   path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
@@ -18,20 +18,20 @@ surfaceMaterial:
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
   parent: Sun
-  semimajorAxis: 4.38e7 # km
-  eccentricity: 0.16
-  longitudePeriapsis: 126.0 # deg
-  epochMeanAnom: 294.0 # deg
+  semimajorAxis: 6.7e7 # km
+  eccentricity: 0.012
+  longitudePeriapsis: 134.0 # deg
+  epochMeanAnom: 114.0 # deg
   epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere
 atmosphere:
   # height to which we simulate atmospheric effects
-  height: 30.0 # km
+  height: 60.0 # km
 
   # pressure characteristics
-  seaLevelPressure: 0.3 # atm
-  scaleHeight: 2.0 # km
+  seaLevelPressure: 0.8 # atm
+  scaleHeight: 4.0 # km
 
   # atmospheric rendering - scattering
   material:
