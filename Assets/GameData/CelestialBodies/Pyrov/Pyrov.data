@@ -1,0 +1,54 @@
+# Pyrov.data
+
+name: Pyrov
+color: "#F0A777"
+
+# planetary info
+radius: 1200.0 # km
+surfaceGravity: 3.6 # m/s^2
+dayLength: 1051.10 # hours
+
+surfaceMaterial:
+  path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
+  properties:
+    _Color:
+      type: Color
+      value: "#181717"
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Sun
+  semimajorAxis: 4.38e7 # km
+  eccentricity: 0.16
+  longitudePeriapsis: 126.0 # deg
+  epochMeanAnom: 294.0 # deg
+  epochTime: 0.0 # s
+
+# atmospheric data, set to false if no atmosphere
+atmosphere:
+  # height to which we simulate atmospheric effects
+  height: 30.0 # km
+
+  # pressure characteristics
+  seaLevelPressure: 0.3 # atm
+  scaleHeight: 2.0 # km
+
+  # atmospheric rendering - scattering
+  material:
+    path: Assets/GameData/CelestialBodies/Atmosphere.mat
+    properties:
+      _RayleighScaleHeight:
+        type: Float
+        value: 5000
+      _MieScaleHeight:
+        type: Float
+        value: 800
+      _RayleighScatteringCoeff:
+        type: Vector
+        value: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
+      _MieScatteringCoeff:
+        type: Vector
+        value: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
+      _MiePhaseG:
+        type: Float
+        value: 0.6
