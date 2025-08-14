@@ -1,12 +1,12 @@
-# Yerp.data
+# Cratos.data
 
-name: Yerp
-color: "#887a67"
+name: Cratos
+color: "#c7a3ca"
 
 # planetary info
-radius: 113.0 # km
-surfaceGravity: 0.24 # m/s^2
-dayLength: 19.70 # hours
+radius: 1300.0 # km
+surfaceGravity: 3.4 # m/s^2
+dayLength: 61.76 # hours
 
 surfaceMaterial:
   path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
@@ -17,9 +17,9 @@ surfaceMaterial:
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
-  parent: Yerf
-  semimajorAxis: 7.81e4 # km
-  eccentricity: 0.23
+  parent: Discus
+  semimajorAxis: 1.75e5 # km
+  eccentricity: 0.003
   longitudePeriapsis: 0.0 # deg
   epochMeanAnom: 0.0 # deg
   epochTime: 0.0 # s

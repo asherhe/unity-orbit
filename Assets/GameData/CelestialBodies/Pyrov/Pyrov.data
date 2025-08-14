@@ -1,7 +1,7 @@
 # Pyrov.data
 
 name: Pyrov
-color: "#F0A777"
+color: "#e9955e"
 
 # planetary info
 radius: 1200.0 # km

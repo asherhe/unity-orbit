@@ -1,12 +1,12 @@
-# Yerf.data
+# Splosha.data
 
-name: Yerf
-color: "#beab76"
+name: Splosha
+color: "#6671d8"
 
 # planetary info
-radius: 2000.0 # km
-surfaceGravity: 5.9 # m/s^2
-dayLength: 16.7 # hours
+radius: 2400.0 # km
+surfaceGravity: 6.3 # m/s^2
+dayLength: 47.47 # hours
 
 surfaceMaterial:
   path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
@@ -17,21 +17,21 @@ surfaceMaterial:
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
-  parent: Sun
-  semimajorAxis: 6.7e7 # km
-  eccentricity: 0.012
-  longitudePeriapsis: 134.0 # deg
-  epochMeanAnom: 114.0 # deg
+  parent: Gus
+  semimajorAxis: 4.0e5 # km
+  eccentricity: 0.014
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
   epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere
 atmosphere:
   # height to which we simulate atmospheric effects
-  height: 60.0 # km
+  height: 50.0 # km
 
   # pressure characteristics
-  seaLevelPressure: 0.8 # atm
-  scaleHeight: 4.0 # km
+  seaLevelPressure: 0.7 # atm
+  scaleHeight: 3.5 # km
 
   # atmospheric rendering - scattering
   material:

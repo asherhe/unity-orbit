@@ -1,12 +1,12 @@
-# Yerf.data
+# Karbin.data
 
-name: Yerf
-color: "#beab76"
+name: Karbin
+color: "#f0bd72"
 
 # planetary info
-radius: 2000.0 # km
-surfaceGravity: 5.9 # m/s^2
-dayLength: 16.7 # hours
+radius: 1700.0 # km
+surfaceGravity: 5.6 # m/s^2
+dayLength: 82.35 # hours
 
 surfaceMaterial:
   path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
@@ -17,21 +17,21 @@ surfaceMaterial:
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
-  parent: Sun
-  semimajorAxis: 6.7e7 # km
-  eccentricity: 0.012
-  longitudePeriapsis: 134.0 # deg
-  epochMeanAnom: 114.0 # deg
+  parent: Discus
+  semimajorAxis: 2.12e5 # km
+  eccentricity: 0.007
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
   epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere
 atmosphere:
   # height to which we simulate atmospheric effects
-  height: 60.0 # km
+  height: 120.0 # km
 
   # pressure characteristics
-  seaLevelPressure: 0.8 # atm
-  scaleHeight: 4.0 # km
+  seaLevelPressure: 1.6 # atm
+  scaleHeight: 7.0 # km
 
   # atmospheric rendering - scattering
   material:
