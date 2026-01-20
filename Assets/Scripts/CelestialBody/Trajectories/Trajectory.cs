@@ -39,34 +39,41 @@ public class Trajectory : MonoBehaviour
     {
         follow.follow = Orbit.body.transform;
 
-        const int trajectorySubdivs = 400;
-        List<Vector2> points = new(trajectorySubdivs);
+        const int TRAJECTORY_SUBDIVS = 100;
+        List<Vector2> points = new(TRAJECTORY_SUBDIVS); // subdivision points used in trajectory mesh
+        List<double> nus = new(TRAJECTORY_SUBDIVS); // true anomaly at each subdivision point
 
-        double theta0, thetaMax;
-        if (Orbit.e <= 1.0)
+        double nu1, nu2;
+        if (Orbit.e < 1.0)
         {
-            theta0 = 0;
-            thetaMax = theta0 + 2 * Math.PI * (Orbit.h > 0.0 ? 1 : -1);
+            nu1 = 0;
+            nu2 = nu1 + 2 * Math.PI * (Orbit.h > 0.0 ? 1 : -1);
             trajectoryMesh.loop = true;
         }
         else
         {
-            double asymptote = Math.Acos(-1.0 / Orbit.e);
-            theta0 = Orbit.omega + asymptote;
-            thetaMax = Orbit.omega - asymptote;
+            // furthest distance we will render parabolic and hyperbolic trajectories to
+            const double MAX_R = 1e13;
+            // true anomaly to MAX_R
+            double asymptote = Math.Acos((Math.Abs(Orbit.p) - MAX_R) / (MAX_R * Orbit.e));
+            nu1 = asymptote;
+            nu2 = -asymptote;
             trajectoryMesh.loop = false;
         }
-        double dTheta = (thetaMax - theta0) / trajectorySubdivs;
+        double dTheta = (nu2 - nu1) / (TRAJECTORY_SUBDIVS - 1);
 
-        double p = Orbit.a * (1 - Orbit.e * Orbit.e);
-        for (int i = 0; i < trajectorySubdivs; i++)
+        for (int i = 0; i < TRAJECTORY_SUBDIVS; i++)
         {
-            double theta = theta0 + i * dTheta;
-            double r = p / (1.0 + (float)Orbit.e * Math.Cos(theta - Orbit.omega));
-            if (r > 0.0)
-                points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
+            double nu = nu1 + i * dTheta;
+            double r = Orbit.GetDistanceFromNu(nu);
+            if (r <= 0.0) continue;
+
+            var theta = Orbit.omega + nu;
+            points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
+            nus.Add(nu);
         }
 
+        // TODO: infer UV from nu
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
     }
@@ -95,7 +102,7 @@ public class Trajectory : MonoBehaviour
             if (len < 2) return;
 
             // we add a duplicate version of the first point if we have a loop so
-            // that UV doesn't interpolate between 0 and 1 for the loop segment
+            // that UV doesn't interpolate between 0 and 1 for the segment that closes the loop
             int nVerts = len + (loop ? 1 : 0);
             verts = new Vector3[nVerts * 2];
             uvs = new Vector2[nVerts * 2];

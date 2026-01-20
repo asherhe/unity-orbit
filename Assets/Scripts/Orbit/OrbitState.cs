@@ -116,6 +116,11 @@ namespace Orbit
         /// </summary>
         public double period { get; private set; }
 
+        /// <summary>
+        /// semi-latus rectum
+        /// </summary>
+        public double p { get; private set; }
+
 
         /// <summary>
         /// construct an orbit from orbital elements
@@ -215,8 +220,10 @@ namespace Orbit
 
             omega = Math.Atan2(eccVec.y, eccVec.x);
 
-            periapsis = a * (1 - e);
-            apoapsis = (e < 1) ? (a * (1 + e)) : double.PositiveInfinity; // betasquared is fine because we know e<1
+            p = h * h / GM;
+
+            periapsis = p / (1 + e);
+            apoapsis = (e < 1) ? (p / (1 - e)) : double.PositiveInfinity;
 
             period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
 
@@ -315,6 +322,14 @@ namespace Orbit
             {
                 return nu;
             }
+        }
+
+        /// <summary>
+        /// get distance from center for a given true anomaly
+        /// </summary>
+        public double GetDistanceFromNu(double nu)
+        {
+            return p / (1 + e * Math.Cos(nu));
         }
     }
 
