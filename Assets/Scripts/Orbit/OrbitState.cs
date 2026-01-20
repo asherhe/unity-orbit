@@ -163,6 +163,13 @@ namespace Orbit
             UpdateFromStateVectors(pos, vel, Universe.Instance.UT, body);
         }
 
+        /// <summary>
+        /// copy state from another orbit
+        /// </summary>
+        public void CopyFrom(OrbitState o)
+        {
+            UpdateFromStateVectors(o.p0, o.v0, o.t0, o.body);
+        }
 
         /// <summary>
         /// converts a vector from body space to perifocal space
@@ -309,10 +316,10 @@ namespace Orbit
     /// <summary>
     /// a time, a position, and a velocity.
     /// </summary>
-    public class StateVectors
+    public readonly struct StateVectors
     {
-        public double time;
-        public Vector2d pos, vel;
+        public readonly double time;
+        public readonly Vector2d pos, vel;
         public StateVectors(double time, Vector2d pos, Vector2d vel)
         {
             this.time = time;

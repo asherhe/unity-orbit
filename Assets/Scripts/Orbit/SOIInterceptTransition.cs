@@ -9,15 +9,13 @@ namespace Orbit
     /// <summary>
     /// deals with the detection and handling of intercepts with celestial bodies
     /// </summary>
-    public class SOIInterceptHandler
+    public class SOIInterceptTransition : OrbitTransition
     {
-        public OrbitState orbit;
         private UniVarPropagator _prop;
         private EncounterCalculator _enc;
 
-        public SOIInterceptHandler(OrbitState orbit)
+        public SOIInterceptTransition(OrbitState orbit) : base(orbit)
         {
-            this.orbit = orbit;
             _prop = new UniVarPropagator(orbit);
             _enc = new EncounterCalculator(orbit);
         }
@@ -25,13 +23,13 @@ namespace Orbit
         /// <summary>
         /// the state of this orbit at the time of the next capture
         /// </summary>
-        public StateVectors nextCapture { get; private set; }
+        public StateVectors? nextCapture { get; private set; }
         /// <summary>
         /// the celestial body that will capture this orbit
         /// </summary>
         public CelestialBody nextCaptureBody { get; private set; }
 
-        public void CheckSOIIntercepts()
+        protected override TransitionResult CalcTransitionResult()
         {
             nextCapture = null; nextCaptureBody = null;
 
@@ -46,7 +44,7 @@ namespace Orbit
                         captureEncounter.orbitingObject = satellite;
                     }
             }
-            if (captureEncounter == null) return;
+            if (captureEncounter == null) return TransitionResult.None;
 
             var b = (CelestialBody)captureEncounter.orbitingObject;
             var t = captureEncounter.state.time;
@@ -74,15 +72,14 @@ namespace Orbit
 
             nextCapture = new(captureTime, _prop.GetPosition(captureTime), _prop.GetVelocity(captureTime));
             nextCaptureBody = b;
-        }
 
-        public void InterceptSOI()
-        {
-            var t = nextCapture.time;
-            orbit.UpdateFromStateVectors(
-                nextCapture.pos - nextCaptureBody.GetPosition(t),
-                nextCapture.vel - nextCaptureBody.GetVelocity(t),
-                t, nextCaptureBody
+            var captState = nextCapture.Value;
+            return new TransitionResult(
+                captureTime, new OrbitState(
+                    captState.pos - nextCaptureBody.GetPosition(captureTime),
+                    captState.vel - nextCaptureBody.GetVelocity(captureTime),
+                    captureTime, nextCaptureBody
+                )
             );
         }
     }

@@ -7,6 +7,7 @@ using UnityEngine;
 public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
 {
     public GameObject trajectoryPrefab;
+    private HashSet<Trajectory> _trajectories = new();
 
     /// <summary>
     /// add a new trajectory to display
@@ -15,10 +16,24 @@ public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
     public Trajectory AddTrajectory(OrbitState o)
     {
         var trajObject = Instantiate(trajectoryPrefab, transform);
-        //trajObject.name = $"Trajectory {o.ToString()}";
         trajObject.transform.localPosition = Vector3.zero;
         var trajectory = trajObject.GetComponent<Trajectory>();
         trajectory.Orbit = o;
+        _trajectories.Add(trajectory);
         return trajectory;
+    }
+
+    /// <summary>
+    /// remove a trajectory from display
+    /// </summary>
+    /// <returns>true if trajectory was found and removed, false otherwise</returns>
+    public bool RemoveTrajectory(Trajectory t)
+    {
+        if (_trajectories.Remove(t))
+        {
+            Destroy(t.gameObject);
+            return true;
+        }
+        return false;
     }
 }

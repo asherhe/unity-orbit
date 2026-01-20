@@ -10,38 +10,32 @@ namespace Orbit
     /// <summary>
     /// deals with the detection and handling of escape trajectories from the SOI of the current celestial body
     /// </summary>
-    public class SOIEscapeHndler
+    public class SOIEscapeTransition : OrbitTransition
     {
-        public OrbitState orbit;
         private UniVarPropagator _prop;
 
-        public SOIEscapeHndler(OrbitState orbit)
+        public SOIEscapeTransition(OrbitState orbit) : base(orbit)
         {
-            this.orbit = orbit;
             _prop = new UniVarPropagator(orbit);
         }
-
 
         /// <summary>
         /// state of orbit at the place where it enters the SOI
         /// </summary>
-        public StateVectors soiCapture;
+        public StateVectors? SOICapture { get; private set; }
         /// <summary>
         /// state of orbit at the place where it exits the SOI
         /// </summary>
-        public StateVectors soiEscape;
+        public StateVectors? SOIEscape { get; private set; }
 
-        /// <summary>
-        /// calculate the state vectors (time, position, velocity) of this orbit at the moments when this orbit enters or leaves the SOI.
-        /// </summary>
-        public void CheckSOITimes()
+        protected override TransitionResult CalcTransitionResult()
         {
-            soiCapture = null; soiEscape = null;
+            SOICapture = null; SOIEscape = null;
 
             // check if body HAS an SOI first
-            if (orbit.body.orbit == null) return;
-
-            if (orbit.apoapsis < orbit.body.soiRadius) return;
+            if (orbit.body.orbit == null) return TransitionResult.None;
+            // whether we will cross the SOI
+            if (orbit.apoapsis < orbit.body.soiRadius) return TransitionResult.None;
 
             var rsoi = orbit.body.soiRadius;
             var e = orbit.e; var a = orbit.a;
@@ -96,17 +90,16 @@ namespace Orbit
                 return new StateVectors(t, p, v);
             }
 
-            soiCapture = stateFromChi(chi1, t1);
-            soiEscape = stateFromChi(chi2, t2);
-        }
+            SOICapture = stateFromChi(chi1, t1);
+            StateVectors escState;
+            SOIEscape = (escState = stateFromChi(chi2, t2));
 
-        public void EscapeSOI()
-        {
-            var t = soiEscape.time;
-            orbit.UpdateFromStateVectors(
-                orbit.body.GetPosition(t) + soiEscape.pos,
-                orbit.body.GetVelocity(t) + soiEscape.vel,
-                t, orbit.body.parent
+            return new TransitionResult(
+                t2, new OrbitState(
+                    orbit.body.GetPosition(t2) + escState.pos,
+                    orbit.body.GetVelocity(t2) + escState.vel,
+                    t2, orbit.body.parent
+                )
             );
         }
     }

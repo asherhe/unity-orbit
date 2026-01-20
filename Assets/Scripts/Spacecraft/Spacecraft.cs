@@ -62,8 +62,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public OrbitState orbit { get; private set; }
     private UniVarPropagator _prop;
-    private SOIEscapeHndler _soiEsc;
-    private SOIInterceptHandler _soiInt;
+    private OrbitTransitionManager _transitionManager;
 
     public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
@@ -131,10 +130,10 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             parent
         );
         _prop = new UniVarPropagator(orbit);
-        _soiEsc = new SOIEscapeHndler(orbit);
-        _soiInt = new SOIInterceptHandler(orbit);
-        orbit.OnStateChanged += _soiEsc.CheckSOITimes;
-        //orbit.OnStateChanged += _soiInt.CheckSOIIntercepts;
+
+        _transitionManager = new OrbitTransitionManager(orbit);
+        _transitionManager.Add(new SOIEscapeTransition(orbit));
+        //_transitionManager.Add(new SOIInterceptTransition(orbit));
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";
@@ -227,12 +226,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
-        var UT = Universe.Instance.UT;
-
-        if (_soiEsc.soiEscape != null && UT >= _soiEsc.soiEscape.time)
-            _soiEsc.EscapeSOI();
-        if (_soiInt.nextCapture != null && UT >= _soiInt.nextCapture.time)
-            _soiInt.InterceptSOI();
+        _transitionManager.UpdateOrbit();
     }
 
     private void Update()
