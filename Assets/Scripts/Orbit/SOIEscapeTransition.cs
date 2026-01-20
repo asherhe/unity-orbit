@@ -91,13 +91,12 @@ namespace Orbit
             }
 
             SOICapture = stateFromChi(chi1, t1);
-            StateVectors escState;
-            SOIEscape = (escState = stateFromChi(chi2, t2));
+            SOIEscape = stateFromChi(chi2, t2);
 
             return new TransitionResult(
-                t2, new OrbitState(
-                    orbit.body.GetPosition(t2) + escState.pos,
-                    orbit.body.GetVelocity(t2) + escState.vel,
+                SOIEscape.Value, new OrbitState(
+                    orbit.body.GetPosition(t2) + SOIEscape?.pos,
+                    orbit.body.GetVelocity(t2) + SOIEscape?.vel,
                     t2, orbit.body.parent
                 )
             );

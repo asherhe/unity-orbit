@@ -62,7 +62,7 @@ namespace Orbit
             foreach (var transition in _transitions)
             {
                 transition.CheckTransition();
-                if (transition.HasTransition && (NextTransition == null || transition.TransitionTime < NextTransition.TransitionTime))
+                if (transition.HasTransition && (NextTransition == null || transition.Time < NextTransition.Time))
                     NextTransition = transition;
             }
 
@@ -75,7 +75,7 @@ namespace Orbit
         /// </summary>
         public void UpdateOrbit()
         {
-            if (NextTransition != null && Universe.Instance.UT >= NextTransition.TransitionTime)
+            if (NextTransition != null && Universe.Instance.UT >= NextTransition.Time)
             {
                 _orbit.CopyFrom(NextTransition.NextOrbit);
             }
@@ -95,27 +95,32 @@ namespace Orbit
         }
 
         /// <summary>
+        /// state vectors at the time of transition
+        /// </summary>
+        public StateVectors State { get; private set; }
+        /// <summary>
         /// time of transition. NaN if no transition will occur
         /// </summary>
-        public double TransitionTime { get; protected set; }
-        public bool HasTransition { get => !double.IsNaN(TransitionTime); }
+        public double Time { get => State.time; }
+        public bool HasTransition { get => !double.IsNaN(Time); }
 
         /// <summary>
         /// new orbit state once transition occurs
         /// </summary>
-        public OrbitState NextOrbit { get; protected set; }
+        public OrbitState NextOrbit { get; private set; }
 
         protected readonly struct TransitionResult
         {
-            public readonly double time;
+            public readonly StateVectors state;
             public readonly OrbitState orbit;
-            public TransitionResult(double time, OrbitState orbit)
+            public double Time { get => state.time; }
+            public TransitionResult(StateVectors state, OrbitState orbit)
             {
-                this.time = time;
+                this.state = state;
                 this.orbit = orbit;
             }
             
-            public static TransitionResult None = new(double.NaN, null);
+            public static TransitionResult None = new(new StateVectors(double.NaN, null, null), null);
         }
 
         /// <summary>
@@ -131,7 +136,7 @@ namespace Orbit
         public void CheckTransition()
         {
             var result = CalcTransitionResult();
-            TransitionTime = result.time;
+            State = result.state;
             NextOrbit = result.orbit;
         }
     }

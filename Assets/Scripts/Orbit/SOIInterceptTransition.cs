@@ -73,11 +73,10 @@ namespace Orbit
             nextCapture = new(captureTime, _prop.GetPosition(captureTime), _prop.GetVelocity(captureTime));
             nextCaptureBody = b;
 
-            var captState = nextCapture.Value;
             return new TransitionResult(
-                captureTime, new OrbitState(
-                    captState.pos - nextCaptureBody.GetPosition(captureTime),
-                    captState.vel - nextCaptureBody.GetVelocity(captureTime),
+                nextCapture.Value, new OrbitState(
+                    nextCapture?.pos - nextCaptureBody.GetPosition(captureTime),
+                    nextCapture?.vel - nextCaptureBody.GetVelocity(captureTime),
                     captureTime, nextCaptureBody
                 )
             );

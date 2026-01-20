@@ -227,11 +227,7 @@ namespace Orbit
 
             period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
 
-            // position in the perifocal plane
-            var pos = BodyToPerifocal(p0);
-
-            // true anomaly, range [-PI, PI]
-            nu0 = Math.Atan2(pos.y, pos.x);
+            nu0 = CalcNu(p0);
 
             if (e == 0.0)
             {
@@ -322,6 +318,17 @@ namespace Orbit
             {
                 return nu;
             }
+        }
+
+        /// <summary>
+        /// calculate the true anomaly at any given position, normalized to [ -PI, PI ]
+        /// </summary>
+        public double CalcNu(Vector2d pos)
+        {
+            var nu = Math.Atan2(pos.y, pos.x) - omega;
+            if (nu > Math.PI) nu -= 2 * Math.PI;
+            if (nu < -Math.PI) nu += 2 * Math.PI;
+            return nu;
         }
 
         /// <summary>

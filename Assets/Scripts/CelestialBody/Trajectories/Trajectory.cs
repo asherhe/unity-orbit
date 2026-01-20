@@ -39,6 +39,11 @@ public class Trajectory : MonoBehaviour
     [SerializeField]
     private double quality = 2e-4;
 
+    /// <summary>
+    /// boundaries that restrict the range of true anomalies we draw. true anomaly is always in [ -PI, +PI ]
+    /// </summary>
+    public double nuMin = double.NegativeInfinity, nuMax = double.PositiveInfinity;
+
     private void Awake()
     {
         trajectoryMesh = new TrajectoryMesh();
@@ -76,19 +81,22 @@ public class Trajectory : MonoBehaviour
         double nu1, nu2;
         if (Orbit.e < 1.0)
         {
-            nu1 = 0;
-            nu2 = nu1 + 2 * Math.PI * (Orbit.h > 0.0 ? 1 : -1);
+            nu1 = -Math.PI;
+            nu2 = Math.PI;
             trajectoryMesh.loop = true;
         }
         else
         {
             // true anomaly to maxRenderDistance
             double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
-            nu1 = asymptote;
-            nu2 = -asymptote;
+            nu1 = -asymptote;
+            nu2 = asymptote;
             trajectoryMesh.loop = false;
         }
 
+        if (nu1 < nuMin || nu2 > nuMax) trajectoryMesh.loop = false;
+        nu1 = Math.Max(nu1, nuMin);
+        nu2 = Math.Min(nu2, nuMax);
 
         LinkedList<TrajectoryPoint> points = new();
 
@@ -106,6 +114,7 @@ public class Trajectory : MonoBehaviour
             double r1 = start.Value.r, r2 = end.Value.r;
             var chordMid = 2 * r1 * r2 * Math.Cos(0.5 * (nuEnd - nuStart)) / (r1 + r2);
 
+            // deviates too far
             if (Math.Abs(rMid - chordMid) > tol)
             {
                 var mid = points.AddAfter(start, new TrajectoryPoint(rMid, nuMid, Orbit.omega));
@@ -121,8 +130,6 @@ public class Trajectory : MonoBehaviour
         // TODO: infer UV from nu
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
-
-        Debug.Log($"{name}: {points.Count} verts");
     }
 
 
@@ -141,12 +148,7 @@ public class Trajectory : MonoBehaviour
 
         public bool loop = false;
 
-        public Mesh mesh;
-
-        public TrajectoryMesh()
-        {
-            mesh = new Mesh();
-        }
+        public Mesh mesh = new();
 
         public void SetPointList(LinkedList<TrajectoryPoint> points)
         {

@@ -63,6 +63,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     public OrbitState orbit { get; private set; }
     private UniVarPropagator _prop;
     private OrbitTransitionManager _transitionManager;
+    private SOIEscapeTransition _soiEscape;
 
     public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
@@ -132,9 +133,36 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _prop = new UniVarPropagator(orbit);
 
         _transitionManager = new OrbitTransitionManager(orbit);
-        _transitionManager.Add(new SOIEscapeTransition(orbit));
+        _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));
         //_transitionManager.Add(new SOIInterceptTransition(orbit));
         _transitionManager.CheckTransitions();
+
+        orbit.OnStateChanged += () =>
+        {
+            // orbit direction
+            var dir = Math.Sign(orbit.h);
+            // true anomalies, timewise - nu1 happens first, then nu2
+            double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
+
+            // adjust nu bounds, accounting for orbit direction
+            double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
+            double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
+
+            if (_soiEscape.HasTransition)
+            {
+                var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
+                SetNu1(nuCapt);
+                SetNu2(-nuCapt);
+            }
+            if (_transitionManager.HasTransition)
+            {
+                var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
+                SetNu2(nuTrans);
+            }
+
+            if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
+            else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
+        };
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";

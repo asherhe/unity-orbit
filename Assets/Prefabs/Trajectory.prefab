@@ -97,6 +97,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 210d9f610f90b194fb0390b1b9202fd3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxRenderDistance: 10000000000000
+  quality: 0.0002
+  nuMin: -Infinity
+  nuMax: Infinity
 --- !u!114 &8027837895430610725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,3 +114,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   follow: {fileID: 0}
+  shouldFollowPosition: 1
+  shouldFollowRotation: 0
