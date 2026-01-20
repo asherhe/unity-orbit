@@ -41,7 +41,8 @@ namespace Orbit
             var e = orbit.e; var a = orbit.a;
 
             // determine true anomaly at SOI intersection
-            var nu = Math.Acos(((e == 1.0 ? orbit.h / orbit.GM : a * (1 - e * e)) / rsoi - 1) / e);
+            //var nu = Math.Acos(((e == 1.0 ? orbit.h / orbit.GM : a * (1 - e * e)) / rsoi - 1) / e);
+            var nu = Math.Acos((Math.Abs(orbit.p) - rsoi) / (rsoi * e));
             var anomaly = orbit.CalcAnomaly(nu);
 
             // prepare to calculate universal anomaly
