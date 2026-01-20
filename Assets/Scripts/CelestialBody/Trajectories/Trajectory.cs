@@ -27,9 +27,17 @@ public class Trajectory : MonoBehaviour
         }
     }
 
-    // furthest distance we will render parabolic and hyperbolic trajectories to
+    /// <summary>
+    /// furthest distance to which we will render parabolic and hyperbolic trajectories (m)
+    /// </summary>
     [SerializeField]
     private double maxRenderDistance = 1e13;
+    /// <summary>
+    /// maximum error allowable in generated trajectory mesh from original conic, as a fraction of semi-latus rectum
+    /// NOTE: ideally we want this to maybe be a fraction of the camera size but that would require regenerating the mesh more times than necessary
+    /// </summary>
+    [SerializeField]
+    private double quality = 1e-4;
 
     private void Awake()
     {
@@ -45,19 +53,25 @@ public class Trajectory : MonoBehaviour
     private readonly struct TrajectoryPoint
     {
         public readonly Vector2 pos;
+        public readonly double r;
         public readonly double nu;
-        public TrajectoryPoint(Vector2 pos, double nu)
+        /// <summary>
+        /// construct a trajectory point
+        /// </summary>
+        /// <param name="r">distance from center</param>
+        /// <param name="nu">true anomaly</param>
+        /// <param name="omega">argument of periapsis</param>
+        public TrajectoryPoint(double r, double nu, double omega)
         {
-            this.pos = pos; this.nu = nu;
+            this.r = r; this.nu = nu;
+            var theta = (float)(nu + omega);
+            pos = (float)r * new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
         }
     }
 
     public void GenerateTrajectory()
     {
         follow.follow = Orbit.body.transform;
-
-        const int TRAJECTORY_SUBDIVS = 100;
-        LinkedList<TrajectoryPoint> points = new();
 
         double nu1, nu2;
         if (Orbit.e < 1.0)
@@ -68,30 +82,47 @@ public class Trajectory : MonoBehaviour
         }
         else
         {
-            // true anomaly to MAX_R
+            // true anomaly to maxRenderDistance
             double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
             nu1 = asymptote;
             nu2 = -asymptote;
             trajectoryMesh.loop = false;
         }
-        double dTheta = (nu2 - nu1) / (TRAJECTORY_SUBDIVS - 1);
 
-        for (int i = 0; i < TRAJECTORY_SUBDIVS; i++)
+
+        LinkedList<TrajectoryPoint> points = new();
+
+        // error tolerance
+        double tol = Orbit.p * quality;
+
+        void SubdivideMesh(LinkedListNode<TrajectoryPoint> start, LinkedListNode<TrajectoryPoint> end, double nuStart, double nuEnd, int depth)
         {
-            double nu = nu1 + i * dTheta;
-            double r = Orbit.GetDistanceFromNu(nu);
-            if (r <= 0.0) continue;
+            if (depth == 0) return;
 
-            var theta = Orbit.omega + nu;
-            points.AddLast(new TrajectoryPoint(
-                (float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)),
-                nu
-            ));
+            var nuMid = 0.5 * (nuStart + nuEnd);
+            // real distance at this point
+            var rMid = Orbit.GetDistanceFromNu(nuMid);
+            // chord distance based on start and end points (i.e. straight line connecting start to end)
+            double r1 = start.Value.r, r2 = end.Value.r;
+            var chordMid = 2 * r1 * r2 * Math.Cos(0.5 * (nuEnd - nuStart)) / (r1 + r2);
+
+            if (Math.Abs(rMid - chordMid) > tol)
+            {
+                var mid = points.AddAfter(start, new TrajectoryPoint(rMid, nuMid, Orbit.omega));
+                SubdivideMesh(start, mid, nuStart, nuMid, depth - 1);
+                SubdivideMesh(mid, end, nuMid, nuEnd, depth - 1);
+            }
         }
+
+        points.AddLast(new TrajectoryPoint(Orbit.GetDistanceFromNu(nu1), nu1, Orbit.omega));
+        points.AddLast(new TrajectoryPoint(Orbit.GetDistanceFromNu(nu2), nu2, Orbit.omega));
+        SubdivideMesh(points.First, points.Last, nu1, nu2, 24);
 
         // TODO: infer UV from nu
         trajectoryMesh.SetPointList(points);
         trajectoryMesh.UpdateMesh();
+
+        Debug.Log($"{name}: {points.Count} verts");
     }
 
 
@@ -187,8 +218,8 @@ public class Trajectory : MonoBehaviour
                 tris[6 * j + 2] = 2 * j + 3;
 
                 tris[6 * j + 3] = 2 * j;
-                tris[6 * j + 4] = 2 * j + 2;
-                tris[6 * j + 5] = 2 * j + 3;
+                tris[6 * j + 4] = 2 * j + 3;
+                tris[6 * j + 5] = 2 * j + 2;
             }
         }
 
