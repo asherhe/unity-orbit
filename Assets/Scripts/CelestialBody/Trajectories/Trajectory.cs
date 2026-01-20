@@ -37,7 +37,7 @@ public class Trajectory : MonoBehaviour
     /// NOTE: ideally we want this to maybe be a fraction of the camera size but that would require regenerating the mesh more times than necessary
     /// </summary>
     [SerializeField]
-    private double quality = 1e-4;
+    private double quality = 2e-4;
 
     private void Awake()
     {
