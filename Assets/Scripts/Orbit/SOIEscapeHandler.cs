@@ -78,7 +78,11 @@ namespace Orbit
             var sqrtGM = Math.Sqrt(orbit.GM);
             var t1 = orbit.t0 + _prop.UniversalKepler(chi1) / sqrtGM;
             var t2 = orbit.t0 + _prop.UniversalKepler(chi2) / sqrtGM;
-            if (t1 > t2) (t1, t2) = (t2, t1);
+            if (t1 > t2)
+            {
+                (t1, t2) = (t2, t1);
+                (chi1, chi2) = (chi2, chi1);
+            }
 
             StateVectors stateFromChi(double chi, double t)
             {
