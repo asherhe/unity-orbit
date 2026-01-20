@@ -1,0 +1,28 @@
+# Fridgeran.data
+
+name: Fridgeran
+color: "#82cae7"
+
+# planetary info
+radius: 249.0 # km
+surfaceGravity: 0.6 # m/s^2
+dayLength: 10.0 # hours
+
+surfaceMaterial:
+  path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
+  properties:
+    _Color:
+      type: Color
+      value: "#181717"
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Discus
+  semimajorAxis: 4.0e5 # km
+  eccentricity: 0.0011
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
+  epochTime: 0.0 # s
+
+# atmospheric data, set to false if no atmosphere
+atmosphere: false

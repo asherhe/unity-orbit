@@ -56,6 +56,8 @@ namespace Orbit
             {
                 coeff = Math.Sqrt(a);
                 anomaly0 = orbit.E0;
+                // normalize to [ -PI, PI ]
+                if (anomaly0 > Math.PI) anomaly0 -= 2 * Math.PI;
             }
             else if (e > 1)
             {
@@ -72,20 +74,15 @@ namespace Orbit
             var chi1 = coeff * (anomaly - anomaly0);
             var chi2 = coeff * (-anomaly - anomaly0);
 
-            // determine dt from universal anomaly via universal kepler's equation
-            double dtFromChi(double chi)
+            // dt from universal anomaly - universal kepler eqn / sqrt(GM)
+            var sqrtGM = Math.Sqrt(orbit.GM);
+            var t1 = orbit.t0 + _prop.UniversalKepler(chi1) / sqrtGM;
+            var t2 = orbit.t0 + _prop.UniversalKepler(chi2) / sqrtGM;
+            if (t1 > t2)
             {
-                double r0 = orbit.r0, vr0 = orbit.vr0, alpha = orbit.alpha;
-                var z = alpha * chi * chi;
-                var sqrtGM = Math.Sqrt(orbit.GM);
-                return r0 * vr0 * chi * chi * _prop.stumpff_C(z) / orbit.GM +
-                    (1 - alpha * r0) * chi * chi * chi * _prop.stumpff_S(z) / sqrtGM +
-                    r0 * chi / sqrtGM;
+                (t1, t2) = (t2, t1);
+                (chi1, chi2) = (chi2, chi1);
             }
-
-            var t1 = orbit.t0 + dtFromChi(chi1);
-            var t2 = orbit.t0 + dtFromChi(chi2);
-            if (t1 > t2) (t1, t2) = (t2, t1);
 
             StateVectors stateFromChi(double chi, double t)
             {
