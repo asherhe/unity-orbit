@@ -83,12 +83,21 @@ namespace Orbit
             // especially with precision loss through mathematical operations
             var accuracy = Math.Abs(DUniversalKepler(chi0)) * 1e-8;
 
-            var chi = NewtonRaphson.FindRootNearGuess(
+            //var chi = NewtonRaphson.FindRootNearGuess(
+            //    chi => UniversalKepler(chi) - dtsqrtGM,
+            //    DUniversalKepler,
+            //    chi0, lower - 1, upper + 1,
+            //    accuracy: accuracy,
+            //    maxIterations: 100
+            //);
+
+            var chi = RobustNewtonRaphson.FindRoot(
                 chi => UniversalKepler(chi) - dtsqrtGM,
                 DUniversalKepler,
-                chi0, lower - 1, upper + 1,
+                lower - 1, upper + 1,
                 accuracy: accuracy,
-                maxIterations: 100
+                maxIterations: 100,
+                subdivision: 20
             );
 
 
