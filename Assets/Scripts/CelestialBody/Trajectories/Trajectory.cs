@@ -27,6 +27,10 @@ public class Trajectory : MonoBehaviour
         }
     }
 
+    // furthest distance we will render parabolic and hyperbolic trajectories to
+    [SerializeField]
+    private double maxRenderDistance = 1e13;
+
     private void Awake()
     {
         trajectoryMesh = new TrajectoryMesh();
@@ -35,13 +39,25 @@ public class Trajectory : MonoBehaviour
         follow = GetComponent<UI.FollowTransform>();
     }
 
+    /// <summary>
+    /// data about each vectex in the trajectory mesh
+    /// </summary>
+    private readonly struct TrajectoryPoint
+    {
+        public readonly Vector2 pos;
+        public readonly double nu;
+        public TrajectoryPoint(Vector2 pos, double nu)
+        {
+            this.pos = pos; this.nu = nu;
+        }
+    }
+
     public void GenerateTrajectory()
     {
         follow.follow = Orbit.body.transform;
 
         const int TRAJECTORY_SUBDIVS = 100;
-        List<Vector2> points = new(TRAJECTORY_SUBDIVS); // subdivision points used in trajectory mesh
-        List<double> nus = new(TRAJECTORY_SUBDIVS); // true anomaly at each subdivision point
+        LinkedList<TrajectoryPoint> points = new();
 
         double nu1, nu2;
         if (Orbit.e < 1.0)
@@ -52,10 +68,8 @@ public class Trajectory : MonoBehaviour
         }
         else
         {
-            // furthest distance we will render parabolic and hyperbolic trajectories to
-            const double MAX_R = 1e13;
             // true anomaly to MAX_R
-            double asymptote = Math.Acos((Math.Abs(Orbit.p) - MAX_R) / (MAX_R * Orbit.e));
+            double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
             nu1 = asymptote;
             nu2 = -asymptote;
             trajectoryMesh.loop = false;
@@ -69,8 +83,10 @@ public class Trajectory : MonoBehaviour
             if (r <= 0.0) continue;
 
             var theta = Orbit.omega + nu;
-            points.Add((float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)));
-            nus.Add(nu);
+            points.AddLast(new TrajectoryPoint(
+                (float)r * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta)),
+                nu
+            ));
         }
 
         // TODO: infer UV from nu
@@ -82,6 +98,11 @@ public class Trajectory : MonoBehaviour
     class TrajectoryMesh
     {
         public Vector3[] verts;
+        /*
+         * uvs: progress along the trajectory at this vertex
+         * prev, next: positions of previous and next point
+         * data: [ which side are we on? (-1 or 1), is this vertex a corner/end cap? (0 or 1) ]
+         */
         public Vector2[] uvs, prev, next, data;
         public int[] tris;
 
@@ -96,7 +117,7 @@ public class Trajectory : MonoBehaviour
             mesh = new Mesh();
         }
 
-        public void SetPointList(List<Vector2> points)
+        public void SetPointList(LinkedList<TrajectoryPoint> points)
         {
             int len = points.Count;
             if (len < 2) return;
@@ -111,35 +132,43 @@ public class Trajectory : MonoBehaviour
             data = new Vector2[nVerts * 2];
             tris = new int[6 * (nVerts - 1)];
 
+            int i = 0;
             Vector2 maxCoords = Vector2.zero;
-            for (int i = 0; i < len; i++)
+            foreach (var point in points)
             {
-                maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(points[i].x));
-                maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(points[i].y));
+                var pos = point.pos;
+                maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
+                maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
 
-                verts[i * 2] = points[i];
-                verts[i * 2 + 1] = points[i];
+                verts[i * 2] = pos;
+                verts[i * 2 + 1] = pos;
                 uvs[i * 2] = new Vector2((float)i / (nVerts - 1), 0);
                 uvs[i * 2 + 1] = new Vector2((float)i / (nVerts - 1), 1);
-                prev[MathUtils.Mod(i + 1, len) * 2] = points[i];
-                prev[MathUtils.Mod(i + 1, len) * 2 + 1] = points[i];
-                next[MathUtils.Mod(i - 1, len) * 2] = points[i];
-                next[MathUtils.Mod(i - 1, len) * 2 + 1] = points[i];
+                prev[MathUtils.Mod(i + 1, len) * 2] = pos;
+                prev[MathUtils.Mod(i + 1, len) * 2 + 1] = pos;
+                next[MathUtils.Mod(i - 1, len) * 2] = pos;
+                next[MathUtils.Mod(i - 1, len) * 2 + 1] = pos;
                 data[i * 2] = new Vector2(1, 0);
                 data[i * 2 + 1] = new Vector2(-1, 0);
+
+                i++;
             }
+            // adjust render bounds for mesh so that it actually displays
             bounds = new Bounds(Vector2.zero, 2 * maxCoords);
 
             if (loop)
             {
-                verts[len * 2] = points[0];
-                verts[len * 2 + 1] = points[0];
+                var pos0 = points.First.Value.pos;
+                var pos1 = points.First.Next.Value.pos;
+                var posL = points.Last.Value.pos;
+                verts[len * 2] = pos0;
+                verts[len * 2 + 1] = pos0;
                 uvs[len * 2] = new Vector2(1, 0);
                 uvs[len * 2 + 1] = new Vector2(1, 1);
-                prev[len * 2] = points[len - 1];
-                prev[len * 2 + 1] = points[len - 1];
-                next[len * 2] = points[1];
-                next[len * 2 + 1] = points[1];
+                prev[len * 2] = posL;
+                prev[len * 2 + 1] = posL;
+                next[len * 2] = pos1;
+                next[len * 2 + 1] = pos1;
                 data[len * 2] = new Vector2(1, 0);
                 data[len * 2 + 1] = new Vector2(-1, 0);
             }
@@ -151,15 +180,15 @@ public class Trajectory : MonoBehaviour
                 data[len - 1].y = 2;
             }
 
-            for (int i = 0; i < nVerts - 1; i++)
+            for (int j = 0; j < nVerts - 1; j++)
             {
-                tris[6 * i] = 2 * i;
-                tris[6 * i + 1] = 2 * i + 1;
-                tris[6 * i + 2] = 2 * i + 3;
+                tris[6 * j] = 2 * j;
+                tris[6 * j + 1] = 2 * j + 1;
+                tris[6 * j + 2] = 2 * j + 3;
 
-                tris[6 * i + 3] = 2 * i;
-                tris[6 * i + 4] = 2 * i + 2;
-                tris[6 * i + 5] = 2 * i + 3;
+                tris[6 * j + 3] = 2 * j;
+                tris[6 * j + 4] = 2 * j + 2;
+                tris[6 * j + 5] = 2 * j + 3;
             }
         }
 
