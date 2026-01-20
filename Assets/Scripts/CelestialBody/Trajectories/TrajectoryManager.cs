@@ -7,7 +7,7 @@ using UnityEngine;
 public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
 {
     public GameObject trajectoryPrefab;
-    private HashSet<Trajectory> _trajectories = new();
+    private readonly HashSet<Trajectory> _trajectories = new();
 
     /// <summary>
     /// add a new trajectory to display

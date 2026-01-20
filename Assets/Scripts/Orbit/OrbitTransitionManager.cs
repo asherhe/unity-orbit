@@ -14,43 +14,60 @@ namespace Orbit
         private readonly List<OrbitTransition> _transitions;
 
         /// <summary>
-        /// predicted next transition to happen
+        /// predicted next transition to happen. <c>null</c> if no transition will happen
         /// </summary>
         public OrbitTransition NextTransition { get; private set; }
+        /// <summary>
+        /// whether a next transition will happen
+        /// </summary>
+        public bool HasTransition { get => NextTransition != null; }
+
+        /// <summary>
+        /// keep track of next orbit for display purposes
+        /// </summary>
+        private readonly OrbitState _nextOrbit;
+
+        /// <summary>
+        /// trajectory display for next orbit
+        /// </summary>
+        private readonly Trajectory _nextTrajectory;
 
         public OrbitTransitionManager(OrbitState orbit)
         {
             _orbit = orbit;
             _transitions = new();
             NextTransition = null;
+            
+            _nextOrbit = new(orbit);
+            _nextTrajectory = TrajectoryManager.Instance.AddTrajectory(_nextOrbit);
+            _nextTrajectory.gameObject.SetActive(false);
+
             orbit.OnStateChanged += CheckTransitions;
         }
 
         /// <summary>
-        /// run the transition check for a transition and update internal stuff if necessary
-        /// </summary>
-        public void CheckTransition(OrbitTransition transition)
-        {
-            transition.CheckTransition();
-            if (NextTransition == null || transition.TransitionTime < NextTransition.TransitionTime)
-                NextTransition = transition;
-        }
-
-        /// <summary>
-        /// register a new OrbitTransition for checking
+        /// register a new OrbitTransition for checking (does not actually run checks)
         /// </summary>
         public void Add(OrbitTransition transition)
         {
             _transitions.Add(transition);
-            CheckTransition(transition);
         }
+
         /// <summary>
         /// rechecks all orbit transitions
         /// </summary>
         public void CheckTransitions()
         {
             NextTransition = null;
-            foreach (var transition in _transitions) CheckTransition(transition);
+            foreach (var transition in _transitions)
+            {
+                transition.CheckTransition();
+                if (transition.HasTransition && (NextTransition == null || transition.TransitionTime < NextTransition.TransitionTime))
+                    NextTransition = transition;
+            }
+
+            _nextTrajectory.gameObject.SetActive(HasTransition);
+            if (HasTransition) _nextOrbit.CopyFrom(NextTransition.NextOrbit);
         }
 
         /// <summary>

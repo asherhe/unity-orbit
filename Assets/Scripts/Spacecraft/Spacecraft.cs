@@ -134,6 +134,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _transitionManager = new OrbitTransitionManager(orbit);
         _transitionManager.Add(new SOIEscapeTransition(orbit));
         //_transitionManager.Add(new SOIInterceptTransition(orbit));
+        _transitionManager.CheckTransitions();
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";

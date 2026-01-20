@@ -149,6 +149,11 @@ namespace Orbit
             UpdateFromStateVectors(pos, vel, t, body);
         }
 
+        public OrbitState(OrbitState other)
+        {
+            CopyFrom(other);
+        }
+
         public void UpdateFromStateVectors(Vector2d pos, Vector2d vel, double t, CelestialBody body)
         {
             this.body = body;
