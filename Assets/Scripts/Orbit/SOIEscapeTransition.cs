@@ -46,26 +46,12 @@ namespace Orbit
             var anomaly = orbit.CalcAnomaly(nu);
 
             // prepare to calculate universal anomaly
-            double coeff = 0, anomaly0 = 0;
-            if (e < 1)
-            {
-                coeff = Math.Sqrt(a);
-                anomaly0 = orbit.E0;
-                // normalize to [ -PI, PI ]
-                if (anomaly0 > Math.PI) anomaly0 -= 2 * Math.PI;
-            }
-            else if (e > 1)
-            {
-                coeff = Math.Sqrt(-a);
-                anomaly0 = orbit.F0;
-            }
-            else if (e == 1)
-            {
-                coeff = orbit.h / Math.Sqrt(orbit.GM);
-                anomaly = Math.Tan(0.5 * nu);
-                anomaly0 = Math.Tan(0.5 * orbit.nu0);
-            }
+            double anomaly0 = orbit.Anomaly0;
+            if (e < 1) anomaly0 = orbit.E0 - (orbit.E0 > Math.PI ? 2 * Math.PI : 0); // normalize to [ -PI, PI ]
 
+            // universal anomaly
+            var coeff = _prop.AnomCoeff;
+            // universal variable (subtracted by initial chi) at SOI intersection
             var chi1 = coeff * (anomaly - anomaly0);
             var chi2 = coeff * (-anomaly - anomaly0);
 

@@ -85,15 +85,19 @@ namespace Orbit
         /// </summary>
         public double M0 { get; private set; }
         /// <summary>
-        /// eccentric anomaly at epoch, only available for e<1
-        /// </summary>
-        public double E0 { get; private set; }
-        /// <summary>
         /// true anomaly at epoch
         /// </summary>
         public double nu0 { get; private set; }
         /// <summary>
-        /// hyperbolic eccentric anomaly at epoch, only availale for e>1
+        /// eccentric anomaly at epoch, only available for e<1
+        /// </summary>
+        public double E0 { get; private set; }
+        /// <summary>
+        /// barker's variable at epoch, only available for e=1
+        /// </summary>
+        public double D0 { get; private set; }
+        /// <summary>
+        /// hyperbolic eccentric anomaly at epoch, only available for e>1
         /// </summary>
         public double F0 { get; private set; }
 
@@ -231,6 +235,7 @@ namespace Orbit
 
             if (e == 0.0)
             {
+                D0 = CalcAnomaly(nu0);
                 M0 = nu0;
             }
             else if (e < 1.0)
@@ -262,7 +267,7 @@ namespace Orbit
         /// calculate the relevant anomaly for any orbits
         /// </summary>
         /// <param name="nu">true anomaly</param>
-        /// <returns>eccentric anomaly when e<1, true anomaly when e=1, hyperbolic eccentric anomaly when e>1</returns>
+        /// <returns>eccentric anomaly when e<1, barker's variable when e=1, hyperbolic eccentric anomaly when e>1</returns>
         public double CalcAnomaly(double nu)
         {
             if (e < 1.0)
@@ -316,7 +321,24 @@ namespace Orbit
             }
             else
             {
-                return nu;
+                // parabolic orbit
+                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
+                // barker's variable, that's it lol
+
+                return Math.Tan(0.5 * nu);
+            }
+        }
+
+        /// <summary>
+        /// get the relevant anomaly at epoch (t=t0)
+        /// </summary>
+        public double Anomaly0
+        {
+            get
+            {
+                if (e < 1.0) return E0;
+                if (e == 1.0) return D0;
+                else return F0;
             }
         }
 

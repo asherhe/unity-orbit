@@ -101,7 +101,7 @@ Shader "Trajectory"
          
             float4 frag(Varyings IN) : SV_Target
             {
-                if (_DoCycle){
+                if (_DoCycle) {
                     float cyclePos = frac(_Time.y / _CyclePeriod);
                     float dist = frac(IN.uv.x - cyclePos);
                     return float4(_Color.xyz, lerp(_CycleAlphaLow, _CycleAlphaHigh, dist));

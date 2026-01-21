@@ -137,5 +137,19 @@ namespace Orbit
             var r = GetPosition(dt, chi, C, S).Magnitude;
             return GetVelocity(chi, z, C, S, r);
         }
+
+
+        /// <summary>
+        /// get the coefficient that makes the universal anomaly when multiplied with the relevant anomaly
+        /// </summary>
+        public double AnomCoeff
+        {
+            get
+            {
+                if (orbit.e < 1) return Math.Sqrt(orbit.a);
+                else if (orbit.e > 1) return Math.Sqrt(-orbit.a);
+                else return Math.Sqrt(orbit.p);
+            }
+        }
     }
 }
