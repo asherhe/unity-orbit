@@ -187,9 +187,11 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory traj = TrajectoryManager.Instance.AddTrajectory(orbit);
-            traj.name = $"Trajectory {this}";
-            traj.GetComponent<MeshRenderer>().material.color = _config.color;
+            Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
+            trajectory.name = $"Trajectory {this}";
+            trajectory.GetComponent<MeshRenderer>().material.color = _config.color;
+            // we can afford to do high quality for celestial trajectories because they are static
+            trajectory.quality = 1e-6;
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))

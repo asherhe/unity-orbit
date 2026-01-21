@@ -32,14 +32,12 @@ public class Trajectory : MonoBehaviour
     /// <summary>
     /// furthest distance to which we will render parabolic and hyperbolic trajectories (m)
     /// </summary>
-    [SerializeField]
-    private double maxRenderDistance = 1e13;
+    public double maxRenderDistance = 1e13;
     /// <summary>
     /// maximum error allowable in generated trajectory mesh from original conic, as a fraction of semi-latus rectum
     /// NOTE: ideally we want this to maybe be a fraction of the camera size but that would require regenerating the mesh more times than necessary
     /// </summary>
-    [SerializeField]
-    private double quality = 2e-4;
+    public double quality = 2e-4;
 
     /// <summary>
     /// boundaries that restrict the range of true anomalies we draw. true anomaly is always in [ -PI, +PI ]
