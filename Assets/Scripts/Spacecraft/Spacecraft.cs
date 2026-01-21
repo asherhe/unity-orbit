@@ -151,11 +151,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             if (_soiEscape.HasTransition)
             {
                 var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
-                Debug.DrawLine(
-                    _soiEscape.SOICapture?.pos + CameraFocus.Instance.GetRelativePosition(orbit.body),
-                    _soiEscape.SOIEscape?.pos + CameraFocus.Instance.GetRelativePosition(orbit.body),
-                    Color.white
-                );
                 SetNu1(nuCapt);
                 SetNu2(-nuCapt);
             }
