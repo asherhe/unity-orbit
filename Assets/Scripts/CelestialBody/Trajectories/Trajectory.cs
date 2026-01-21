@@ -76,17 +76,34 @@ public class Trajectory : MonoBehaviour
             // TODO: migrate out of constructor into dedicated block in GenerateTrajectory()
             var prop = new UniVarPropagator(o);
             var coeff = prop.AnomCoeff;
-            var anomaly = o.CalcAnomaly(nu);
-            var chi = coeff * MathUtils.Mod(anomaly - o.Anomaly0, 2 * Math.PI);
-            var dt = prop.UniversalKepler(chi) / Math.Sqrt(o.GM);
+            var danomaly = o.CalcAnomaly(nu) - o.Anomaly0;
+            if (o.e < 1.0) danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);
+            var chi = coeff * danomaly;
+            // time since periapsis
+            u = prop.UniversalKepler(chi) / Math.Sqrt(o.GM);
 
-            // characteristic time 
-            double tscale = 0;
-            if (o.e < 1.0) tscale = o.period;
-            else if (o.e == 1.0) tscale = 4 * Math.Sqrt(o.periapsis * o.periapsis * o.periapsis / o.GM) / 3;
-            else tscale = Math.Sqrt(o.p * o.p * o.p / o.GM) / (o.e * o.e - 1);
+            // orbit time for one full "revolution"
+            if (o.e < 1.0) { u /= o.period; }
+            else if (o.e == 1.0)
+            {
+                u /= 4 * Math.Sqrt(o.periapsis * o.periapsis * o.periapsis / o.GM) / 3;
+            }
+            else
+            {
+                // characteristic time for hyperbolic orbits:
+                //     t = b / v_excess
+                // where b is the impact parameter (distance from asymptote to focus) and
+                // v_excess is the hyperbolic excess velocity (speed at infinity).
+                //
+                // since the formulas for b and v_excess are
+                //     b = -a sqrt( e^2 - 1 )
+                //     vexcess = sqrt( GM / -a )
+                // the expression for the characteristic time is
+                //     t = -a sqrt( -a (e^2 - 1) / GM )
 
-            u = dt / tscale;
+                u /= -o.a * Math.Sqrt(-o.a * (o.e * o.e - 1) / o.GM);
+                u = 1 / (1 + Math.Exp(-0.5 * u)); // sigmoid
+            }
 
             // flip direction to match orbit direction
             if (o.h < 0) u = 1 - u;

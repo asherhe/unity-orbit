@@ -316,7 +316,6 @@ namespace Orbit
                 // NOTE 2: still unstable near asymptotes, perhaps add fallback for that
 
                 var F = 2 * Math.Asinh(Math.Sin(0.5 * nu) * Math.Sqrt((e - 1) / (1 + e * Math.Cos(nu))));
-                if (nu < 0) F = -F;
                 return F;
             }
             else
