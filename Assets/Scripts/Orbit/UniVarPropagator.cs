@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Orbit.OrbitState;
 
 namespace Orbit
 {
@@ -166,9 +167,17 @@ namespace Orbit
         {
             get
             {
-                if (orbit.e < 1) return Math.Sqrt(orbit.a);
-                else if (orbit.e > 1) return Math.Sqrt(-orbit.a);
-                else return Math.Sqrt(orbit.p);
+                switch (orbit.shape)
+                {
+                    case OrbitShape.Ellipse:
+                        return Math.Sqrt(orbit.a); 
+                    case OrbitShape.Parabola:
+                        return Math.Sqrt(orbit.p);
+                    case OrbitShape.Hyperbola:
+                        return Math.Sqrt(-orbit.a);
+                    default:
+                        throw new NotImplementedException("Orbit shape must be elliptical, parabolic, or hyperbolic");
+                }
             }
         }
     }

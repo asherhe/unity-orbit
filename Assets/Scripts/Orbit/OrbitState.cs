@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
 
 namespace Orbit
 {
@@ -125,6 +124,10 @@ namespace Orbit
         /// </summary>
         public double p { get; private set; }
 
+        /// <summary>
+        /// shape of this orbit
+        /// </summary>
+        public OrbitShape shape { get => ClassifyEccentricityShape(e); }
 
         /// <summary>
         /// construct an orbit from orbital elements
@@ -139,8 +142,11 @@ namespace Orbit
         {
             this.body = body;
             this.t0 = t0;
-            var kprop = new KeplerianPropagator(body.GM, h, e, omega, M0, t0);
-            var state = kprop.GetStateVectors(t0);
+
+            IOrbitPropagator prop;
+            if (ClassifyEccentricityShape(e) == OrbitShape.Parabola) prop = new BarkerPropagator(body.GM, h, omega, M0, t0);
+            else prop = new KeplerianPropagator(body.GM, h, e, omega, M0, t0);
+            var state = prop.GetStateVectors(t0);
             p0 = state.pos; v0 = state.vel;
 
             PostUpdate();
@@ -227,37 +233,26 @@ namespace Orbit
             p = h * h / GM;
 
             periapsis = p / (1 + e);
-            apoapsis = e < 1 ? (p / (1 - e)) : double.PositiveInfinity;
+            apoapsis = e <= 1 ? (p / (1 - e)) : double.PositiveInfinity;
 
             period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
 
             nu0 = CalcNu(p0);
 
-            if (e == 0.0)
+            switch (shape)
             {
-                E0 = CalcAnomaly(nu0);
-                M0 = nu0;
-            }
-            else if (e < 1.0)
-            {
-                E0 = CalcAnomaly(nu0);
-                M0 = E0 - e * Math.Sin(E0);
-            }
-            else if (e > 1.0)
-            {
-                F0 = CalcAnomaly(nu0);
-                M0 = e * Math.Sinh(F0) - F0;
-            }
-            else
-            {
-                // parabolic
-                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
-
-                // pretty stable compared to elliptical and hyperbolic orbits
-                // as usual, some floating point trouble at infinity but that's alright
-
-                D0 = CalcAnomaly(nu0);
-                M0 = 0.5 * D0 + D0 * D0 * D0 / 6.0;
+                case OrbitShape.Ellipse:
+                    E0 = CalcAnomaly(nu0);
+                    M0 = E0 - e * Math.Sin(E0);
+                    break;
+                case OrbitShape.Parabola:
+                    D0 = CalcAnomaly(nu0);
+                    M0 = 0.5 * D0 + D0 * D0 * D0 / 6.0;
+                    break;
+                case OrbitShape.Hyperbola:
+                    F0 = CalcAnomaly(nu0);
+                    M0 = e * Math.Sinh(F0) - F0;
+                    break;
             }
 
             OnStateChanged?.Invoke();
@@ -270,64 +265,66 @@ namespace Orbit
         /// <returns>eccentric anomaly when e<1, barker's variable when e=1, hyperbolic eccentric anomaly when e>1</returns>
         public double CalcAnomaly(double nu)
         {
-            if (e < 1.0)
+            switch (shape)
             {
-                // elliptical orbit
-                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/elliptical-orbits.html
+                case OrbitShape.Ellipse:
+                    // elliptical orbit
+                    // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/elliptical-orbits.html
 
-                // the equation for eccentric anomaly is
-                // 
-                // tan( E/2 ) = tan( nu/2 ) * sqrt( (1-e) / (1+e) )
-                // OR: E = 2 atan( tan( nu/2 ) * sqrt( (1-e) / (1+e) )
-                // 
-                // this issue is that, when nu is close to +-PI (i.e. apoapsis), tan gets blown up to a very large unstable number,
-                // after which we use atan and compress it to +-PI/2, losing a lot of stability and precision in the process.
-                // 
-                // to address this we leverage the Atan2 function to keep relatively managable what would have been a very unstable calculation:
-                // 
-                // E = 2 atan2( sin(nu/2) * sqrt(1-e), cos(nu/2) * sqrt(1+e) )
-                // 
-                // this avoids any instabilities that arise when the orbit is near apoapsis
-                // 
-                // NOTE: still unstable for near-parabolic (e close to 1) orbits. might pretend it is parabolic in this case
+                    // the equation for eccentric anomaly is
+                    // 
+                    // tan( E/2 ) = tan( nu/2 ) * sqrt( (1-e) / (1+e) )
+                    // OR: E = 2 atan( tan( nu/2 ) * sqrt( (1-e) / (1+e) )
+                    // 
+                    // this issue is that, when nu is close to +-PI (i.e. apoapsis), tan gets blown up to a very large unstable number,
+                    // after which we use atan and compress it to +-PI/2, losing a lot of stability and precision in the process.
+                    // 
+                    // to address this we leverage the Atan2 function to keep relatively managable what would have been a very unstable calculation:
+                    // 
+                    // E = 2 atan2( sin(nu/2) * sqrt(1-e), cos(nu/2) * sqrt(1+e) )
+                    // 
+                    // this avoids any instabilities that arise when the orbit is near apoapsis
+                    // 
+                    // NOTE: still unstable for near-parabolic (e close to 1) orbits. might pretend it is parabolic in this case
 
-                var E = 2 * Math.Atan2(
-                    Math.Sin(0.5 * nu) * Math.Sqrt(1 - e),
-                    Math.Cos(0.5 * nu) * Math.Sqrt(1 + e)
-                );
-                if (h < 0) E = -E;
-                E = MathUtils.Mod(E, 2 * Math.PI);
-                return E;
-            }
-            else if (e > 1.0)
-            {
-                // hyperbolic orbit
-                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/hyperbolic-trajectories.html
+                    var E = 2 * Math.Atan2(
+                        Math.Sin(0.5 * nu) * Math.Sqrt(1 - e),
+                        Math.Cos(0.5 * nu) * Math.Sqrt(1 + e)
+                    );
+                    if (h < 0) E = -E;
+                    E = MathUtils.Mod(E, 2 * Math.PI);
+                    return E;
 
-                // the equation for hyperbolic eccentric anomaly is
-                // 
-                // tanh( F/2 ) = tan( nu/2 ) * sqrt( (e-1) / (e+1) )
-                // 
-                // if we want to solve for F, we need to use atanh, which is somewhat unstable around the edges of its domain
-                // instead, we can use sinh because sinh has the best stability:
-                // 
-                // sinh( F/2 ) = sin( nu/2 ) * sqrt( (e-1) / (1 + E cos(nu)) )
-                // 
-                // NOTE 1: this alternative form is only valid for -PI < nu < PI
-                // NOTE 2: still unstable near asymptotes, perhaps add fallback for that
+                case OrbitShape.Parabola:
+                    // parabolic orbit
+                    // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
+                    // barker's variable, that's it lol
+                    var D = Math.Tan(0.5 * nu);
+                    if (h < 0) D = -D;
+                    return D;
 
-                var F = 2 * Math.Asinh(Math.Sin(0.5 * nu) * Math.Sqrt((e - 1) / (1 + e * Math.Cos(nu))));
-                if (h < 0) F = -F;
-                return F;
-            }
-            else
-            {
-                // parabolic orbit
-                // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
-                // barker's variable, that's it lol
-                var D = Math.Tan(0.5 * nu);
-                if (h < 0) D = -D;
-                return D;
+                case OrbitShape.Hyperbola:
+                    // hyperbolic orbit
+                    // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/hyperbolic-trajectories.html
+
+                    // the equation for hyperbolic eccentric anomaly is
+                    // 
+                    // tanh( F/2 ) = tan( nu/2 ) * sqrt( (e-1) / (e+1) )
+                    // 
+                    // if we want to solve for F, we need to use atanh, which is somewhat unstable around the edges of its domain
+                    // instead, we can use sinh because sinh has the best stability:
+                    // 
+                    // sinh( F/2 ) = sin( nu/2 ) * sqrt( (e-1) / (1 + E cos(nu)) )
+                    // 
+                    // NOTE 1: this alternative form is only valid for -PI < nu < PI
+                    // NOTE 2: still unstable near asymptotes, perhaps add fallback for that
+
+                    var F = 2 * Math.Asinh(Math.Sin(0.5 * nu) * Math.Sqrt((e - 1) / (1 + e * Math.Cos(nu))));
+                    if (h < 0) F = -F;
+                    return F;
+
+                default:
+                    throw new NotImplementedException("Orbit shape must be elliptical, parabolic, or hyperbolic");
             }
         }
 
@@ -338,9 +335,17 @@ namespace Orbit
         {
             get
             {
-                if (e < 1.0) return E0;
-                if (e == 1.0) return D0;
-                else return F0;
+                switch (shape)
+                {
+                    case OrbitShape.Ellipse:
+                        return E0;
+                    case OrbitShape.Parabola:
+                        return D0;
+                    case OrbitShape.Hyperbola:
+                        return F0;
+                    default:
+                        throw new NotImplementedException("Orbit shape must be elliptical, parabolic, or hyperbolic");
+                }
             }
         }
 
@@ -362,7 +367,24 @@ namespace Orbit
         {
             return p / (1 + e * Math.Cos(nu));
         }
+
+        /// <summary>
+        /// determine whether an eccentricity value belongs to an elliptical, parabolic, or hyperbolic orbit
+        /// </summary>
+        public static OrbitShape ClassifyEccentricityShape(double e)
+        {
+            // how close is 'close enough' to a parabola?
+            const double TOL = 1e-5;
+            if (e + TOL < 1) return OrbitShape.Ellipse;
+            if (1 < e - TOL) return OrbitShape.Hyperbola;
+            else return OrbitShape.Parabola;
+        }
     }
+
+    /// <summary>
+    /// describes the shape of an orbit
+    /// </summary>
+    public enum OrbitShape { Ellipse, Parabola, Hyperbola }
 
     /// <summary>
     /// a time, a position, and a velocity.
@@ -377,5 +399,7 @@ namespace Orbit
             this.pos = pos;
             this.vel = vel;
         }
+
+        public override string ToString() => $"[ t={time}; p={pos}; v={vel} ]";
     }
 }

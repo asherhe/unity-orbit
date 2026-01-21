@@ -36,12 +36,12 @@ namespace Orbit
             this.M0 = M0;
             this.t0 = t0;
 
+            if (Shape == OrbitShape.Parabola)
+                throw new ArgumentException("KeplerianPropagator does not support parabolic orbits (e=0). Please use BarkerPropagator instead.");
+
             a = h * h / (GM * (1 - e * e));
             betaSquared = Math.Abs(1 - e * e); // 1-e^2 for elliptical, e^2-1 for hyperbolic
-            if (e == 1)
-                meanMotion = GM * GM / (h * h * h);
-            else
-                meanMotion = Math.Sqrt(GM / Math.Abs(a * a * a));
+            meanMotion = Math.Sqrt(GM / Math.Abs(a * a * a));
         }
 
         public double GM;
@@ -55,6 +55,8 @@ namespace Orbit
         public double a;
         public double betaSquared;
         public double meanMotion;
+
+        public OrbitShape Shape { get => OrbitState.ClassifyEccentricityShape(e); }
 
         /// <summary>
         /// converts a vector from body space to perifocal space
@@ -88,9 +90,8 @@ namespace Orbit
         /// <param name="E">eccentric anomaly</param>
         public double CalcKepler(double E)
         {
-            if (e < 1) return E - e * Math.Sin(E);
-            else if (e > 1) return e * Math.Sinh(E) - E;
-            else return 0; // kepler's equation doesn't apply to parabolic orbits
+            if (Shape == OrbitShape.Ellipse) return E - e * Math.Sin(E);
+            else return e * Math.Sinh(E) - E;
         }
         /// <summary>
         /// the derivative of CalcKepler
@@ -98,9 +99,8 @@ namespace Orbit
         /// <param name="E">eccentric anomaly</param>
         public double CalcDKepler(double E)
         {
-            if (e < 1) return 1 - e * Math.Cos(E);
-            else if (e > 1) return e * Math.Cosh(E) - 1;
-            else return 0; // kepler's equation doesn't apply to parabolic orbits
+            if (Shape == OrbitShape.Ellipse) return 1 - e * Math.Cos(E);
+            else return e * Math.Cosh(E) - 1;
         }
 
         /// <summary>
@@ -109,7 +109,6 @@ namespace Orbit
         public double GetEccentricAnomaly(double t) => GetEccentricAnomalyFromMeanAnomaly(GetMeanAnomaly(t));
         public double GetEccentricAnomalyFromMeanAnomaly(double M)
         {
-            if (e == 1.0) throw new InvalidOperationException("Cannot calculate the eccentric anomaly of a parabolic orbit.");
             if (M == 0.0) return 0.0;
             if (e == 0.0) return M;
 
@@ -121,7 +120,7 @@ namespace Orbit
              */
 
             double left, right;
-            if (e < 1)
+            if (Shape == OrbitShape.Ellipse)
             {
                 left = 0;
                 right = 2 * Math.PI;
@@ -154,53 +153,26 @@ namespace Orbit
             return E;
         }
 
-        public double GetTrueAnomaly(double t) => GetTrueAnomalyFromMeanAnomaly(GetMeanAnomaly(t));
-        public double GetTrueAnomalyFromMeanAnomaly(double M)
-        {
-            if (e < 1)
-            {
-                throw new NotImplementedException();
-            }
-            else if (e > 1)
-            {
-                throw new NotImplementedException();
-            }
-            else
-            {
-                var z = Math.Cbrt(3 * M + Math.Sqrt(1 + 9 * M * M));
-                var nu = 2 * Math.Atan(z - 1 / z);
-                return nu;
-            }
-        }
-
         /// <summary>
         /// get the position of this orbit from some anomaly, depending on the orbit type
         /// </summary>
-        /// <param name="anomaly">eccentric anomaly when e<1, true anomaly when e=0, and hyperbolic eccentric anomaly when e>1</param>
+        /// <param name="anomaly">eccentric anomaly when e<1 and hyperbolic eccentric anomaly when e>1</param>
         /// <returns>position vector</returns>
         private Vector2d GetPositionFromAnomaly(double t, double anomaly)
         {
             Vector2d pos;
-            if (e < 1)
+            if (Shape == OrbitShape.Ellipse)
             {
                 pos = new(
                     a * (Math.Cos(anomaly) - e),
                     a * Math.Sqrt(betaSquared) * Math.Sin(anomaly)
                 );
             }
-            else if (e > 1)
+            else
             {
                 pos = new(
                     -a * (e - Math.Cosh(anomaly)),
                     -a * Math.Sqrt(betaSquared) * Math.Sinh(anomaly)
-                );
-            }
-            else
-            {
-                var r = h * h / (GM * (1 + Math.Cos(anomaly)));
-                pos = new(
-                    r * Math.Cos(anomaly),
-                    r * Math.Sin(anomaly)
                 );
             }
 
@@ -214,7 +186,7 @@ namespace Orbit
         private Vector2d GetVelocityFromAnomaly(double t, double anomaly)
         {
             Vector2d vel;
-            if (e < 1)
+            if (Shape == OrbitShape.Ellipse)
             {
                 var r = a * (1 - e * Math.Cos(anomaly));
                 vel = new(
@@ -223,7 +195,7 @@ namespace Orbit
                 );
                 vel *= Math.Sqrt(GM * a) / r;
             }
-            else if (e > 1)
+            else
             {
                 var r = -a * (e * Math.Cosh(anomaly) - 1);
                 vel = new(
@@ -232,37 +204,20 @@ namespace Orbit
                 );
                 vel *= Math.Sqrt(GM * -a) / r;
             }
-            else
-            {
-                vel = new(
-                    -Math.Sin(anomaly),
-                    1 + Math.Cos(anomaly)
-                );
-                vel *= GM / h;
-            }
             return PerifocalToBody(vel);
-        }
-        /// <summary>
-        /// get the relevant anomaly for orbital propagation (E for ellipses, nu for parabolas, and F for hyperbolas)
-        /// </summary>
-        private double GetAnomaly(double t)
-        {
-            if (e < 1) return GetEccentricAnomaly(t);
-            else if (e > 1) return GetEccentricAnomaly(t);
-            else return GetTrueAnomaly(t);
         }
 
         /// <summary>
         /// get the position (in world space) of the orbit at a given time
         /// </summary>
         /// <returns>position of orbit, in meters</returns>
-        public Vector2d GetPosition(double t) => GetPositionFromAnomaly(t, GetAnomaly(t));
+        public Vector2d GetPosition(double t) => GetPositionFromAnomaly(t, GetEccentricAnomaly(t));
 
         /// <summary>
         /// get the velocity (in world space) of the orbit at a given time
         /// </summary>
         /// <returns>velocity of orbit, in meters</returns>
-        public Vector2d GetVelocity(double t) => GetVelocityFromAnomaly(t, GetAnomaly(t));
+        public Vector2d GetVelocity(double t) => GetVelocityFromAnomaly(t, GetEccentricAnomaly(t));
 
         /// <summary>
         /// get the state vectors at a given time.
@@ -273,11 +228,11 @@ namespace Orbit
         /// </remarks>
         public StateVectors GetStateVectors(double t)
         {
-            var anomaly = GetAnomaly(t);
+            var anomaly = GetEccentricAnomaly(t);
             return new(
                 t,
-                GetPositionFromAnomaly(t, GetAnomaly(t)),
-                GetVelocityFromAnomaly(t, GetAnomaly(t))
+                GetPositionFromAnomaly(t, anomaly),
+                GetVelocityFromAnomaly(t, anomaly)
             );
         }
     }

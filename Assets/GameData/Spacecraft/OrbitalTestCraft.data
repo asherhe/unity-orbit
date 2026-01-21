@@ -9,7 +9,7 @@ orbit:
   h: -1e11
   e: 1.0
   omega: 1
-  M0: 0
+  M0: -1
   t0: 0
 
 rotation:
