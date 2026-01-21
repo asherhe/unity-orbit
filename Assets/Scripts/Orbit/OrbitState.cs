@@ -227,7 +227,7 @@ namespace Orbit
             p = h * h / GM;
 
             periapsis = p / (1 + e);
-            apoapsis = (e < 1) ? (p / (1 - e)) : double.PositiveInfinity;
+            apoapsis = e < 1 ? (p / (1 - e)) : double.PositiveInfinity;
 
             period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
 
@@ -235,7 +235,7 @@ namespace Orbit
 
             if (e == 0.0)
             {
-                D0 = CalcAnomaly(nu0);
+                E0 = CalcAnomaly(nu0);
                 M0 = nu0;
             }
             else if (e < 1.0)
@@ -256,8 +256,8 @@ namespace Orbit
                 // pretty stable compared to elliptical and hyperbolic orbits
                 // as usual, some floating point trouble at infinity but that's alright
 
-                double D = Math.Tan(0.5 * nu0);
-                M0 = 0.5 * D + D * D * D / 6.0;
+                D0 = CalcAnomaly(nu0);
+                M0 = 0.5 * D0 + D0 * D0 * D0 / 6.0;
             }
 
             OnStateChanged?.Invoke();
@@ -295,7 +295,8 @@ namespace Orbit
                     Math.Sin(0.5 * nu) * Math.Sqrt(1 - e),
                     Math.Cos(0.5 * nu) * Math.Sqrt(1 + e)
                 );
-                if (E < 0) E += 2 * Math.PI;
+                if (h < 0) E = -E;
+                E = MathUtils.Mod(E, 2 * Math.PI);
                 return E;
             }
             else if (e > 1.0)
@@ -316,6 +317,7 @@ namespace Orbit
                 // NOTE 2: still unstable near asymptotes, perhaps add fallback for that
 
                 var F = 2 * Math.Asinh(Math.Sin(0.5 * nu) * Math.Sqrt((e - 1) / (1 + e * Math.Cos(nu))));
+                if (h < 0) F = -F;
                 return F;
             }
             else
@@ -323,8 +325,9 @@ namespace Orbit
                 // parabolic orbit
                 // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/parabolic-trajectories.html
                 // barker's variable, that's it lol
-
-                return Math.Tan(0.5 * nu);
+                var D = Math.Tan(0.5 * nu);
+                if (h < 0) D = -D;
+                return D;
             }
         }
 

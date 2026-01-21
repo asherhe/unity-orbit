@@ -41,13 +41,17 @@ namespace Orbit
             var e = orbit.e; var a = orbit.a;
 
             // determine true anomaly at SOI intersection
-            //var nu = Math.Acos(((e == 1.0 ? orbit.h / orbit.GM : a * (1 - e * e)) / rsoi - 1) / e);
             var nu = Math.Acos((Math.Abs(orbit.p) - rsoi) / (rsoi * e));
             var anomaly = orbit.CalcAnomaly(nu);
+            var anomaly0 = orbit.Anomaly0;
 
-            // prepare to calculate universal anomaly
-            double anomaly0 = orbit.Anomaly0;
-            if (e < 1) anomaly0 = orbit.E0 - (orbit.E0 > Math.PI ? 2 * Math.PI : 0); // normalize to [ -PI, PI ]
+            if (e < 1)
+            {
+                // ensure that E < PI (it might wrap around apoapsis)
+                if (anomaly > Math.PI) anomaly = 2 * Math.PI - anomaly;
+                // normalize to [ -PI, PI ]
+                if (anomaly0 > Math.PI) anomaly0 -= 2 * Math.PI;
+            }
 
             // universal anomaly
             var coeff = _prop.AnomCoeff;
@@ -65,20 +69,8 @@ namespace Orbit
                 (chi1, chi2) = (chi2, chi1);
             }
 
-            StateVectors stateFromChi(double chi, double t)
-            {
-                var z = orbit.alpha * chi * chi;
-                var dt = t - orbit.t0;
-                var C = _prop.stumpff_C(z);
-                var S = _prop.stumpff_S(z);
-
-                var p = _prop.GetPosition(dt, chi, C, S);
-                var v = _prop.GetVelocity(chi, z, C, S, p.Magnitude);
-                return new StateVectors(t, p, v);
-            }
-
-            SOICapture = stateFromChi(chi1, t1);
-            SOIEscape = stateFromChi(chi2, t2);
+            SOICapture = _prop.GetStateVectors(t1, chi1);
+            SOIEscape = _prop.GetStateVectors(t2, chi2);
 
             return new TransitionResult(
                 SOIEscape.Value, new OrbitState(

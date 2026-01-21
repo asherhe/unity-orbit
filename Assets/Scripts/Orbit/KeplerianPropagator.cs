@@ -6,7 +6,10 @@ using UnityEngine;
 
 namespace Orbit
 {
-    public class KeplerianPropagator
+    /// <summary>
+    /// simple orbital propagation for hyperbolic and elliptical orbits
+    /// </summary>
+    public class KeplerianPropagator : IOrbitPropagator
     {
         /// <summary>
         /// constructs a new keplerian propagator from orbital elements

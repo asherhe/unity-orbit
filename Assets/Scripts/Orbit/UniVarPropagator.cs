@@ -9,7 +9,7 @@ namespace Orbit
     /// <summary>
     /// orbital propagation using the universal anomaly
     /// </summary>
-    public class UniVarPropagator
+    public class UniVarPropagator : IOrbitPropagator
     {
         // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/universal-variables.html
 
@@ -138,6 +138,27 @@ namespace Orbit
             return GetVelocity(chi, z, C, S, r);
         }
 
+        public StateVectors GetStateVectors(double dt, double chi)
+        {
+            var z = alpha * chi * chi;
+            var C = stumpff_C(z);
+            var S = stumpff_S(z);
+
+            var p = GetPosition(dt, chi, C, S);
+            var v = GetVelocity(dt, chi, C, S, p.Magnitude);
+
+            return new(t0 + dt, p, v);
+        }
+        public StateVectors GetStateVectors(double t)
+        {
+            var dt = t - t0;
+            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+
+            var chi = GetChi(dt);
+
+            var state = GetStateVectors(dt, chi);
+            return new(t, state.pos, state.vel); // since we normalized dt to the first period for ellipses
+        }
 
         /// <summary>
         /// get the coefficient that makes the universal anomaly when multiplied with the relevant anomaly
