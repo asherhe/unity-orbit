@@ -174,7 +174,7 @@
                     "name": "WarpIncrease",
                     "type": "Button",
                     "id": "ac70b837-97c3-4a77-926f-ab1127e708ab",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -251,7 +251,7 @@
                     "name": "ToggleMap",
                     "type": "Button",
                     "id": "6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
