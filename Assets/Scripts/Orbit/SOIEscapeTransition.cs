@@ -12,11 +12,11 @@ namespace Orbit
     /// </summary>
     public class SOIEscapeTransition : OrbitTransition
     {
-        private UniVarPropagator _prop;
+        private UniversalPropagator _prop;
 
         public SOIEscapeTransition(OrbitState orbit) : base(orbit)
         {
-            _prop = new UniVarPropagator(orbit);
+            _prop = new UniversalPropagator(orbit);
         }
 
         /// <summary>

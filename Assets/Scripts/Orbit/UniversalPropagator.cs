@@ -3,19 +3,18 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static Orbit.OrbitState;
 
 namespace Orbit
 {
     /// <summary>
-    /// orbital propagation using the universal anomaly
+    /// orbital propagation using the universal variable formulation
     /// </summary>
-    public class UniVarPropagator : IOrbitPropagator
+    public class UniversalPropagator : IOrbitPropagator
     {
         // https://orbital-mechanics.space/time-since-periapsis-and-keplers-equation/universal-variables.html
 
         public OrbitState orbit;
-        public UniVarPropagator(OrbitState orbit)
+        public UniversalPropagator(OrbitState orbit)
         {
             this.orbit = orbit;
         }
@@ -28,18 +27,22 @@ namespace Orbit
         private double vr0 { get => orbit.vr0; }
         private double alpha { get => orbit.alpha; }
 
+        // cutoff for z in the stumpff functions when we decide to fallback to the z=0 case
+        // any lower than this and it seems that the floating-point error from the z in the denominator starts to be bad for performance
+        private const double Z_TOL = 1e-7;
+
         public double stumpff_C(double z)
         {
             var sqrtz = Math.Sqrt(Math.Abs(z));
-            if (z > 0) return (1 - Math.Cos(sqrtz)) / z;
-            else if (z < 0) return (Math.Cosh(sqrtz) - 1) / -z;
+            if (z > Z_TOL) return (1 - Math.Cos(sqrtz)) / z;
+            else if (z < -Z_TOL) return (Math.Cosh(sqrtz) - 1) / -z;
             else return 0.5;
         }
         public double stumpff_S(double z)
         {
             var sqrtz = Math.Sqrt(Math.Abs(z));
-            if (z > 0) return (sqrtz - Math.Sin(sqrtz)) / (z * sqrtz);
-            else if (z < 0) return (Math.Sinh(sqrtz) - sqrtz) / (-z * sqrtz);
+            if (z > Z_TOL) return (sqrtz - Math.Sin(sqrtz)) / (z * sqrtz);
+            else if (z < -Z_TOL) return (Math.Sinh(sqrtz) - sqrtz) / (-z * sqrtz);
             else return 1.0 / 6.0;
         }
 
@@ -119,7 +122,8 @@ namespace Orbit
         public Vector2d GetPosition(double t)
         {
             var dt = t - t0;
-            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+            if (orbit.Shape == OrbitShape.Ellipse)
+                dt = MathUtils.Mod(dt, orbit.period);
 
             var chi = GetChi(dt);
             var z = alpha * chi * chi;
@@ -128,7 +132,8 @@ namespace Orbit
         public Vector2d GetVelocity(double t)
         {
             var dt = t - t0;
-            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+            if (orbit.Shape == OrbitShape.Ellipse)
+                dt = MathUtils.Mod(dt, orbit.period);
 
             var chi = GetChi(dt);
             var z = alpha * chi * chi;
@@ -152,7 +157,8 @@ namespace Orbit
         public StateVectors GetStateVectors(double t)
         {
             var dt = t - t0;
-            if (alpha > 0) dt = MathUtils.Mod(dt, orbit.period);
+            if (orbit.Shape == OrbitShape.Ellipse)
+                dt = MathUtils.Mod(dt, orbit.period);
 
             var chi = GetChi(dt);
 
@@ -167,7 +173,7 @@ namespace Orbit
         {
             get
             {
-                switch (orbit.shape)
+                switch (orbit.Shape)
                 {
                     case OrbitShape.Ellipse:
                         return Math.Sqrt(orbit.a); 

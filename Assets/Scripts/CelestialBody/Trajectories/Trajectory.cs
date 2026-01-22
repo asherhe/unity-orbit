@@ -14,7 +14,7 @@ public class Trajectory : MonoBehaviour
     private UI.FollowTransform follow;
 
     private OrbitState _orbit;
-    private UniVarPropagator _prop;
+    private UniversalPropagator _prop;
     public OrbitState Orbit
     {
         get => _orbit;
@@ -23,7 +23,7 @@ public class Trajectory : MonoBehaviour
             if (_orbit == value) return;
             if (_orbit != null) _orbit.OnStateChanged -= GenerateTrajectory;
             _orbit = value;
-            _prop = new UniVarPropagator(_orbit);
+            _prop = new UniversalPropagator(_orbit);
             _orbit.OnStateChanged += GenerateTrajectory;
             GenerateTrajectory();
         }
@@ -74,7 +74,7 @@ public class Trajectory : MonoBehaviour
             pos = (float)r * new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
 
             // TODO: migrate out of constructor into dedicated block in GenerateTrajectory()
-            var prop = new UniVarPropagator(o);
+            var prop = new UniversalPropagator(o);
             var coeff = prop.AnomCoeff;
             var danomaly = o.CalcAnomaly(nu) - o.Anomaly0;
             if (o.e < 1.0) danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);

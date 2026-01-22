@@ -127,7 +127,7 @@ namespace Orbit
         /// <summary>
         /// shape of this orbit
         /// </summary>
-        public OrbitShape shape { get => ClassifyEccentricityShape(e); }
+        public OrbitShape Shape { get => ClassifyEccentricityShape(e); }
 
         /// <summary>
         /// construct an orbit from orbital elements
@@ -239,7 +239,7 @@ namespace Orbit
 
             nu0 = CalcNu(p0);
 
-            switch (shape)
+            switch (Shape)
             {
                 case OrbitShape.Ellipse:
                     E0 = CalcAnomaly(nu0);
@@ -265,7 +265,7 @@ namespace Orbit
         /// <returns>eccentric anomaly when e<1, barker's variable when e=1, hyperbolic eccentric anomaly when e>1</returns>
         public double CalcAnomaly(double nu)
         {
-            switch (shape)
+            switch (Shape)
             {
                 case OrbitShape.Ellipse:
                     // elliptical orbit
@@ -335,7 +335,7 @@ namespace Orbit
         {
             get
             {
-                switch (shape)
+                switch (Shape)
                 {
                     case OrbitShape.Ellipse:
                         return E0;

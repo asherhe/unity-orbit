@@ -61,7 +61,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private GameObject _partsGameObject;
 
     public OrbitState orbit { get; private set; }
-    private UniVarPropagator _prop;
+    private UniversalPropagator _prop;
     private OrbitTransitionManager _transitionManager;
     private SOIEscapeTransition _soiEscape;
 
@@ -130,7 +130,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent
         );
-        _prop = new UniVarPropagator(orbit);
+        _prop = new UniversalPropagator(orbit);
 
         _transitionManager = new OrbitTransitionManager(orbit);
         _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));

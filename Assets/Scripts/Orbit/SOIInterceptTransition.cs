@@ -11,12 +11,12 @@ namespace Orbit
     /// </summary>
     public class SOIInterceptTransition : OrbitTransition
     {
-        private UniVarPropagator _prop;
+        private UniversalPropagator _prop;
         private EncounterCalculator _enc;
 
         public SOIInterceptTransition(OrbitState orbit) : base(orbit)
         {
-            _prop = new UniVarPropagator(orbit);
+            _prop = new UniversalPropagator(orbit);
             _enc = new EncounterCalculator(orbit);
         }
 
