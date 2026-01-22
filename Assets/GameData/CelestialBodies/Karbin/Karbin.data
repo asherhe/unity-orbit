@@ -1,0 +1,54 @@
+# Karbin.data
+
+name: Karbin
+color: "#f0bd72"
+
+# planetary info
+radius: 1700.0 # km
+surfaceGravity: 5.6 # m/s^2
+dayLength: 82.35 # hours
+
+surfaceMaterial:
+  path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
+  properties:
+    _Color:
+      type: Color
+      value: "#181717"
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Discus
+  semimajorAxis: 2.12e5 # km
+  eccentricity: 0.007
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
+  epochTime: 0.0 # s
+
+# atmospheric data, set to false if no atmosphere
+atmosphere:
+  # height to which we simulate atmospheric effects
+  height: 120.0 # km
+
+  # pressure characteristics
+  seaLevelPressure: 1.6 # atm
+  scaleHeight: 7.0 # km
+
+  # atmospheric rendering - scattering
+  material:
+    path: Assets/GameData/CelestialBodies/Atmosphere.mat
+    properties:
+      _RayleighScaleHeight:
+        type: Float
+        value: 5000
+      _MieScaleHeight:
+        type: Float
+        value: 800
+      _RayleighScatteringCoeff:
+        type: Vector
+        value: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
+      _MieScatteringCoeff:
+        type: Vector
+        value: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
+      _MiePhaseG:
+        type: Float
+        value: 0.6

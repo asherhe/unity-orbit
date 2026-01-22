@@ -1,0 +1,28 @@
+# Cratos.data
+
+name: Cratos
+color: "#c7a3ca"
+
+# planetary info
+radius: 1300.0 # km
+surfaceGravity: 3.4 # m/s^2
+dayLength: 61.76 # hours
+
+surfaceMaterial:
+  path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
+  properties:
+    _Color:
+      type: Color
+      value: "#181717"
+
+# orbital info, set to false if there is no orbit (i.e. the Sun)
+orbit:
+  parent: Discus
+  semimajorAxis: 1.75e5 # km
+  eccentricity: 0.003
+  longitudePeriapsis: 0.0 # deg
+  epochMeanAnom: 0.0 # deg
+  epochTime: 0.0 # s
+
+# atmospheric data, set to false if no atmosphere
+atmosphere: false

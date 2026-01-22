@@ -1,3 +1,4 @@
+using Orbit;
 using Parts;
 using System;
 using System.Collections;
@@ -59,13 +60,15 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     private GameObject _partsGameObject;
 
-    public Orbit orbit { get; private set; }
+    public OrbitState orbit { get; private set; }
+    private IOrbitPropagator _prop;
+    private OrbitTransitionManager _transitionManager;
+    private SOIEscapeTransition _soiEscape;
+
     public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
 
-    public Vector2d Pos { get => orbit.GetPosition(); }
-    public Vector2d Vel { get => orbit.GetVelocity(); }
-    public double Altitude { get => Pos.Magnitude - body.radius; }
+    public double Altitude { get => GetPosition().Magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.
@@ -119,16 +122,29 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         Newtonian.angularMomentum = _config.rotation.momentum;
 
         var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
-        orbit = new Orbit(
+        orbit = new OrbitState(
             _config.orbit.h,
             _config.orbit.e,
             _config.orbit.omega,
             _config.orbit.M0,
             _config.orbit.t0,
-            parent // TODO: still using serialized inspector field, change this once we upgrade celestial bodies
+            parent
         );
+        _prop = new UniversalPropagator(orbit);
+
+        _transitionManager = new OrbitTransitionManager(orbit);
+        _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));
+        //_transitionManager.Add(new SOIInterceptTransition(orbit));
+        _transitionManager.CheckTransitions();
+
+        // we bind this callback BEFORE we instantiate _trajectory so that the
+        // new orbit bounds are immediately updated in the current tick
+        orbit.OnStateChanged += UpdateTrajectoryBounds;
+
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";
+
+        UpdateTrajectoryBounds();
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -211,12 +227,46 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
+    /// <summary>
+    /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
+    /// </summary>
+    private void UpdateTrajectoryBounds()
+    {
+        // orbit direction
+        var dir = Math.Sign(orbit.h);
+        // true anomalies, timewise - nu1 happens first, then nu2
+        double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
+
+        // adjust nu bounds, accounting for orbit direction
+        double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
+        double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
+
+        if (_soiEscape.HasTransition)
+        {
+            var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
+            SetNu1(nuCapt);
+            SetNu2(-nuCapt);
+        }
+        if (_transitionManager.HasTransition)
+        {
+            var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
+            SetNu2(nuTrans);
+        }
+
+        if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
+        else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
+    }
+
+    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
+    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
+    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
+    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
+    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
+    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
+
     private void FixedUpdate()
     {
-        //if (orbit.nextCapture != null)
-        //    Debug.Log($"{orbit.nextCaptureBody} (soi {orbit.nextCaptureBody.soiRadius}): distance to body {(orbit.nextCaptureBody.orbit.GetPosition() - Pos).Magnitude}; time {Universe.Instance.UT - orbit.nextCapture.time}; distance to capture {(Pos - orbit.nextCapture.pos).Magnitude}");
-        Debug.DrawRay(Vector3.zero, Vel);
-        orbit.CheckBodyChange();
+        _transitionManager.UpdateOrbit();
     }
 
     private void Update()

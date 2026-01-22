@@ -9,7 +9,7 @@ namespace UI
         protected override string GetText()
         {
             var craft = ActiveCraftController.Instance.craft;
-            double apoapsis = craft.orbit.Apoapsis - craft.body.radius;
+            double apoapsis = craft.orbit.apoapsis - craft.body.radius;
             return $"Ap:{AddMetricPrefix(apoapsis)}m";
         }
     }

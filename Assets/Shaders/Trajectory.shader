@@ -3,12 +3,12 @@ Shader "Trajectory"
     Properties
     {
         _Color ("Color", Color) = (1,1,1,0.2)
-        _Width ("Width (px)", Integer) = 4
+        _Width ("Width (px)", Integer) = 3
         _MiterThreshold ("Miter Threshold", Float) = 0.8
-        [Toggle] _DoCycle ("Cycle effect?", Integer) = 1
-        _CyclePeriod ("Cycle Period (s)", Float) = 5
-        _CycleAlphaLow ("Cycle alpha: Low", Range(0.0, 1.0)) = 0.2
-        _CycleAlphaHigh ("Cycle alpha: High", Range(0.0, 1.0)) = 1.0
+        [Toggle] _DoAnim ("Cycle effect?", Integer) = 1
+        _AnimPeriod ("Cycle Period (s)", Float) = 5
+        _AlphaLow ("Alpha: Low", Range(0.0, 1.0)) = 0.2
+        _AlphaHigh ("Alpha: High", Range(0.0, 1.0)) = 1.0
     }
     SubShader
     {
@@ -33,10 +33,10 @@ Shader "Trajectory"
                 float4 _Color;
                 int _Width;
                 float _MiterThreshold;
-                int _DoCycle;
-                float _CyclePeriod;
-                float _CycleAlphaLow;
-                float _CycleAlphaHigh;
+                int _DoAnim;
+                float _AnimPeriod;
+                float _AlphaLow;
+                float _AlphaHigh;
             CBUFFER_END
 
             struct Attributes
@@ -101,13 +101,11 @@ Shader "Trajectory"
          
             float4 frag(Varyings IN) : SV_Target
             {
-                if (_DoCycle){
-                    float cyclePos = frac(_Time.y / _CyclePeriod);
-                    float dist = frac(IN.uv.x - cyclePos);
-                    return float4(_Color.xyz, lerp(_CycleAlphaLow, _CycleAlphaHigh, dist));
-                } else {
-                    return _Color;
+                float u = frac(IN.uv.x);
+                if (_DoAnim) {
+                    u = frac(u - _Time.y / _AnimPeriod);
                 }
+                return float4(_Color.xyz, lerp(_AlphaLow, _AlphaHigh, u));
             }
          
             ENDHLSL

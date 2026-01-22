@@ -1,3 +1,4 @@
+using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -99,19 +100,24 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// <summary>
     /// orbit of this body
     /// </summary>
-    public Orbit orbit { get; private set; }
+    public OrbitState orbit { get; private set; }
+    private IOrbitPropagator _prop;
+
     /// <summary>
     /// celestial body that this body is a satellite of
     /// </summary>
     public CelestialBody parent { get => orbit.body; }
+
     /// <summary>
     /// natural satellites of this body
     /// </summary>
     public List<CelestialBody> satellites;
+
     /// <summary>
     /// radius of this celestial body's SOI
     /// </summary>
     public double soiRadius { get; private set; }
+
 
     /// <summary>
     /// mass of the celestial body, in kg
@@ -169,7 +175,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         {
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
             var a = _config.orbit.semimajorAxis * 1000.0;
-            orbit = new Orbit(
+            orbit = new OrbitState(
                 -Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
                 _config.orbit.eccentricity,
                 _config.orbit.longitudePeriapsis * Math.PI / 180.0,
@@ -177,12 +183,15 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
+            _prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory traj = TrajectoryManager.Instance.AddTrajectory(orbit);
-            traj.name = $"Trajectory {this}";
-            traj.GetComponent<MeshRenderer>().material.color = _config.color;
+            Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
+            trajectory.name = $"Trajectory {this}";
+            trajectory.Color = _config.color;
+            // we can afford to do high quality for celestial trajectories because they are static
+            trajectory.quality = 1e-6;
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))
@@ -218,7 +227,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         Vector4 sunDirection = Vector4.zero;
         if (orbit != null)
         {
-            var heliocentric = orbit.GetHeliocentricPosition();
+            var heliocentric = GetHeliocentricPosition();
             sunIntensity = (float)(1.7e23 / heliocentric.Magnitude2);
             sunDirection = -heliocentric.Normalized;
             sunDirection.z = 0.2f; sunDirection.w = 0.0f;
@@ -304,6 +313,24 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         SetDynamicMaterialProperties();
     }
+
+    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
+    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
+    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
+    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
+    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
+    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
+
+    /// <summary>
+    /// get the current position of this body, with the sun at the origin
+    /// </summary>
+    public Vector2d GetHeliocentricPosition()
+    {
+        var parentPos = Vector2d.zero;
+        if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
+        return parentPos + GetPosition();
+    }
+
 
     private void FixedUpdate()
     {
