@@ -233,7 +233,7 @@ namespace Orbit
             p = h * h / GM;
 
             periapsis = p / (1 + e);
-            apoapsis = e <= 1 ? (p / (1 - e)) : double.PositiveInfinity;
+            apoapsis = Shape == OrbitShape.Ellipse ? (p / (1 - e)) : double.PositiveInfinity;
 
             period = 2 * Math.PI * Math.Sqrt(a * a * a / GM);
 
