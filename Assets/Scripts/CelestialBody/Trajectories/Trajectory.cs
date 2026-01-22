@@ -9,9 +9,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(UI.FollowTransform))]
 public class Trajectory : MonoBehaviour
 {
-    private TrajectoryMesh trajectoryMesh;
-    private MeshFilter meshFilter;
-    private UI.FollowTransform follow;
+    private TrajectoryMesh _trajectoryMesh;
+    private MeshRenderer _meshRenderer;
+    private MeshFilter _meshFilter;
+    private UI.FollowTransform _follow;
 
     private OrbitState _orbit;
     private UniversalPropagator _prop;
@@ -26,6 +27,58 @@ public class Trajectory : MonoBehaviour
             _prop = new UniversalPropagator(_orbit);
             _orbit.OnStateChanged += GenerateTrajectory;
             GenerateTrajectory();
+        }
+    }
+
+    /// <summary>
+    /// color of the rendered trajectory
+    /// </summary>
+    public UnityEngine.Color Color
+    {
+        get => _meshRenderer.material.color;
+        set => _meshRenderer.material.color = value;
+    }
+
+    /// <summary>
+    /// stroke width of trajectory line, in px
+    /// </summary>
+    public int Width
+    {
+        get => _meshRenderer.material.GetInteger("_Width");
+        set => _meshRenderer.material.SetInteger("_Width", value);
+    }
+
+    /// <summary>
+    /// whether or not to animate the loop progress
+    /// </summary>
+    public bool DoAnimation
+    {
+        get => _meshRenderer.material.GetInteger("_DoAnim") != 0;
+        set => _meshRenderer.material.SetInteger("_DoAnim", value ? 1 : 0);
+    }
+
+    /// <summary>
+    /// period of each animation loop
+    /// </summary>
+    public float AnimationPeriod
+    {
+        get => _meshRenderer.material.GetFloat("_AnimPeriod");
+        set => _meshRenderer.material.SetFloat("_AnimPeriod", value);
+    }
+
+    /// <summary>
+    /// ( low, high ) alpha across the trajectory
+    /// </summary>
+    public Vector2 AlphaRange
+    {
+        get => new(
+            _meshRenderer.material.GetFloat("_AlphaLow"),
+            _meshRenderer.material.GetFloat("_AlphaHigh")
+        );
+        
+        set {
+            _meshRenderer.material.SetFloat("_AlphaLow", value.x);
+            _meshRenderer.material.SetFloat("_AlphaHigh", value.y);
         }
     }
 
@@ -46,10 +99,11 @@ public class Trajectory : MonoBehaviour
 
     private void Awake()
     {
-        trajectoryMesh = new TrajectoryMesh();
-        meshFilter = GetComponent<MeshFilter>();
-        meshFilter.mesh = trajectoryMesh.mesh;
-        follow = GetComponent<UI.FollowTransform>();
+        _trajectoryMesh = new TrajectoryMesh();
+        _meshRenderer = GetComponent<MeshRenderer>();
+        _meshFilter = GetComponent<MeshFilter>();
+        _meshFilter.mesh = _trajectoryMesh.mesh;
+        _follow = GetComponent<UI.FollowTransform>();
     }
 
     /// <summary>
@@ -80,7 +134,7 @@ public class Trajectory : MonoBehaviour
             //if (o.Shape == OrbitShape.Ellipse)
             //    danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);
             var chi = coeff * danomaly;
-            
+
             // time since epoch
             u = prop.UniversalKepler(chi) / Math.Sqrt(o.GM);
 
@@ -116,14 +170,14 @@ public class Trajectory : MonoBehaviour
 
     public void GenerateTrajectory()
     {
-        follow.follow = Orbit.body.transform;
+        _follow.follow = Orbit.body.transform;
 
         double nu1, nu2;
         if (Orbit.e < 1.0)
         {
             nu1 = -Math.PI;
             nu2 = Math.PI;
-            trajectoryMesh.isLooped = true;
+            _trajectoryMesh.isLooped = true;
         }
         else
         {
@@ -131,17 +185,17 @@ public class Trajectory : MonoBehaviour
             double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
             nu1 = -asymptote;
             nu2 = asymptote;
-            trajectoryMesh.isLooped = false;
+            _trajectoryMesh.isLooped = false;
         }
 
         // cancel looping if trajectory gets clipped
-        if (nu1 < nuMin || nu2 > nuMax) trajectoryMesh.isLooped = false;
+        if (nu1 < nuMin || nu2 > nuMax) _trajectoryMesh.isLooped = false;
 
         nu1 = Math.Max(nu1, nuMin);
         nu2 = Math.Min(nu2, nuMax);
 
         // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
-        if (trajectoryMesh.isLooped) { nu1 = 0; nu2 = 2 * Math.PI; }
+        if (_trajectoryMesh.isLooped) { nu1 = 0; nu2 = 2 * Math.PI; }
 
         LinkedList<TrajectoryPoint> points = new();
 
@@ -172,7 +226,7 @@ public class Trajectory : MonoBehaviour
         points.AddLast(new TrajectoryPoint(Orbit.GetDistanceFromNu(nu2), nu2, Orbit));
         SubdivideMesh(points.First, points.Last, nu1, nu2, 24);
 
-        if (trajectoryMesh.isLooped)
+        if (_trajectoryMesh.isLooped)
         {
             // remove duplicate point that closes the loop
             points.RemoveLast();
@@ -190,8 +244,8 @@ public class Trajectory : MonoBehaviour
             }
         }
 
-        trajectoryMesh.SetPointList(points);
-        trajectoryMesh.UpdateMesh();
+        _trajectoryMesh.SetPointList(points);
+        _trajectoryMesh.UpdateMesh();
     }
 
 
@@ -230,13 +284,10 @@ public class Trajectory : MonoBehaviour
             var node = points.First;
             int i = 0;
             Vector2 maxCoords = Vector2.zero;
-            var s = ""; // DEBUG
             while (node != null)
             {
                 var point = node.Value;
                 var pos = point.pos;
-
-                s +=$"{point.nu}: {point.u}\n";
 
                 maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
                 maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
@@ -260,8 +311,6 @@ public class Trajectory : MonoBehaviour
             }
             // adjust render bounds for mesh so that it actually displays
             bounds = new Bounds(Vector2.zero, 2 * maxCoords);
-
-            Debug.Log(s);
 
             if (isLooped)
             {

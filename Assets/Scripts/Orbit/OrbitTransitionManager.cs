@@ -40,6 +40,9 @@ namespace Orbit
             
             _nextOrbit = new(orbit);
             _nextTrajectory = TrajectoryManager.Instance.AddTrajectory(_nextOrbit);
+            _nextTrajectory.Width = 2;
+            _nextTrajectory.DoAnimation = false;
+            _nextTrajectory.AlphaRange = new Vector2(0.5f, 0.0f);
             _nextTrajectory.gameObject.SetActive(false);
 
             orbit.OnStateChanged += CheckTransitions;

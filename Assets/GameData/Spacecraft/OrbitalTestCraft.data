@@ -4,10 +4,8 @@ name: Orbital Test Craft
 
 orbit:
   parent: Hamswell
-  # h: -1.73e10
-  # e: 0.08
-  h: -1e11
-  e: 1.0
+  h: -1.73e10
+  e: 0.08
   omega: 1
   M0: -1
   t0: 0

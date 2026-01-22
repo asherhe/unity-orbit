@@ -189,7 +189,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
             Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
             trajectory.name = $"Trajectory {this}";
-            trajectory.GetComponent<MeshRenderer>().material.color = _config.color;
+            trajectory.Color = _config.color;
             // we can afford to do high quality for celestial trajectories because they are static
             trajectory.quality = 1e-6;
         }
