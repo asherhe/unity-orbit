@@ -70,14 +70,13 @@ namespace Orbit
                 Debug.LogError(e);
             }
 
-            nextCapture = new(captureTime, _prop.GetPosition(captureTime), _prop.GetVelocity(captureTime));
-            nextCaptureBody = b;
-
+            nextCapture = _prop.GetStateVectors(captureTime);
+            var bodyState = b.GetStateVectors(captureTime);
             return new TransitionResult(
                 nextCapture.Value, new OrbitState(
-                    nextCapture?.pos - nextCaptureBody.GetPosition(captureTime),
-                    nextCapture?.vel - nextCaptureBody.GetVelocity(captureTime),
-                    captureTime, nextCaptureBody
+                    nextCapture?.pos - bodyState.pos,
+                    nextCapture?.vel - bodyState.pos,
+                    captureTime, b
                 )
             );
         }

@@ -61,7 +61,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private GameObject _partsGameObject;
 
     public OrbitState orbit { get; private set; }
-    private UniversalPropagator _prop;
+    private IOrbitPropagator _prop;
     private OrbitTransitionManager _transitionManager;
     private SOIEscapeTransition _soiEscape;
 
@@ -259,8 +259,10 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
     public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
+    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
     public Vector2d GetPosition(double t) => _prop.GetPosition(t);
     public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
+    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
 
     private void FixedUpdate()
     {

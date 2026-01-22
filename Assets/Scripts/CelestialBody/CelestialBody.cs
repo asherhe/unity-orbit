@@ -101,7 +101,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// orbit of this body
     /// </summary>
     public OrbitState orbit { get; private set; }
-    private UniversalPropagator _prop;
+    private IOrbitPropagator _prop;
 
     /// <summary>
     /// celestial body that this body is a satellite of
@@ -316,8 +316,10 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
     public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
+    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
     public Vector2d GetPosition(double t) => _prop.GetPosition(t);
     public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
+    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
 
     /// <summary>
     /// get the current position of this body, with the sun at the origin
