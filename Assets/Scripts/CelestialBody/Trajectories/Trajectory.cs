@@ -87,6 +87,7 @@ public class Trajectory : MonoBehaviour
             else if (o.e == 1.0)
             {
                 u /= 4 * Math.Sqrt(o.periapsis * o.periapsis * o.periapsis / o.GM) / 3;
+                u = 1 / (1 + Math.Exp(-0.2 * u)); // sigmoid
             }
             else
             {
@@ -104,9 +105,6 @@ public class Trajectory : MonoBehaviour
                 u /= -o.a * Math.Sqrt(-o.a * (o.e * o.e - 1) / o.GM);
                 u = 1 / (1 + Math.Exp(-0.5 * u)); // sigmoid
             }
-
-            // flip direction to match orbit direction
-            if (o.h < 0) u = 1 - u;
         }
     }
 
