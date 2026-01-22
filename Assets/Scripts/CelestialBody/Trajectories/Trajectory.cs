@@ -55,12 +55,12 @@ public class Trajectory : MonoBehaviour
     /// <summary>
     /// data about each vectex in the trajectory mesh
     /// </summary>
-    private readonly struct TrajectoryPoint
+    private struct TrajectoryPoint
     {
-        public readonly Vector2 pos;
-        public readonly double r;
-        public readonly double nu;
-        public readonly double u;
+        public Vector2 pos;
+        public double r;
+        public double nu;
+        public double u;
         /// <summary>
         /// construct a trajectory point
         /// </summary>
@@ -77,14 +77,20 @@ public class Trajectory : MonoBehaviour
             var prop = new UniversalPropagator(o);
             var coeff = prop.AnomCoeff;
             var danomaly = o.CalcAnomaly(nu) - o.Anomaly0;
-            if (o.e < 1.0) danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);
+            //if (o.Shape == OrbitShape.Ellipse)
+            //    danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);
             var chi = coeff * danomaly;
-            // time since periapsis
+            
+            // time since epoch
             u = prop.UniversalKepler(chi) / Math.Sqrt(o.GM);
 
-            // orbit time for one full "revolution"
-            if (o.e < 1.0) { u /= o.period; }
-            else if (o.e == 1.0)
+            // orbit time for one full cycle of the trajectory animation
+            if (o.Shape == OrbitShape.Ellipse)
+            {
+                u /= o.period;
+                if (o.h < 0.0 && nu == 0.0) u += 1;
+            }
+            else if (o.Shape == OrbitShape.Parabola)
             {
                 u /= 4 * Math.Sqrt(o.periapsis * o.periapsis * o.periapsis / o.GM) / 3;
                 u = 1 / (1 + Math.Exp(-0.2 * u)); // sigmoid
@@ -224,10 +230,13 @@ public class Trajectory : MonoBehaviour
             var node = points.First;
             int i = 0;
             Vector2 maxCoords = Vector2.zero;
+            var s = ""; // DEBUG
             while (node != null)
             {
                 var point = node.Value;
                 var pos = point.pos;
+
+                s +=$"{point.nu}: {point.u}\n";
 
                 maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
                 maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
@@ -251,6 +260,8 @@ public class Trajectory : MonoBehaviour
             }
             // adjust render bounds for mesh so that it actually displays
             bounds = new Bounds(Vector2.zero, 2 * maxCoords);
+
+            Debug.Log(s);
 
             if (isLooped)
             {
