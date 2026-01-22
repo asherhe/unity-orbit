@@ -150,7 +150,7 @@ namespace Orbit
             var S = stumpff_S(z);
 
             var p = GetPosition(dt, chi, C, S);
-            var v = GetVelocity(dt, chi, C, S, p.Magnitude);
+            var v = GetVelocity(chi, z, C, S, p.Magnitude);
 
             return new(t0 + dt, p, v);
         }
