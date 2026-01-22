@@ -137,35 +137,14 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         //_transitionManager.Add(new SOIInterceptTransition(orbit));
         _transitionManager.CheckTransitions();
 
-        orbit.OnStateChanged += () =>
-        {
-            // orbit direction
-            var dir = Math.Sign(orbit.h);
-            // true anomalies, timewise - nu1 happens first, then nu2
-            double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
-
-            // adjust nu bounds, accounting for orbit direction
-            double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
-            double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
-
-            if (_soiEscape.HasTransition)
-            {
-                var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
-                SetNu1(nuCapt);
-                SetNu2(-nuCapt);
-            }
-            if (_transitionManager.HasTransition)
-            {
-                var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
-                SetNu2(nuTrans);
-            }
-
-            if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
-            else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
-        };
+        // we bind this callback BEFORE we instantiate _trajectory so that the
+        // new orbit bounds are immediately updated in the current tick
+        orbit.OnStateChanged += UpdateTrajectoryBounds;
 
         _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
         _trajectory.name = $"Trajectory {this}";
+
+        UpdateTrajectoryBounds();
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -246,6 +225,36 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
             Newtonian.momentOfInertia += mass * (part.craftPos - Newtonian.CenterOfMass).Magnitude;
         }
+    }
+
+    /// <summary>
+    /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
+    /// </summary>
+    private void UpdateTrajectoryBounds()
+    {
+        // orbit direction
+        var dir = Math.Sign(orbit.h);
+        // true anomalies, timewise - nu1 happens first, then nu2
+        double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
+
+        // adjust nu bounds, accounting for orbit direction
+        double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
+        double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
+
+        if (_soiEscape.HasTransition)
+        {
+            var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
+            SetNu1(nuCapt);
+            SetNu2(-nuCapt);
+        }
+        if (_transitionManager.HasTransition)
+        {
+            var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
+            SetNu2(nuTrans);
+        }
+
+        if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
+        else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
     }
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
