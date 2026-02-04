@@ -130,6 +130,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent
         );
+        orbit.Owner = this;
+
         _prop = new UniversalPropagator(orbit);
 
         _transitionManager = new OrbitTransitionManager(orbit);

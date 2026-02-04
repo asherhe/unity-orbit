@@ -7,7 +7,10 @@ using UnityEngine;
 namespace Orbit
 {
     /// <summary>
-    /// represents a particular orbit around a <c>CelestialBody</c>
+    /// represents a particular orbit around a <c>CelestialBody</c>.
+    /// 
+    /// OrbitState is mutable - directly overwriting instances of OrbitState is highly discouraged;
+    /// use the Update functions instead to modify orbit state.
     /// </summary>
     public class OrbitState
     {
@@ -19,6 +22,20 @@ namespace Orbit
         /// standard gravitational parameter
         /// </summary>
         public double GM { get => body.GM; }
+
+        private IOrbitingObject _owner;
+        /// <summary>
+        /// the orbiting object that occupies this orbit. possibly <c>null</c>
+        /// </summary>
+        public IOrbitingObject Owner
+        {
+            get
+            {
+                if (_owner == null) throw new InvalidOperationException("this orbit does not have an owner");
+                return _owner;
+            }
+            set { _owner = value; }
+        }
 
         public double t0 { get; private set; }
         public Vector2d p0 { get; private set; }

@@ -183,6 +183,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
+            orbit.Owner = this;
             _prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
