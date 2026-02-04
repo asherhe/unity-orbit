@@ -2,6 +2,7 @@ using MathNet.Numerics.RootFinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Vertx.Debugging;
 using UnityEngine;
 
 namespace Orbit
@@ -74,7 +75,7 @@ namespace Orbit
 
             if (orbit.Shape == OrbitShape.Ellipse)
             {
-                return GetEncounters(orbit, t, t + orbit.period);
+                return GetEncounters(other, t, t + orbit.period);
             }
             else
             {
@@ -115,32 +116,31 @@ namespace Orbit
 
             // bracketing times and distances between them
             double[] T = new double[brackets + 1];
-            double[] D = new double[brackets + 1];
-
+            double[] DD = new double[brackets + 1];
             for (int i = 0; i <= brackets; i++)
             {
                 T[i] = tStart + i * dt;
-                D[i] = DDistance(T[i]);
+                DD[i] = DDistance(T[i]);
             }
 
             // search for brackets where extrema exist
             for (int i = 0; i < brackets; i++)
             {
                 double t0 = T[i], t1 = T[i + 1];
-                double d0 = D[i], d1 = D[i + 1];
+                double dd0 = DD[i], dd1 = DD[i + 1];
 
-                if (!(d0 < 0 && 0 < d1)) continue;
+                if (!(dd0 < 0 && 0 < dd1)) continue;
 
                 // we've found a local minimum for distance; determine the exact time
                 double t = 0.0;
                 try
                 {
-                    var accuracy = Math.Max(Math.Abs(d0), Math.Abs(d1)) * 1e-8;
+                    var accuracy = Math.Max(Math.Abs(t0), Math.Abs(t1)) * 1e-10;
                     t = Brent.FindRoot(
                         DDistance,
                         t0, t1,
                         accuracy: accuracy,
-                        maxIterations: 64
+                        maxIterations: 100
                     );
                 }
                 catch (Exception e)

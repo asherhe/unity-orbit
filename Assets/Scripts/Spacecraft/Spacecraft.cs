@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using Vertx.Debugging;
 
 public class Spacecraft : MonoBehaviour, IOrbitingObject
 {
@@ -285,9 +286,12 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         {
             var p1 = e.state.pos + p0;
             var p2 = e.otherState.pos + p0;
-            Debug.DrawLine(p0, p1, Color.grey);
-            Debug.DrawLine(p1, p2);
+            D.raw(new Shape.Line(p1, p2), Color.grey);
+            D.raw(new Shape.Text(p1, Vector2d.Dot(e.state.pos - e.otherState.pos,e.state.vel - e.otherState.vel), Camera.main), Color.grey);
         }
+
+        D.raw(new Shape.Line(GetPosition() + p0, CelestialBodyManager.Instance.celestialBodies["Mozza"].GetPosition() + p0));
+        D.raw(new Shape.Text(GetPosition() + p0, (CelestialBodyManager.Instance.celestialBodies["Mozza"].GetPosition()- GetPosition()).Magnitude, Camera.main));
     }
 
     public override string ToString()
