@@ -33,20 +33,22 @@ namespace Orbit
         {
             nextCapture = null; nextCaptureBody = null;
 
-            EncounterCalculator.Encounter captureEncounter = null;
+            EncounterCalculator.Encounter? earliestEnc = null;
             foreach (var satellite in orbit.body.satellites)
             {
                 var encounters = _enc.GetEncounters(satellite.orbit, Universe.Instance.UT);
                 foreach (var e in encounters)
-                    if (e.distance < satellite.soiRadius && (captureEncounter == null || e.state.time < captureEncounter.state.time))
+                {
+                    if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))
                     {
-                        captureEncounter = e;
-                        captureEncounter.orbitingObject = satellite;
+                        earliestEnc = e;
                     }
+                }
             }
-            if (captureEncounter == null) return TransitionResult.None;
+            if (!earliestEnc.HasValue) return TransitionResult.None;
+            var captureEncounter = earliestEnc.Value;
 
-            var b = (CelestialBody)captureEncounter.orbitingObject;
+            var b = (CelestialBody)captureEncounter.orbit.Owner;
             var t = captureEncounter.state.time;
 
             // estimated time to traverse the SOI radius

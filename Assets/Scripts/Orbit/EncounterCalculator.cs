@@ -17,8 +17,12 @@ namespace Orbit
             _prop = new UniversalPropagator(orbit);
         }
 
-        public class Encounter
+        public struct Encounter
         {
+            /// <summary>
+            /// the current orbit we are on
+            /// </summary>
+            public OrbitState orbit;
             /// <summary>
             /// the orbit we have an encounter with
             /// </summary>
@@ -34,114 +38,120 @@ namespace Orbit
             /// <summary>
             /// distance at encounter
             /// </summary>
-            public double distance;
+            public double Distance { get => (state.pos - otherState.pos).Magnitude; }
 
-            /// <summary>
-            /// the object that <c>other</c> belongs to, used internally to keep tabs on encounters
-            /// </summary>
-            public IOrbitingObject orbitingObject;
-
-            public Encounter(OrbitState o, StateVectors state, StateVectors otherState, double distance)
+            public Encounter(OrbitState orbit, OrbitState other, StateVectors state, StateVectors otherState)
             {
-                other = o;
+                this.orbit = orbit;
+                this.other = other;
                 this.state = state;
                 this.otherState = otherState;
-                this.distance = distance;
             }
         }
 
-        public List<Encounter> GetEncounters(OrbitState o, double t)
+        public List<Encounter> GetEncounters(OrbitState other, double t)
         {
-            static void setTBounds(OrbitState o, double t, ref double tStart, ref double tEnd)
+            //static void setTBounds(OrbitState o, double t, ref double tStart, ref double tEnd)
+            //{
+            //    if (o.Shape == OrbitShape.Ellipse)
+            //    {
+            //        tStart = Math.Min(t, tStart);
+            //        tEnd = Math.Max(t + o.period, tEnd);
+            //    }
+            //    else
+            //    {
+            //        // todo: determine appropriate scaling factor for this
+            //        double tWindow = 4.0 * Math.Sqrt(1.0 / (o.GM * Math.Abs(o.alpha * o.alpha * o.alpha)));
+            //        tStart = Math.Min(t - tWindow, tStart);
+            //        tEnd = Math.Max(t + tWindow, tEnd);
+            //    }
+            //}
+
+            //double tStart = t, tEnd = t;
+            //setTBounds(orbit, t, ref tStart, ref tEnd);
+            //setTBounds(o, t, ref tStart, ref tEnd);
+            //return GetEncounters(o, tStart, tEnd);
+
+            if (orbit.Shape == OrbitShape.Ellipse)
             {
-                if (o.e < 1.0)
-                {
-                    tStart = Math.Min(t, tStart);
-                    tEnd = Math.Max(t + o.period, tEnd);
-                }
-                else
-                {
-                    // todo: determine appropriate scaling factor for this
-                    double tWindow = 4.0 * Math.Sqrt(1.0 / (o.GM * Math.Abs(o.alpha * o.alpha * o.alpha)));
-                    tStart = Math.Min(t - tWindow, tStart);
-                    tEnd = Math.Max(t + tWindow, tEnd);
-                }
+                return GetEncounters(orbit, t, t + orbit.period);
             }
-
-            double tStart = t, tEnd = t;
-            setTBounds(orbit, t, ref tStart, ref tEnd);
-            setTBounds(o, t, ref tStart, ref tEnd);
-
-            return GetEncounters(o, tStart, tEnd);
+            else
+            {
+                throw new NotImplementedException("only elliptical orbits are supported for automatic bound determination");
+            }
         }
 
         /// <summary>
         /// gets a list of all encounters with the given orbit
         /// </summary>
-        public List<Encounter> GetEncounters(OrbitState o, double tStart, double tEnd, int brackets = 100)
+        public List<Encounter> GetEncounters(OrbitState other, double tStart, double tEnd, int brackets = 64)
         {
-            if (orbit.body != o.body)
-                throw new ArgumentException("Orbit o must share the same body as this EncounterCalculator's orbit.");
+            if (orbit.body != other.body)
+                throw new ArgumentException("Orbit other must share the same body as this EncounterCalculator's orbit.");
 
-            var oprop = new UniversalPropagator(o);
+            var oprop = new UniversalPropagator(other);
 
-            // derivative of distance
-            double DDistance(double t) => 2.0 * Vector2d.Dot(
-                _prop.GetPosition(t) - oprop.GetPosition(t),
-                _prop.GetVelocity(t) - oprop.GetVelocity(t)
-            );
+            // derivative of squared distance
+            double DDistance(double t)
+            {
+                var state = _prop.GetStateVectors(t);
+                var ostate = oprop.GetStateVectors(t);
+
+                // the squared distance between two orbits is
+                //    r = || p1 - p2 ||^2
+                // the derivative of this is
+                //   r' = 2 ( p1 - p2 ) * ( v1 - v2 )
+                // we remove the coefficient of 2 because we just don't need it
+                return Vector2d.Dot(
+                    state.pos - ostate.pos,
+                    state.vel - ostate.vel
+                );
+            }
 
             // find local minima of distance function -> find zeroes of DDistance, then confirm it is local minimum
-
             var encounters = new List<Encounter>();
             var dt = (tEnd - tStart) / brackets;
 
+            // bracketing times and distances between them
+            double[] T = new double[brackets + 1];
+            double[] D = new double[brackets + 1];
+
+            for (int i = 0; i <= brackets; i++)
+            {
+                T[i] = tStart + i * dt;
+                D[i] = DDistance(T[i]);
+            }
+
             // search for brackets where extrema exist
-            double t0 = tStart, d0 = DDistance(t0);
             for (int i = 0; i < brackets; i++)
             {
-                var t1 = t0 + dt;
-                var d1 = DDistance(t1);
+                double t0 = T[i], t1 = T[i + 1];
+                double d0 = D[i], d1 = D[i + 1];
 
-                // inflection point found
-                if (d0 * d1 <= 0.0)
+                if (!(d0 < 0 && 0 < d1)) continue;
+
+                // we've found a local minimum for distance; determine the exact time
+                double t = 0.0;
+                try
                 {
-                    double t = 0.0;
-                    try
-                    {
-                        t = Brent.FindRoot(
-                            DDistance,
-                            t0, t1,
-                            accuracy: 1e-12,
-                            maxIterations: 100
-                        );
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(e);
-                    }
-
-                    // check if local minimum
-                    const double STEP = 1e-6;
-                    if ((DDistance(t + 0.5 * STEP) - DDistance(t - 0.5 * STEP)) / STEP > 0.0)
-                    {
-                        Vector2d pos = _prop.GetPosition(t), vel = _prop.GetVelocity(t),
-                             opos = oprop.GetPosition(t), ovel = oprop.GetVelocity(t);
-                        encounters.Add(new Encounter(
-                            o,
-                            new StateVectors(t, pos, vel),
-                            new StateVectors(t, opos, ovel),
-                            (pos - opos).Magnitude
-                        ));
-                    }
+                    var accuracy = Math.Max(Math.Abs(d0), Math.Abs(d1)) * 1e-8;
+                    t = Brent.FindRoot(
+                        DDistance,
+                        t0, t1,
+                        accuracy: accuracy,
+                        maxIterations: 64
+                    );
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
                 }
 
-                t0 = t1;
-                d0 = d1;
+                encounters.Add(new Encounter(orbit, other, _prop.GetStateVectors(t), oprop.GetStateVectors(t)));
             }
 
             return encounters;
         }
-
     }
 }
