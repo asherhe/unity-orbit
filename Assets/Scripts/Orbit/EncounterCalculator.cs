@@ -50,39 +50,6 @@ namespace Orbit
             }
         }
 
-        public List<Encounter> GetEncounters(OrbitState other, double t)
-        {
-            //static void setTBounds(OrbitState o, double t, ref double tStart, ref double tEnd)
-            //{
-            //    if (o.Shape == OrbitShape.Ellipse)
-            //    {
-            //        tStart = Math.Min(t, tStart);
-            //        tEnd = Math.Max(t + o.period, tEnd);
-            //    }
-            //    else
-            //    {
-            //        // todo: determine appropriate scaling factor for this
-            //        double tWindow = 4.0 * Math.Sqrt(1.0 / (o.GM * Math.Abs(o.alpha * o.alpha * o.alpha)));
-            //        tStart = Math.Min(t - tWindow, tStart);
-            //        tEnd = Math.Max(t + tWindow, tEnd);
-            //    }
-            //}
-
-            //double tStart = t, tEnd = t;
-            //setTBounds(orbit, t, ref tStart, ref tEnd);
-            //setTBounds(o, t, ref tStart, ref tEnd);
-            //return GetEncounters(o, tStart, tEnd);
-
-            if (orbit.Shape == OrbitShape.Ellipse)
-            {
-                return GetEncounters(other, t, t + orbit.period);
-            }
-            else
-            {
-                throw new NotImplementedException("only elliptical orbits are supported for automatic bound determination");
-            }
-        }
-
         /// <summary>
         /// gets a list of all encounters with the given orbit
         /// </summary>

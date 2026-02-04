@@ -29,14 +29,15 @@ namespace Orbit
         /// </summary>
         public CelestialBody nextCaptureBody { get; private set; }
 
-        protected override TransitionResult CalcTransitionResult()
+        protected override TransitionResult CalcTransitionResult(double UT)
         {
             nextCapture = null; nextCaptureBody = null;
 
             EncounterCalculator.Encounter? earliestEnc = null;
             foreach (var satellite in orbit.body.satellites)
             {
-                var encounters = _enc.GetEncounters(satellite.orbit, Universe.Instance.UT);
+                // TODO: only works for elliptical so far
+                var encounters = _enc.GetEncounters(satellite.orbit, UT, UT + orbit.period);
                 foreach (var e in encounters)
                 {
                     if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))

@@ -28,7 +28,7 @@ namespace Orbit
         /// </summary>
         public StateVectors? SOIEscape { get; private set; }
 
-        protected override TransitionResult CalcTransitionResult()
+        protected override TransitionResult CalcTransitionResult(double UT)
         {
             SOICapture = null; SOIEscape = null;
 
@@ -56,6 +56,8 @@ namespace Orbit
             // universal anomaly
             var coeff = _prop.AnomCoeff;
             // universal variable (subtracted by initial chi) at SOI intersection
+            // if the orbit is elliptical, we assume that t0 will be some part of the flyby
+            // and not from any other period of the orbit.
             var chi1 = coeff * (anomaly - anomaly0);
             var chi2 = coeff * (-anomaly - anomaly0);
 

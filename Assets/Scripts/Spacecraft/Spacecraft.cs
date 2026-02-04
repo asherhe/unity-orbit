@@ -278,20 +278,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
-
-        var enc = new EncounterCalculator(orbit);
-        var encs = enc.GetEncounters(CelestialBodyManager.Instance.celestialBodies["Mozza"].orbit, Universe.Instance.UT);
-        var p0 = CameraFocus.Instance.GetRelativePosition(body);
-        foreach (var e in encs)
-        {
-            var p1 = e.state.pos + p0;
-            var p2 = e.otherState.pos + p0;
-            D.raw(new Shape.Line(p1, p2), Color.grey);
-            D.raw(new Shape.Text(p1, Vector2d.Dot(e.state.pos - e.otherState.pos,e.state.vel - e.otherState.vel), Camera.main), Color.grey);
-        }
-
-        D.raw(new Shape.Line(GetPosition() + p0, CelestialBodyManager.Instance.celestialBodies["Mozza"].GetPosition() + p0));
-        D.raw(new Shape.Text(GetPosition() + p0, (CelestialBodyManager.Instance.celestialBodies["Mozza"].GetPosition()- GetPosition()).Magnitude, Camera.main));
     }
 
     public override string ToString()
