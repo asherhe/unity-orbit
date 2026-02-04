@@ -38,6 +38,7 @@ namespace Orbit
             foreach (var satellite in orbit.body.satellites)
             {
                 // TODO: time bounds only work for elliptical so far
+                if (orbit.Shape != OrbitShape.Ellipse) return TransitionResult.None;
                 var encounters = _enc.GetEncounters(satellite.orbit, UT, UT + orbit.period);
                 foreach (var e in encounters)
                 {
