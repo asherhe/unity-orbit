@@ -34,9 +34,10 @@ namespace Orbit
             nextCapture = null; nextCaptureBody = null;
 
             EncounterCalculator.Encounter? earliestEnc = null;
+            double expiry = UT + orbit.period; // TODO: integrate with dynamic bound readjustment
             foreach (var satellite in orbit.body.satellites)
             {
-                // TODO: only works for elliptical so far
+                // TODO: time bounds only work for elliptical so far
                 var encounters = _enc.GetEncounters(satellite.orbit, UT, UT + orbit.period);
                 foreach (var e in encounters)
                 {
@@ -49,22 +50,22 @@ namespace Orbit
             if (!earliestEnc.HasValue) return TransitionResult.None;
             var captureEncounter = earliestEnc.Value;
 
-            var b = (CelestialBody)captureEncounter.orbit.Owner;
+            var body = (CelestialBody)captureEncounter.other.Owner;
             var t = captureEncounter.state.time;
 
-            // estimated time to traverse the SOI radius
-            var soiTrav = b.soiRadius / captureEncounter.state.vel.Magnitude;
+            // estimated time to traverse the SOI radius, doubled for extra wiggle room
+            var soiTrav = 2 * body.soiRadius / (captureEncounter.state.vel - captureEncounter.otherState.vel).Magnitude;
 
             // distance to SOI edge
-            double SOIDistance(double t) => (_prop.GetPosition(t) - b.GetPosition(t)).Magnitude - b.soiRadius;
+            double SOIDistance(double t) => (_prop.GetPosition(t) - body.GetPosition(t)).Magnitude - body.soiRadius;
 
             double captureTime = 0;
             try
             {
                 captureTime = Brent.FindRoot(
                     SOIDistance,
-                    t - 2 * soiTrav, t,
-                    accuracy: 1e-12,
+                    t - soiTrav, t,
+                    accuracy: Math.Abs(t) * 1e-10,
                     maxIterations: 100
                 );
             }
@@ -74,13 +75,14 @@ namespace Orbit
             }
 
             nextCapture = _prop.GetStateVectors(captureTime);
-            var bodyState = b.GetStateVectors(captureTime);
+            var bodyState = body.GetStateVectors(captureTime);
             return new TransitionResult(
                 nextCapture.Value, new OrbitState(
                     nextCapture?.pos - bodyState.pos,
-                    nextCapture?.vel - bodyState.pos,
-                    captureTime, b
-                )
+                    nextCapture?.vel - bodyState.vel,
+                    captureTime, body
+                ),
+                expiryDate: expiry
             );
         }
     }

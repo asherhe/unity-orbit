@@ -65,6 +65,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private IOrbitPropagator _prop;
     private OrbitTransitionManager _transitionManager;
     private SOIEscapeTransition _soiEscape;
+    private SOIInterceptTransition _soiIntercept;
 
     public CelestialBody body { get => orbit.body; }
     private Trajectory _trajectory;
@@ -137,7 +138,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
         _transitionManager = new OrbitTransitionManager(orbit);
         _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));
-        //_transitionManager.Add(new SOIInterceptTransition(orbit));
+        _transitionManager.Add(_soiIntercept = new SOIInterceptTransition(orbit));
         _transitionManager.CheckTransitions();
 
         // we bind this callback BEFORE we instantiate _trajectory so that the
@@ -270,6 +271,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private void FixedUpdate()
     {
         _transitionManager.UpdateOrbit();
+        Debug.Log(_transitionManager.ExpiryDate - Universe.Instance.UT);
     }
 
     private void Update()

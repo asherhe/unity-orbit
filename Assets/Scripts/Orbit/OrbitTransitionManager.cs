@@ -105,7 +105,7 @@ namespace Orbit
 
         /// <summary>
         /// updates orbit state if it is time for the next transition.
-        /// should run in unity's Update() loop.
+        /// should run in unity's Update or FixedUpdate loop.
         /// </summary>
         public void UpdateOrbit()
         {
