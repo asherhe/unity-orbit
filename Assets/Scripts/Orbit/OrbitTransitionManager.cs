@@ -178,6 +178,11 @@ namespace Orbit
             }
 
             public static TransitionResult None = new(new StateVectors(double.NaN, null, null), null);
+            /// <summary>
+            /// no transition predicted, but this prediction expires at time UT
+            /// </summary>
+            /// <returns>newly constructed TransitionResult</returns>
+            public static TransitionResult ExpiresAt(double UT) => new(new StateVectors(double.NaN, null, null), null, expiryDate: UT);
         }
 
         /// <summary>

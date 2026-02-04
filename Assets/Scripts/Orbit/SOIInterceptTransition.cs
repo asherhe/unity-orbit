@@ -47,7 +47,7 @@ namespace Orbit
                     }
                 }
             }
-            if (!earliestEnc.HasValue) return TransitionResult.None;
+            if (!earliestEnc.HasValue) return TransitionResult.ExpiresAt(expiry);
             var captureEncounter = earliestEnc.Value;
 
             var body = (CelestialBody)captureEncounter.other.Owner;
@@ -81,8 +81,7 @@ namespace Orbit
                     nextCapture?.pos - bodyState.pos,
                     nextCapture?.vel - bodyState.vel,
                     captureTime, body
-                ),
-                expiryDate: expiry
+                )
             );
         }
     }
