@@ -253,8 +253,12 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
         if (_transitionManager.HasTransition)
         {
-            var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
-            SetNu2(nuTrans);
+            if (orbit.Shape != OrbitShape.Ellipse)
+            {
+                var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
+                SetNu2(nuTrans);
+            }
+            // currently no support for elliptical trajectories as we still gotta show the entire period anyways
         }
 
         if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
@@ -271,7 +275,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private void FixedUpdate()
     {
         _transitionManager.UpdateOrbit();
-        Debug.Log(_transitionManager.ExpiryDate - Universe.Instance.UT);
     }
 
     private void Update()
