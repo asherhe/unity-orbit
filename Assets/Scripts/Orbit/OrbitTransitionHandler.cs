@@ -7,19 +7,25 @@ namespace Orbit
     /// <summary>
     /// defines handling for changes in orbit state
     /// </summary>
-    public abstract class OrbitTransition
+    public abstract class OrbitTransitionHandler
     {
         protected OrbitState orbit { get; private set; }
 
-        public OrbitTransition(OrbitState orbit)
+        public OrbitTransitionHandler(OrbitState orbit)
         {
             this.orbit = orbit;
+            _result = TransitionResult.None;
         }
+
+        /// <summary>
+        /// stored result of next predicted transition
+        /// </summary>
+        private TransitionResult _result;
 
         /// <summary>
         /// state vectors at the time of transition
         /// </summary>
-        public StateVectors State { get; private set; }
+        public StateVectors State { get => _result.state; }
         /// <summary>
         /// time of transition. NaN if no transition will occur
         /// </summary>
@@ -29,12 +35,12 @@ namespace Orbit
         /// if HasTransition is false, this is the time at which this transition possibly becomes invalid.
         /// equal to double.PositiveInfinity if HasTransition is true or if it is certain that there will never be a transition event.
         /// </summary>
-        public double ExpiryDate { get; private set; }
+        public double ExpiryDate { get => _result.expiryDate; }
 
         /// <summary>
         /// new orbit state once transition occurs
         /// </summary>
-        public OrbitState NextOrbit { get; private set; }
+        public OrbitState NextOrbit { get => _result.orbit; }
 
         protected struct TransitionResult
         {
@@ -73,10 +79,15 @@ namespace Orbit
         /// </summary>
         public void CheckTransition(double UT)
         {
-            var result = CalcTransitionResult(UT);
-            State = result.state;
-            NextOrbit = result.orbit;
-            ExpiryDate = result.expiryDate;
+            _result = CalcTransitionResult(UT);
+        }
+
+        /// <summary>
+        /// clear stored transition prediction
+        /// </summary>
+        public void ClearResults()
+        {
+            _result = TransitionResult.None;
         }
     }
 }

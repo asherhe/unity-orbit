@@ -9,7 +9,7 @@ namespace Orbit
     /// <summary>
     /// deals with the detection and handling of intercepts with celestial bodies
     /// </summary>
-    public class SOIInterceptTransition : OrbitTransition
+    public class SOIInterceptTransition : OrbitTransitionHandler
     {
         private UniversalPropagator _prop;
         private EncounterCalculator _enc;

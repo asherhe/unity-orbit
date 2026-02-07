@@ -10,7 +10,7 @@ namespace Orbit
     /// <summary>
     /// deals with the detection and handling of escape trajectories from the SOI of the current celestial body
     /// </summary>
-    public class SOIEscapeTransition : OrbitTransition
+    public class SOIEscapeTransition : OrbitTransitionHandler
     {
         private UniversalPropagator _prop;
 
