@@ -63,7 +63,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public OrbitState orbit { get; private set; }
     private IOrbitPropagator _prop;
-    private OrbitTransitionManager _transitionManager;
+    private PatchedConicManager _transitionManager;
     private SOIEscapeTransition _soiEscape;
     private SOIInterceptTransition _soiIntercept;
 
@@ -274,7 +274,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
-        _transitionManager.UpdateOrbit();
+        _transitionManager.Update();
     }
 
     private void Update()

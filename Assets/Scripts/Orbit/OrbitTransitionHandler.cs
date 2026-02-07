@@ -9,6 +9,9 @@ namespace Orbit
     /// </summary>
     public abstract class OrbitTransitionHandler
     {
+        /// <summary>
+        /// reference to OrbitState object this OrbitTransitionHandler answers to
+        /// </summary>
         protected OrbitState orbit { get; private set; }
 
         public OrbitTransitionHandler(OrbitState orbit)
