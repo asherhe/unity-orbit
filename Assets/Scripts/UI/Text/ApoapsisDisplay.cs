@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UI
 {
-    public class Apoapsis : TextDisplay
+    public class ApoapsisDisplay : TextDisplay
     {
         protected override string GetText()
         {

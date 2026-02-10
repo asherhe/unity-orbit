@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace UI
 {
-    [RequireComponent(typeof(FollowTransform))]
+    [RequireComponent(typeof(FollowWorldTransform))]
     public class SpacecraftIcon : MonoBehaviour
     {
-        private FollowTransform _follow;
+        private FollowWorldTransform _follow;
 
         [SerializeField]
         private Spacecraft _craft;
@@ -23,7 +23,7 @@ namespace UI
 
         private void Awake()
         {
-            _follow = GetComponent<FollowTransform>();
+            _follow = GetComponent<FollowWorldTransform>();
             _follow.shouldFollowPosition = true;
             _follow.shouldFollowRotation = true;
 

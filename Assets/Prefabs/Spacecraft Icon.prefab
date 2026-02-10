@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1768955350272861550}
   - component: {fileID: 131471601665357620}
   - component: {fileID: 5073882212711321521}
-  - component: {fileID: 6889421583771933669}
+  - component: {fileID: 7359080453342204206}
   m_Layer: 6
   m_Name: Spacecraft Icon
   m_TagString: Untagged
@@ -98,7 +98,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9dc0dcee5657f5648af783f17663d26c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6889421583771933669
+  _craft: {fileID: 0}
+--- !u!114 &7359080453342204206
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -107,7 +108,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6950650967229741733}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ab9f55def00a42489f4f6fe8004ed05, type: 3}
+  m_Script: {fileID: 11500000, guid: 984c8d936d498ef499e9770f073c3a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   follow: {fileID: 0}
+  shouldFollowPosition: 1
+  shouldFollowRotation: 1

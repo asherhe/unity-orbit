@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Drawing;
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(UI.FollowTransform))]
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(FollowWorldTransform))]
 public class Trajectory : MonoBehaviour
 {
     private TrajectoryMesh _trajectoryMesh;
     private MeshRenderer _meshRenderer;
     private MeshFilter _meshFilter;
-    private UI.FollowTransform _follow;
+    private FollowWorldTransform _follow;
 
     private OrbitState _orbit;
     private UniversalPropagator _prop;
@@ -101,7 +101,7 @@ public class Trajectory : MonoBehaviour
         _meshRenderer = GetComponent<MeshRenderer>();
         _meshFilter = GetComponent<MeshFilter>();
         _meshFilter.mesh = _trajectoryMesh.mesh;
-        _follow = GetComponent<UI.FollowTransform>();
+        _follow = GetComponent<FollowWorldTransform>();
     }
 
     /// <summary>
