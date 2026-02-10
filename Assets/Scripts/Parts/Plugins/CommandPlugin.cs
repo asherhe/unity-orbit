@@ -52,13 +52,20 @@ namespace Parts
 
         protected override void OnFixedUpdate()
         {
+            // no control allowed in high timewarp
+            if (Universe.Instance.Timewarp.TimewarpScale > 50.0) {
+                craft.Control.SteeringControl = 0;
+                craft.Control.Throttle = 0;
+                return; 
+            }
+
             craft.Control.SteeringControl = SteeringInput;
             craft.Control.Throttle += ThrottleInput * Time.fixedDeltaTime;
 
             // autosteer override
             if (IsAutoSteerEnabled && SteeringInput == 0)
             {
-                // dummy autosteer
+                // dummy autosteer (add PID sometime)
                 craft.Control.SteeringControl = -(float)craft.Newtonian.angularVelocity;
             }
         }

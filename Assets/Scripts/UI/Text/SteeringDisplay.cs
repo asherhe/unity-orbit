@@ -11,9 +11,12 @@ namespace UI
         {
             var craft = ActiveCraftController.Instance.craft;
             var steeringVal = (int)Mathf.Round(craft.Control.SteeringControl * 6);
-            var left = new string('=', Math.Max(-steeringVal, 0)).PadLeft(6, '-');
-            var right = new string('=', Math.Max(steeringVal, 0)).PadRight(6, '-');
-            return $"STEER:[{left}+{right}]";
+
+            var leftVal = Math.Max(steeringVal, 0);
+            var rightVal = Math.Max(-steeringVal, 0);
+            var left = $"<color=grey>{new string('-', 6 - leftVal)}</color><color=white>{new string('=', leftVal)}</color>";
+            var right = $"<color=white>{new string('=', rightVal)}</color><color=grey>{new string('-', 6 - rightVal)}</color>";
+            return $"STEER:[{left}<color=white>+</color>{right}]";
         }
     }
 }
