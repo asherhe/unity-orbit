@@ -168,9 +168,6 @@ namespace Orbit
                 // update our own copy of the next orbit state
                 nextOrbit.CopyFrom(NextTransition.NextOrbit);
             }
-
-            // use transition information to update trajectory display
-            UpdateTrajectoryBounds();
         }
 
         /// <summary>
@@ -205,6 +202,8 @@ namespace Orbit
 
             if (dir == 1) { trajectory.nuMin = nu1; trajectory.nuMax = nu2; }
             else { trajectory.nuMin = nu2; trajectory.nuMax = nu1; }
+
+            trajectory.GenerateTrajectory();
         }
     }
 }
