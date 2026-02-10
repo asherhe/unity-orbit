@@ -22,10 +22,8 @@ public class Trajectory : MonoBehaviour
         set
         {
             if (_orbit == value) return;
-            if (_orbit != null) _orbit.OnStateChanged -= GenerateTrajectory;
             _orbit = value;
             _prop = new UniversalPropagator(_orbit);
-            _orbit.OnStateChanged += GenerateTrajectory;
             GenerateTrajectory();
         }
     }
