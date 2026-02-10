@@ -32,12 +32,6 @@ namespace Orbit
         public int numActivePatches;
 
         /// <summary>
-        /// internal flag used to block recalculations.
-        /// we use this in Update() to avoid recomputing all conic patches when SrcOrbit is updated.
-        /// </summary>
-        private bool _doBlockRecalculation = false;
-
-        /// <summary>
         /// configures a PatchedConicManager linked to an object with orbit state orbit
         /// </summary>
         /// <param name="orbit">OrbitState of the source object that this PatchedConicManager answers to</param>
@@ -69,8 +63,6 @@ namespace Orbit
         /// <param name="startPatch">id of the patch to start recalculating from (0 is current orbit). all patches before this point are left untouched</param>
         public void RecalculatePatches(double UT, int startPatch = 0)
         {
-            if (_doBlockRecalculation) return;
-
             // current "time" as we step through patches
             double t = UT;
 
