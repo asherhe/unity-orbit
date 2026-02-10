@@ -113,7 +113,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""name"": ""ThrottleCut"",
                     ""type"": ""Button"",
                     ""id"": ""73107268-d24c-4d71-b41d-e43719b05884"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -122,7 +122,16 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""name"": ""ThrottleFull"",
                     ""type"": ""Button"",
                     ""id"": ""d99893bb-0542-413e-bca3-36a480414858"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AutoSteer"",
+                    ""type"": ""Button"",
+                    ""id"": ""ebd5ddf5-57e4-4fc7-bc23-e4548d750449"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -247,6 +256,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
                     ""action"": ""ThrottleFull"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""40a451ee-7d24-464d-b7d7-9ff884331ba4"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""AutoSteer"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -394,6 +414,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Flight_Throttle = m_Flight.FindAction("Throttle", throwIfNotFound: true);
         m_Flight_ThrottleCut = m_Flight.FindAction("ThrottleCut", throwIfNotFound: true);
         m_Flight_ThrottleFull = m_Flight.FindAction("ThrottleFull", throwIfNotFound: true);
+        m_Flight_AutoSteer = m_Flight.FindAction("AutoSteer", throwIfNotFound: true);
         // Warp
         m_Warp = asset.FindActionMap("Warp", throwIfNotFound: true);
         m_Warp_WarpIncrease = m_Warp.FindAction("WarpIncrease", throwIfNotFound: true);
@@ -489,6 +510,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_Throttle;
     private readonly InputAction m_Flight_ThrottleCut;
     private readonly InputAction m_Flight_ThrottleFull;
+    private readonly InputAction m_Flight_AutoSteer;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -516,6 +538,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Flight/ThrottleFull".
         /// </summary>
         public InputAction @ThrottleFull => m_Wrapper.m_Flight_ThrottleFull;
+        /// <summary>
+        /// Provides access to the underlying input action "Flight/AutoSteer".
+        /// </summary>
+        public InputAction @AutoSteer => m_Wrapper.m_Flight_AutoSteer;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -554,6 +580,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrottleFull.started += instance.OnThrottleFull;
             @ThrottleFull.performed += instance.OnThrottleFull;
             @ThrottleFull.canceled += instance.OnThrottleFull;
+            @AutoSteer.started += instance.OnAutoSteer;
+            @AutoSteer.performed += instance.OnAutoSteer;
+            @AutoSteer.canceled += instance.OnAutoSteer;
         }
 
         /// <summary>
@@ -577,6 +606,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ThrottleFull.started -= instance.OnThrottleFull;
             @ThrottleFull.performed -= instance.OnThrottleFull;
             @ThrottleFull.canceled -= instance.OnThrottleFull;
+            @AutoSteer.started -= instance.OnAutoSteer;
+            @AutoSteer.performed -= instance.OnAutoSteer;
+            @AutoSteer.canceled -= instance.OnAutoSteer;
         }
 
         /// <summary>
@@ -883,6 +915,13 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottleFull(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AutoSteer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAutoSteer(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Warp" which allows adding and removing callbacks.

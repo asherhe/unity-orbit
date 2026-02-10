@@ -48,6 +48,9 @@ public class ActiveCraftController : MonoBehaviour
 
         _inputActions.Flight.ThrottleCut.performed += ctx => command.CutThrottle();
         _inputActions.Flight.ThrottleFull.performed += ctx => command.FullThrottle();
+
+        _inputActions.Flight.AutoSteer.performed += ctx => command.IsAutoSteerEnabled = !command.IsAutoSteerEnabled;
+
     }
 
     private void Update()

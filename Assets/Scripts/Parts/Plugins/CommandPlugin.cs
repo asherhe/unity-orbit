@@ -15,10 +15,22 @@ namespace Parts
             /// <summary>
             /// whether or not this CommandPlugin instance is allowed to autosteer (analogous to kerbal's SAS)
             /// </summary>
-            public bool autoSteer;
+            public bool autoSteerable = false;
         }
 
-        private bool _autoSteer;
+        /// <summary>
+        /// whether or not this command pod can be autosteered
+        /// </summary>
+        public bool autoSteerable { get; private set; }
+        
+        private bool _isAutoSteerEnabled = false;
+        public bool IsAutoSteerEnabled
+        {
+            get => _isAutoSteerEnabled;
+            set {
+                if (autoSteerable) _isAutoSteerEnabled = value;
+            }
+        }
 
         /// <summary>
         /// requested steering direction
@@ -35,13 +47,20 @@ namespace Parts
 
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
-            _autoSteer = _config.autoSteer;
+            autoSteerable = _config.autoSteerable;
         }
 
         protected override void OnFixedUpdate()
         {
             craft.Control.SteeringControl = SteeringInput;
             craft.Control.Throttle += ThrottleInput * Time.fixedDeltaTime;
+
+            // autosteer override
+            if (IsAutoSteerEnabled && SteeringInput == 0)
+            {
+                // dummy autosteer
+                craft.Control.SteeringControl = -(float)craft.Newtonian.angularVelocity;
+            }
         }
 
         public void CutThrottle() => craft.Control.Throttle = 0.0f;

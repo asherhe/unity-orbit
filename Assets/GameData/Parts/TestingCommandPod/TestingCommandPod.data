@@ -14,6 +14,6 @@ plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
   CommandPlugin:
-    autoSteer: true
+    autoSteerable: true
   ReactionWheelPlugin:
     torque: 5 # kN m
