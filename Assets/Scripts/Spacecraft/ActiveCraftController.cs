@@ -1,3 +1,4 @@
+using Parts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,7 +19,10 @@ public class ActiveCraftController : MonoBehaviour
     /// </summary>
     public Spacecraft craft { get; private set; }
 
-    public SpacecraftControl control { get; private set; }
+    /// <summary>
+    /// active command plugin on spacecraft
+    /// </summary>
+    public CommandPlugin command { get; private set; }
 
     /// <summary>
     /// throttle change rate per second
@@ -32,27 +36,24 @@ public class ActiveCraftController : MonoBehaviour
 
         craft = GetComponent<Spacecraft>();
 
+        craft.OnLoaded += () =>
+        {
+            // TODO: implement proper logic for active command plugin
+            foreach (var part in craft.parts)
+                if ((command = part.GetPlugin<CommandPlugin>()) != null) break;
+        };
+
         _inputActions = new InputActions();
         _inputActions.Flight.Enable();
 
-        _inputActions.Flight.ThrottleCut.performed += CutThrottle;
-        _inputActions.Flight.ThrottleFull.performed += FullThrottle;
+        _inputActions.Flight.ThrottleCut.performed += ctx => command.CutThrottle();
+        _inputActions.Flight.ThrottleFull.performed += ctx => command.FullThrottle();
     }
-
-    private void Start()
-    {
-        // added in Spacecraft.Awake(), so we get it in Start() and not Awake()
-        control = GetComponent<SpacecraftControl>();
-    }
-
-    public void CutThrottle(InputAction.CallbackContext context) => control.Throttle = 0.0f;
-    public void FullThrottle(InputAction.CallbackContext context) => control.Throttle = 1.0f;
 
     private void Update()
     {
-        control.SteeringControl = _inputActions.Flight.Steering.ReadValue<float>();
-
-        float throttleControl = _inputActions.Flight.Throttle.ReadValue<float>();
-        control.Throttle += throttleControl * throttlingRate * Time.deltaTime;
+        if (command == null) return;
+        command.SteeringInput = _inputActions.Flight.Steering.ReadValue<float>();
+        command.ThrottleInput = _inputActions.Flight.Throttle.ReadValue<float>() * throttlingRate;
     }
 }
