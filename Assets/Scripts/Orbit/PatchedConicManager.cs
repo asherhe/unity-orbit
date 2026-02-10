@@ -45,13 +45,15 @@ namespace Orbit
         public PatchedConicManager(OrbitState orbit, int maxPatches = 6)
         {
             SrcOrbit = orbit;
+            
+            // bind this before we initialize patches so that the trajectory update code within
+            // Patch executes AFTER new transition points are established
+            SrcOrbit.OnStateChanged += RecalculatePatches;
 
             // construct linked patches
             _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit) };
             for (int i = 1; i < maxPatches; i++)
                 _patches.Add(new Patch(_patches[i - 1]));
-
-            SrcOrbit.OnStateChanged += RecalculatePatches;
         }
 
         /// <summary>
@@ -76,8 +78,11 @@ namespace Orbit
             for (; i < _patches.Count; i++)
             {
                 var patch = _patches[i];
+                _patches[i].SetActive(true);
+
                 patch.CheckTransitions(t);
-                if (!patch.HasTransition) break;
+                if (!patch.HasTransition) { i++; break; }
+
                 // advance to next patch
                 t = patch.NextTransition.Time;
             }
@@ -86,7 +91,7 @@ namespace Orbit
             // disable all inactive patches
             for (; i < _patches.Count; i++)
             {
-                _patches[i].Disable();
+                _patches[i].SetActive(false);
             }
         }
 
@@ -97,16 +102,16 @@ namespace Orbit
         public void Update(double UT)
         {
             // repeatedly advance through future conic patches until there are no more
-            while (!_patches[0].HasTransition || _patches[0].NextTransition.Time >= UT)
+            while (!_patches[0].HasTransition || _patches[0].NextTransition.Time <= UT)
             {
                 // ensure that no hidden transitions exist
                 while (_patches[0].ExpiryDate < UT)
                     RecalculatePatches(_patches[0].ExpiryDate);
 
-                if (_patches[0].HasTransition && _patches[0].NextTransition.Time >= UT)
+                if (_patches[0].HasTransition && _patches[0].NextTransition.Time <= UT)
                 {
                     // advance orbits of all conic sections forward by one
-                    
+
                     // NOTE: this triggers a reevaluation of all patch transition handlers. this is not ideal
                     // because the state of all patches save the last can actually be transferred to the preceding one.
                     // however, implementing the logic to copy state of all fields in a patch, including the internal

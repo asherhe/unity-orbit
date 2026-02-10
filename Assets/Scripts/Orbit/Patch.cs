@@ -21,15 +21,19 @@ namespace Orbit
 
         public readonly Patch prevPatch;
         public Patch nextPatch { get; private set; } = null;
+        /// <summary>
+        /// the OrbitState (of the first patch) that this patch is tied to
+        /// </summary>
+        private readonly OrbitState rootOrbit;
 
         /// <summary>
         /// all transition handlers that can update this orbit patch from the previous one
         /// </summary>
-        public readonly List<OrbitTransitionHandler> transitions;
+        public readonly List<OrbitTransitionHandler> transitions = new();
 
         // specific orbit transition handlers
-        public readonly SOIEscapeTransition soiEscape;
-        public readonly SOIInterceptTransition soiIntercept;
+        public SOIEscapeTransition soiEscape;
+        public SOIInterceptTransition soiIntercept;
 
 
         /// <summary>
@@ -58,7 +62,7 @@ namespace Orbit
         /// equal to zero if this Patch represents the current orbit.
         /// </summary>
         private readonly int _patchStep;
-        
+
         /// <summary>
         /// construct a patch based on the orbit state of an orbiting body.
         /// the resulting Patch is directly linked to the current state of the body.
@@ -67,21 +71,17 @@ namespace Orbit
         {
             patchOrbit = srcOrbit;
             nextOrbit = new(patchOrbit);
-
             prevPatch = null;
+            rootOrbit = srcOrbit;
 
-            transitions = new()
-            {
-                (soiEscape = new(nextOrbit)),
-                (soiIntercept = new(nextOrbit))
-            };
-
-            NextTransition = null;
-            ExpiryDate = double.PositiveInfinity;
+            soiEscape = new(patchOrbit);
+            soiIntercept = new(patchOrbit);
 
             trajectory = TrajectoryManager.Instance.AddTrajectory(patchOrbit);
 
             _patchStep = 0;
+
+            SetupPatch();
         }
 
         /// <summary>
@@ -91,19 +91,13 @@ namespace Orbit
         {
             patchOrbit = patch.nextOrbit;
             nextOrbit = new(patchOrbit);
-
             prevPatch = patch;
             if (patch.nextPatch != null) throw new InvalidOperationException("provided preceding patch already has a subsequent patch.");
             patch.nextPatch = this;
+            rootOrbit = patch.rootOrbit;
 
-            transitions = new()
-            {
-                (soiEscape = new(nextOrbit)),
-                (soiIntercept = new(nextOrbit))
-            };
-
-            NextTransition = null;
-            ExpiryDate = double.PositiveInfinity;
+            soiEscape = new(patchOrbit);
+            soiIntercept = new(patchOrbit);
 
             trajectory = TrajectoryManager.Instance.AddTrajectory(patchOrbit);
             trajectory.DoAnimation = false;
@@ -111,15 +105,27 @@ namespace Orbit
             trajectory.gameObject.SetActive(false);
 
             _patchStep = patch._patchStep + 1;
+
+            SetupPatch();
+        }
+
+        private void SetupPatch()
+        {
+            transitions.Add(soiEscape);
+            transitions.Add(soiIntercept);
+
+            NextTransition = null;
+            ExpiryDate = double.PositiveInfinity;
+
+            trajectory.name = $"Trajectory {rootOrbit.Owner} (Patch {_patchStep})";
         }
 
         /// <summary>
-        /// designate this patch as inactive
+        /// designate the active/inactive state of this patch
         /// </summary>
-        public void Disable()
+        public void SetActive(bool isActive)
         {
-            // TODO
-            trajectory.gameObject.SetActive(false);
+            trajectory.gameObject.SetActive(isActive);
         }
 
         public void CheckTransitions() => CheckTransitions(Universe.Instance.UT);
@@ -163,16 +169,42 @@ namespace Orbit
                 nextOrbit.CopyFrom(NextTransition.NextOrbit);
             }
 
-            trajectory.gameObject.SetActive(HasTransition);
+            // use transition information to update trajectory display
+            UpdateTrajectoryBounds();
         }
 
         /// <summary>
-        /// copy the state of another patch. relationships between patches (e.g. patchOrbit, prevPatch, nextPatch) are left preserved, as are 
-        /// (i.e. nextOrbit, NextTransition, and HasTransition are the only fields affected)
+        /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
         /// </summary>
-        public void CopyStateFrom(Patch p)
+        public void UpdateTrajectoryBounds()
         {
+            // orbit direction
+            var dir = Math.Sign(patchOrbit.h);
+            // true anomalies, timewise - nu1 happens first, then nu2
+            double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
 
+            // adjust nu bounds, accounting for orbit direction
+            double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
+            double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
+
+            if (soiEscape.HasTransition)
+            {
+                var nuCapt = patchOrbit.CalcNu(soiEscape.SOICapture?.pos);
+                SetNu1(nuCapt);
+                SetNu2(-nuCapt);
+            }
+            if (HasTransition)
+            {
+                if (patchOrbit.Shape != OrbitShape.Ellipse)
+                {
+                    var nuTrans = patchOrbit.CalcNu(NextTransition.State.pos);
+                    SetNu2(nuTrans);
+                }
+                // currently no support for elliptical trajectories as we still gotta show the entire period anyways
+            }
+
+            if (dir == 1) { trajectory.nuMin = nu1; trajectory.nuMax = nu2; }
+            else { trajectory.nuMin = nu2; trajectory.nuMax = nu1; }
         }
     }
 }

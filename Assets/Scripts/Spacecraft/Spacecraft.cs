@@ -3,6 +3,7 @@ using Parts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 using Vertx.Debugging;
@@ -63,12 +64,11 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public OrbitState orbit { get; private set; }
     private IOrbitPropagator _prop;
-    private PatchedConicManager _transitionManager;
+    private PatchedConicManager _patchManager;
     private SOIEscapeTransition _soiEscape;
     private SOIInterceptTransition _soiIntercept;
 
     public CelestialBody body { get => orbit.body; }
-    private Trajectory _trajectory;
 
     public double Altitude { get => GetPosition().Magnitude - body.radius; }
 
@@ -136,19 +136,10 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
         _prop = new UniversalPropagator(orbit);
 
-        _transitionManager = new OrbitTransitionManager(orbit);
-        _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));
-        _transitionManager.Add(_soiIntercept = new SOIInterceptTransition(orbit));
-        _transitionManager.CheckTransitions();
-
-        // we bind this callback BEFORE we instantiate _trajectory so that the
-        // new orbit bounds are immediately updated in the current tick
-        orbit.OnStateChanged += UpdateTrajectoryBounds;
-
-        _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
-        _trajectory.name = $"Trajectory {this}";
-
-        UpdateTrajectoryBounds();
+        _patchManager = new PatchedConicManager(orbit);
+        _soiEscape = _patchManager.Patches[0].soiEscape;
+        _soiIntercept = _patchManager.Patches[0].soiIntercept;
+        _patchManager.RecalculatePatches();
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -231,40 +222,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
-    /// <summary>
-    /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
-    /// </summary>
-    private void UpdateTrajectoryBounds()
-    {
-        // orbit direction
-        var dir = Math.Sign(orbit.h);
-        // true anomalies, timewise - nu1 happens first, then nu2
-        double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
-
-        // adjust nu bounds, accounting for orbit direction
-        double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
-        double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
-
-        if (_soiEscape.HasTransition)
-        {
-            var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
-            SetNu1(nuCapt);
-            SetNu2(-nuCapt);
-        }
-        if (_transitionManager.HasTransition)
-        {
-            if (orbit.Shape != OrbitShape.Ellipse)
-            {
-                var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
-                SetNu2(nuTrans);
-            }
-            // currently no support for elliptical trajectories as we still gotta show the entire period anyways
-        }
-
-        if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
-        else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
-    }
-
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
     public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
     public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
@@ -274,7 +231,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
-        _transitionManager.Update();
+        _patchManager.Update(Universe.Instance.UT);
     }
 
     private void Update()

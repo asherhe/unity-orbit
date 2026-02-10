@@ -41,7 +41,7 @@ namespace Orbit
             var e = orbit.e; var a = orbit.a;
 
             // determine true anomaly at SOI intersection
-            var nu = Math.Acos((Math.Abs(orbit.p) - rsoi) / (rsoi * e));
+            var nu = Math.Acos(Math.Clamp((Math.Abs(orbit.p) - rsoi) / (rsoi * e), -1.0, 1.0)); // numerical instability for near-parabolic orbits does not play nice with this, so we clamp
             var anomaly = orbit.CalcAnomaly(nu);
             var anomaly0 = orbit.Anomaly0;
 
