@@ -100,9 +100,7 @@ namespace Orbit
             soiIntercept = new(patchOrbit);
 
             trajectory = TrajectoryManager.Instance.AddTrajectory(patchOrbit);
-            trajectory.DoAnimation = false;
-            trajectory.AlphaRange = new Vector2(0.5f, 0.0f);
-            trajectory.gameObject.SetActive(false);
+            trajectory.AlphaRange = new Vector2(0.0f, 0.5f);
 
             _patchStep = patch._patchStep + 1;
 
