@@ -68,11 +68,11 @@ namespace UI
                 case HoldMode.Prograde:
                     return progradeDir;
                 case HoldMode.Retrograde:
-                    return MathUtils.NormalizeAngle(progradeDir + Mathf.PI);
+                    return progradeDir + Mathf.PI;
                 case HoldMode.RadialOut:
-                    return MathUtils.NormalizeAngle(progradeDir - orbitDirection * 0.5f * Mathf.PI);
+                    return progradeDir - orbitDirection * 0.5f * Mathf.PI;
                 case HoldMode.RadialIn:
-                    return MathUtils.NormalizeAngle(progradeDir + orbitDirection * 0.5f * Mathf.PI);
+                    return progradeDir + orbitDirection * 0.5f * Mathf.PI;
                 default:
                     return _handle.Direction;
             }
@@ -90,6 +90,9 @@ namespace UI
 
             if (holdMode != HoldMode.None && (_handleTween == null || !_handleTween.IsActive()))
                 _handle.Direction = GetDirection(holdMode);
+            
+            // 0 radians on spacecraft is up
+            _command.autosteerTarget = _handle.Direction - 0.5f * Mathf.PI;
         }
 
         private void FixedUpdate()
@@ -113,7 +116,6 @@ namespace UI
         private void OnHandleDrag()
         {
             if (_toggleGroup.activeButton != null) _toggleGroup.activeButton.IsActive = false;
-            // TODO: set command target direction
         }
 
         /// <summary>
