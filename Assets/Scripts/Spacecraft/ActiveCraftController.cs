@@ -1,4 +1,3 @@
-using Parts;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,7 +21,7 @@ public class ActiveCraftController : MonoBehaviour
     /// <summary>
     /// active command plugin on spacecraft
     /// </summary>
-    public CommandPlugin command { get; private set; }
+    public Parts.CommandPlugin command { get; private set; }
 
     /// <summary>
     /// throttle change rate per second
@@ -40,7 +39,7 @@ public class ActiveCraftController : MonoBehaviour
         {
             // TODO: implement proper logic for active command plugin
             foreach (var part in craft.parts)
-                if ((command = part.GetPlugin<CommandPlugin>()) != null) break;
+                if ((command = part.GetPlugin<Parts.CommandPlugin>()) != null) break;
         };
 
         _inputActions = new InputActions();

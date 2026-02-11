@@ -28,9 +28,14 @@ namespace Parts
         {
             get => _isAutoSteerEnabled;
             set {
-                if (autoSteerable) _isAutoSteerEnabled = value;
+                if (!autoSteerable) return;
+                if (_isAutoSteerEnabled == value) return;
+                _isAutoSteerEnabled = value;
+                OnAutoSteerToggled?.Invoke();
             }
         }
+
+        public event Action OnAutoSteerToggled;
 
         /// <summary>
         /// requested steering direction
