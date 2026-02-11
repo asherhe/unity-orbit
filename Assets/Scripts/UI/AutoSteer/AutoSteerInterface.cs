@@ -90,7 +90,7 @@ namespace UI
 
             if (holdMode != HoldMode.None && (_handleTween == null || !_handleTween.IsActive()))
                 _handle.Direction = GetDirection(holdMode);
-            
+
             // 0 radians on spacecraft is up
             _command.autosteerTarget = _handle.Direction - 0.5f * Mathf.PI;
         }
@@ -103,7 +103,15 @@ namespace UI
         private void ToggleInterface()
         {
             var isEnabled = _command.IsAutoSteerEnabled;
-            if (isEnabled) gameObject.SetActive(isEnabled);
+            if (isEnabled)
+            {
+                // we don't immediately enable the gameobject when autosteer is turned off
+                // that has to wait until after the tween completes
+                gameObject.SetActive(isEnabled);
+
+                // initialize steer direction to current orientation
+                _handle.Direction = (float)_craft.Newtonian.angle + 0.5f * Mathf.PI;
+            }
 
             _rectTransform.DOScale(isEnabled ? 1.0f : 0.0f, 0.25f)
                 .SetEase(isEnabled ? Ease.OutBack : Ease.InCubic)
