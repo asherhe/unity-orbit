@@ -2,6 +2,7 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UI;
 using UnityEditor;
 using UnityEngine;
 
@@ -88,6 +89,9 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _displayObject;
     private GameObject _surfaceObject;
     private GameObject _atmObject;
+    private GameObject _soiObject;
+    
+    private CelestialBodyLabel _mapLabel;
 
     [SerializeField]
     private GameObject _SOIPrefab;
@@ -154,6 +158,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     public double atmScaleHeight { get; private set; }
 
     /* rendering parameters */
+    public Color color { get; private set; }
     public Material surfaceMaterial { get; private set; }
     public Material atmMaterial { get; private set; }
     private List<Material> _dynamicMaterials;
@@ -170,6 +175,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         dayLength = _config.dayLength * 3600.0;
 
         satellites = new();
+
+        color = _config.color;
 
         if (_config.orbit != null)
         {
@@ -190,7 +197,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
             Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
             trajectory.name = $"Trajectory {this}";
-            trajectory.Color = _config.color;
+            trajectory.Color = color;
             // we can afford to do high quality for celestial trajectories because they are static
             trajectory.quality = 1e-6;
         }
@@ -308,11 +315,13 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         if (orbit != null)
         {
-            var soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
-            soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
+            _soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
+            _soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 
         SetDynamicMaterialProperties();
+
+        _mapLabel = MapLabelManager.Instance.AddCelestialBody(this);
     }
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
@@ -331,7 +340,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
         return parentPos + GetPosition();
     }
-
 
     private void FixedUpdate()
     {

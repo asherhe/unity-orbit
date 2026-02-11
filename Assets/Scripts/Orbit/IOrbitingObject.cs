@@ -10,7 +10,10 @@ namespace Orbit
     public interface IOrbitingObject
     {
         public OrbitState orbit { get; }
+        // GameObject this IOrbitingObject represents, if necessary
+        public GameObject gameObject { get; }
 
+        // orbital propagators
         public Vector2d GetPosition();
         public Vector2d GetVelocity();
         public StateVectors GetStateVectors();
