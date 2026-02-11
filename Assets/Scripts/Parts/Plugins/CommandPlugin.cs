@@ -18,7 +18,7 @@ namespace Parts
             public bool autoSteerable = false;
 
             // PID parameters
-            public float Kp, Ki, Kd;
+            public float Kp = 3.54f, Ki = 0.12f, Kd = 3.12f;
         }
 
         /// <summary>
