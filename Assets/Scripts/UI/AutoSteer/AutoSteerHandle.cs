@@ -98,7 +98,7 @@ namespace UI
         private void UpdateVisuals()
         {
             _rectTransform.anchoredPosition = _handleRadius * new Vector2(Mathf.Cos(Direction), Mathf.Sin(Direction));
-            _lineTransform.localEulerAngles = new Vector3(0.0f, 0.0f, Direction * 180.0f / Mathf.PI);
+            _lineTransform.localEulerAngles = new Vector3(0.0f, 0.0f, Direction * Mathf.Rad2Deg);
         }
     }
 }
