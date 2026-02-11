@@ -12,7 +12,7 @@ namespace UI
             var command = ActiveCraftController.Instance.command;
             var isAutoSteer = command != null && command.IsAutoSteerEnabled;
             var color = isAutoSteer ? "green" : "red";
-            return $"<color={color}>AUTO</color>";
+            return $"<color={color}>AUTO\n{(isAutoSteer ? "ON" : "OFF")}</color>";
         }
     }
 }
