@@ -82,7 +82,7 @@ namespace Parts
         protected override void OnFixedUpdate()
         {
             // no control allowed in high timewarp
-            if (Universe.Instance.Timewarp.TimewarpScale > 5.0)
+            if (Universe.Instance.Timewarp.TimewarpScale > 10.0)
             {
                 craft.Control.SteeringControl = 0;
                 if (Universe.Instance.Timewarp.TimewarpScale > 50.0) craft.Control.Throttle = 0;
@@ -97,7 +97,7 @@ namespace Parts
             {
                 var error = Mathf.Deg2Rad * Mathf.DeltaAngle((float)craft.Newtonian.angle * Mathf.Rad2Deg, autosteerTarget * Mathf.Rad2Deg);
                 if (float.IsNaN(_prevError)) _prevError = error;
-                var derivative = (error - _prevError) / Time.fixedDeltaTime;
+                var derivative = (error - _prevError) / (float)Universe.Instance.fixedDeltaTime;
 
                 var output = Kp * error + Ki * _integralError + Kd * derivative;
 
@@ -108,7 +108,7 @@ namespace Parts
                 // reset integral if we've reached target
                 if (error * _prevError < 0.0f) _integralError = 0.0f;
                 // only accumulate if steering is not maxed out (to prevent overcompensation of integral term)
-                if (Mathf.Abs(craft.Control.SteeringControl) < 1.0f) _integralError += error * Time.fixedDeltaTime;
+                if (Mathf.Abs(craft.Control.SteeringControl) < 1.0f) _integralError += error * (float)Universe.Instance.fixedDeltaTime;
 
                 _prevError = error;
                 this.error = error; this.derivative = derivative; integral = _integralError;
