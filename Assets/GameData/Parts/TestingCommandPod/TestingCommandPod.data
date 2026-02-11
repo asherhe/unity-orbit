@@ -15,5 +15,8 @@ plugins:
     sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
   CommandPlugin:
     autoSteerable: true
+    Kp: 3.54
+    Ki: 0.12
+    Kd: 3.12
   ReactionWheelPlugin:
     torque: 5 # kN m

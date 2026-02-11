@@ -61,11 +61,11 @@ namespace Parts
         /// <summary>
         /// previous PID error
         /// </summary>
-        private float _prevError;
+        private float _prevError = float.NaN;
         /// <summary>
         /// accumulated error since the last time we reached target
         /// </summary>
-        private float _integralError;
+        private float _integralError = 0.0f;
 
         public override void OnLoad(DataNode config)
         {
@@ -74,15 +74,18 @@ namespace Parts
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
             autoSteerable = _config.autoSteerable;
+            Kp = _config.Kp; Ki = _config.Ki; Kd = _config.Kd;
+
+            OnAutoSteerToggled += () => { _prevError = float.NaN; _integralError = 0.0f; };
         }
 
         protected override void OnFixedUpdate()
         {
             // no control allowed in high timewarp
-            if (Universe.Instance.Timewarp.TimewarpScale > 50.0)
+            if (Universe.Instance.Timewarp.TimewarpScale > 5.0)
             {
                 craft.Control.SteeringControl = 0;
-                craft.Control.Throttle = 0;
+                if (Universe.Instance.Timewarp.TimewarpScale > 50.0) craft.Control.Throttle = 0;
                 return;
             }
 
@@ -93,20 +96,26 @@ namespace Parts
             if (IsAutoSteerEnabled && SteeringInput == 0)
             {
                 var error = Mathf.Deg2Rad * Mathf.DeltaAngle((float)craft.Newtonian.angle * Mathf.Rad2Deg, autosteerTarget * Mathf.Rad2Deg);
+                if (float.IsNaN(_prevError)) _prevError = error;
                 var derivative = (error - _prevError) / Time.fixedDeltaTime;
-                // reset integral if we've reached target
-                if (error * _prevError < 0.0f) _integralError = 0.0f;
-                _integralError += error * Time.fixedDeltaTime;
 
                 var output = Kp * error + Ki * _integralError + Kd * derivative;
 
                 // adjust steering output to moment of inertia so that the same parameters work regardless of craft properties
                 // TODO: adjust for spacecraft's usable torque too
-                craft.Control.SteeringControl = (float)craft.Newtonian.momentOfInertia * output;
+                craft.Control.SteeringControl = (float)(craft.Newtonian.momentOfInertia / craft.Control.maxTorque) * output;
+
+                // reset integral if we've reached target
+                if (error * _prevError < 0.0f) _integralError = 0.0f;
+                // only accumulate if steering is not maxed out (to prevent overcompensation of integral term)
+                if (Mathf.Abs(craft.Control.SteeringControl) < 1.0f) _integralError += error * Time.fixedDeltaTime;
 
                 _prevError = error;
+                this.error = error; this.derivative = derivative; integral = _integralError;
             }
         }
+
+        public float error, derivative, integral;
 
         public void CutThrottle() => craft.Control.Throttle = 0.0f;
         public void FullThrottle() => craft.Control.Throttle = 1.0f;
