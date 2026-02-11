@@ -2856,7 +2856,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '<color=red>AUTO
+  m_text: '<color=grey>AUTO
 
     OFF</color>'
   m_isRightToLeft: 0
