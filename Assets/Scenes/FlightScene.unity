@@ -1451,7 +1451,7 @@ GameObject:
   m_Component:
   - component: {fileID: 555601239}
   - component: {fileID: 555601240}
-  m_Layer: 5
+  m_Layer: 6
   m_Name: Map Labels
   m_TagString: Untagged
   m_Icon: {fileID: 0}

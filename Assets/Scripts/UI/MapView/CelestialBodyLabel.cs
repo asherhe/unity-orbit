@@ -25,6 +25,7 @@ namespace UI
 
         private void Update()
         {
+            if (_body == null) return;
             if (_body.orbit == null) return;
             var r = (float)_body.radius;
             var a = (float)_body.orbit.a;

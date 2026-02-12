@@ -17,6 +17,23 @@ namespace UI
 
         private readonly HashSet<MapLabel> _labels = new();
 
+        protected override void Awake()
+        {
+            base.Awake();
+
+            MapViewManager.Instance.OnMapToggled += UpdateLabelVisibility;
+        }
+
+        private void Start()
+        {
+            UpdateLabelVisibility();
+        }
+
+        private void UpdateLabelVisibility()
+        {
+            gameObject.SetActive(MapViewManager.Instance.activeView == CameraView.MapView);
+        }
+
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)
         {
             var labelObject = Instantiate(_celestialBodyLabelPrefab, transform);

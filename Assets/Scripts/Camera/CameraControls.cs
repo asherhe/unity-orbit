@@ -27,7 +27,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
     {
         _inputActions = new InputActions();
         _inputActions.Camera.Enable();
-        MapViewManager.Instance.MapToggled += () =>
+        MapViewManager.Instance.OnMapToggled += () =>
         {
             isTweening = true;
             Camera.main.DOOrthoSize(zoomLevels[MapViewManager.Instance.activeView], 0.25f)
