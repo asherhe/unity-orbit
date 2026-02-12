@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class CelestialBodyLabel : MapLabel
+    public class CelestialBodyLabel : ObjectLabel
     {
         private RectTransform rectTransform;
         private Image _iconImage;
