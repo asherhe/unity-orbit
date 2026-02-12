@@ -2,8 +2,6 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UI;
-using UnityEditor;
 using UnityEngine;
 
 public class CelestialBody : MonoBehaviour, IOrbitingObject
@@ -91,7 +89,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _atmObject;
     private GameObject _soiObject;
     
-    private CelestialBodyLabel _mapLabel;
+    private UI.CelestialBodyLabel _mapLabel;
 
     [SerializeField]
     private GameObject _SOIPrefab;
@@ -195,7 +193,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
+            UI.Trajectory trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
             trajectory.name = $"Trajectory {this}";
             trajectory.Color = color;
             // we can afford to do high quality for celestial trajectories because they are static
@@ -321,7 +319,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         SetDynamicMaterialProperties();
 
-        _mapLabel = MapLabelManager.Instance.AddCelestialBody(this);
+        _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
     }
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);

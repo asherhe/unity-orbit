@@ -1,3 +1,4 @@
+using Orbit;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,16 +11,30 @@ namespace UI
     public class MapLabelManager : SingletonBehaviour<MapLabelManager>
     {
         [SerializeField]
-        private GameObject _labelPrefab;
+        private GameObject _celestialBodyLabelPrefab;
+        [SerializeField]
+        private GameObject _spacecraftLabelPrefab;
 
         private readonly HashSet<MapLabel> _labels = new();
 
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)
         {
-            var labelObject = Instantiate(_labelPrefab, transform);
+            var labelObject = Instantiate(_celestialBodyLabelPrefab, transform);
             labelObject.name = $"{body.bodyName} Label";
-            var label = labelObject.GetComponent<CelestialBodyLabel>();
-            label.Owner = body;
+            return (CelestialBodyLabel)SetupObjectLabel(labelObject, body);
+        }
+
+        public SpacecraftLabel AddSpacecraft(Spacecraft craft)
+        {
+            var labelObject = Instantiate(_spacecraftLabelPrefab, transform);
+            labelObject.name = $"{craft.craftName} Label";
+            return (SpacecraftLabel)SetupObjectLabel(labelObject, craft);
+        }
+
+        private ObjectLabel SetupObjectLabel(GameObject labelObject, IOrbitingObject obj)
+        {
+            var label = labelObject.GetComponent<ObjectLabel>();
+            label.Owner = obj;
             _labels.Add(label);
             return label;
         }

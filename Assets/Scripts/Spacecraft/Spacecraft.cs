@@ -10,11 +10,6 @@ using Vertx.Debugging;
 
 public class Spacecraft : MonoBehaviour, IOrbitingObject
 {
-    /// <summary>
-    /// invoked when a spacecraft instance is loaded from config
-    /// </summary>
-    public static event Action<Spacecraft> OnSpacecraftLoaded;
-
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
     [Serializable]
@@ -67,6 +62,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     private PatchedConicManager _patchManager;
     private SOIEscapeTransition _soiEscape;
     private SOIInterceptTransition _soiIntercept;
+
+    private UI.SpacecraftLabel _mapLabel;
 
     public CelestialBody body { get => orbit.body; }
 
@@ -141,6 +138,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _soiIntercept = _patchManager.Patches[0].soiIntercept;
         _patchManager.RecalculatePatches();
 
+        _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
+
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
         // so we wrap Part.OnLoadAsync in a function that returns the part itself
@@ -202,7 +201,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         foreach (var part in parts) part.OnCraftPartsLoaded();
 
         OnLoaded?.Invoke();
-        OnSpacecraftLoaded?.Invoke(this);
     }
 
     /// <summary>
