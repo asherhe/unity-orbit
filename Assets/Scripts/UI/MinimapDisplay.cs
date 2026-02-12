@@ -7,20 +7,22 @@ namespace UI
 {
     public class MinimapDisplay : MonoBehaviour
     {
+        public bool IsMinimapActive { get => MapViewManager.Instance.activeView == CameraView.FlightView; }
+
         private RectTransform _rectTransform;
 
         private void Awake()
         {
             _rectTransform = GetComponent<RectTransform>();
-            MapViewManager.Instance.MapToggled += ToggleMinimap;
+            MapViewManager.Instance.OnMapToggled += ToggleMinimap;
         }
 
         private void ToggleMinimap()
         {
             _rectTransform.DOAnchorPosX(
-                MapViewManager.Instance.activeView == CameraView.MapView ? 200.0f : -10.0f,
+               IsMinimapActive ? -10.0f : 200.0f,
                 0.25f
-            ).SetEase(MapViewManager.Instance.activeView == CameraView.MapView ? Ease.InCubic : Ease.OutCubic);
+            ).SetEase(IsMinimapActive ? Ease.OutCubic : Ease.InCubic);
         }
     }
 }

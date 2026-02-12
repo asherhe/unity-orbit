@@ -72,68 +72,8 @@ using UnityEngine.InputSystem.Utilities;
 /// }
 /// </code>
 /// </example>
-/// <summary>
-/// Provides programmatic access to <see cref="InputActionAsset" />, <see cref="InputActionMap" />, <see cref="InputAction" /> and <see cref="InputControlScheme" /> instances defined in asset "Assets/Input/InputActions.inputactions".
-/// </summary>
-/// <remarks>
-/// This class is source generated and any manual edits will be discarded if the associated asset is reimported or modified.
-/// </remarks>
-/// <example>
-/// <code>
-/// using namespace UnityEngine;
-/// using UnityEngine.InputSystem;
-///
-/// // Example of using an InputActionMap named "Player" from a UnityEngine.MonoBehaviour implementing callback interface.
-/// public class Example : MonoBehaviour, MyActions.IPlayerActions
-/// {
-///     private MyActions_Actions m_Actions;                  // Source code representation of asset.
-///     private MyActions_Actions.PlayerActions m_Player;     // Source code representation of action map.
-///
-///     void Awake()
-///     {
-///         m_Actions = new MyActions_Actions();              // Create asset object.
-///         m_Player = m_Actions.Player;                      // Extract action map object.
-///         m_Player.AddCallbacks(this);                      // Register callback interface IPlayerActions.
-///     }
-///
-///     void OnDestroy()
-///     {
-///         m_Actions.Dispose();                              // Destroy asset object.
-///     }
-///
-///     void OnEnable()
-///     {
-///         m_Player.Enable();                                // Enable all actions within map.
-///     }
-///
-///     void OnDisable()
-///     {
-///         m_Player.Disable();                               // Disable all actions within map.
-///     }
-///
-///     #region Interface implementation of MyActions.IPlayerActions
-///
-///     // Invoked when "Move" action is either started, performed or canceled.
-///     public void OnMove(InputAction.CallbackContext context)
-///     {
-///         Debug.Log($"OnMove: {context.ReadValue&lt;Vector2&gt;()}");
-///     }
-///
-///     // Invoked when "Attack" action is either started, performed or canceled.
-///     public void OnAttack(InputAction.CallbackContext context)
-///     {
-///         Debug.Log($"OnAttack: {context.ReadValue&lt;float&gt;()}");
-///     }
-///
-///     #endregion
-/// }
-/// </code>
-/// </example>
-public partial class @InputActions : IInputActionCollection2, IDisposable
+public partial class @InputActions: IInputActionCollection2, IDisposable
 {
-    /// <summary>
-    /// Provides access to the underlying asset instance.
-    /// </summary>
     /// <summary>
     /// Provides access to the underlying asset instance.
     /// </summary>
@@ -142,14 +82,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Constructs a new instance.
     /// </summary>
-
-    /// <summary>
-    /// Constructs a new instance.
-    /// </summary>
     public @InputActions()
     {
         asset = InputActionAsset.FromJson(@"{
-    ""version"": 1,
     ""name"": ""InputActions"",
     ""maps"": [
         {
@@ -178,7 +113,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""name"": ""ThrottleCut"",
                     ""type"": ""Button"",
                     ""id"": ""73107268-d24c-4d71-b41d-e43719b05884"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -187,7 +122,16 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""name"": ""ThrottleFull"",
                     ""type"": ""Button"",
                     ""id"": ""d99893bb-0542-413e-bca3-36a480414858"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AutoSteer"",
+                    ""type"": ""Button"",
+                    ""id"": ""ebd5ddf5-57e4-4fc7-bc23-e4548d750449"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -314,6 +258,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""action"": ""ThrottleFull"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""40a451ee-7d24-464d-b7d7-9ff884331ba4"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""AutoSteer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -325,7 +280,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""name"": ""WarpIncrease"",
                     ""type"": ""Button"",
                     ""id"": ""ac70b837-97c3-4a77-926f-ab1127e708ab"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -402,7 +357,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                     ""name"": ""ToggleMap"",
                     ""type"": ""Button"",
                     ""id"": ""6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -459,6 +414,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         m_Flight_Throttle = m_Flight.FindAction("Throttle", throwIfNotFound: true);
         m_Flight_ThrottleCut = m_Flight.FindAction("ThrottleCut", throwIfNotFound: true);
         m_Flight_ThrottleFull = m_Flight.FindAction("ThrottleFull", throwIfNotFound: true);
+        m_Flight_AutoSteer = m_Flight.FindAction("AutoSteer", throwIfNotFound: true);
         // Warp
         m_Warp = asset.FindActionMap("Warp", throwIfNotFound: true);
         m_Warp_WarpIncrease = m_Warp.FindAction("WarpIncrease", throwIfNotFound: true);
@@ -480,22 +436,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Destroys this asset and all associated <see cref="InputAction"/> instances.
     /// </summary>
-    ~@InputActions()
-    {
-        UnityEngine.Debug.Assert(!m_Flight.enabled, "This will cause a leak and performance issues, InputActions.Flight.Disable() has not been called.");
-        UnityEngine.Debug.Assert(!m_Warp.enabled, "This will cause a leak and performance issues, InputActions.Warp.Disable() has not been called.");
-        UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, InputActions.Camera.Disable() has not been called.");
-    }
-
-    /// <summary>
-    /// Destroys this asset and all associated <see cref="InputAction"/> instances.
-    /// </summary>
     public void Dispose()
     {
         UnityEngine.Object.Destroy(asset);
     }
 
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.bindingMask" />
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.bindingMask" />
     public InputBinding? bindingMask
     {
@@ -504,7 +449,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
 
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.devices" />
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.devices" />
     public ReadOnlyArray<InputDevice>? devices
     {
         get => asset.devices;
@@ -512,10 +456,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
 
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.controlSchemes" />
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.controlSchemes" />
     public ReadOnlyArray<InputControlScheme> controlSchemes => asset.controlSchemes;
 
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Contains(InputAction)" />
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Contains(InputAction)" />
     public bool Contains(InputAction action)
     {
@@ -523,13 +465,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
 
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.GetEnumerator()" />
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.GetEnumerator()" />
     public IEnumerator<InputAction> GetEnumerator()
     {
         return asset.GetEnumerator();
     }
 
-    /// <inheritdoc cref="IEnumerable.GetEnumerator()" />
     /// <inheritdoc cref="IEnumerable.GetEnumerator()" />
     IEnumerator IEnumerable.GetEnumerator()
     {
@@ -537,13 +477,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
 
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Enable()" />
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Enable()" />
     public void Enable()
     {
         asset.Enable();
     }
 
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Disable()" />
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.Disable()" />
     public void Disable()
     {
@@ -551,17 +489,14 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     }
 
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.bindings" />
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.bindings" />
     public IEnumerable<InputBinding> bindings => asset.bindings;
 
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.FindAction(string, bool)" />
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.FindAction(string, bool)" />
     public InputAction FindAction(string actionNameOrId, bool throwIfNotFound = false)
     {
         return asset.FindAction(actionNameOrId, throwIfNotFound);
     }
 
-    /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.FindBinding(InputBinding, out InputAction)" />
     /// <inheritdoc cref="UnityEngine.InputSystem.InputActionAsset.FindBinding(InputBinding, out InputAction)" />
     public int FindBinding(InputBinding bindingMask, out InputAction action)
     {
@@ -575,9 +510,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     private readonly InputAction m_Flight_Throttle;
     private readonly InputAction m_Flight_ThrottleCut;
     private readonly InputAction m_Flight_ThrottleFull;
-    /// <summary>
-    /// Provides access to input actions defined in input action map "Flight".
-    /// </summary>
+    private readonly InputAction m_Flight_AutoSteer;
     /// <summary>
     /// Provides access to input actions defined in input action map "Flight".
     /// </summary>
@@ -588,14 +521,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
         /// </summary>
-
-        /// <summary>
-        /// Construct a new instance of the input action map wrapper class.
-        /// </summary>
         public FlightActions(@InputActions wrapper) { m_Wrapper = wrapper; }
-        /// <summary>
-        /// Provides access to the underlying input action "Flight/Steering".
-        /// </summary>
         /// <summary>
         /// Provides access to the underlying input action "Flight/Steering".
         /// </summary>
@@ -603,13 +529,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action "Flight/Throttle".
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action "Flight/Throttle".
-        /// </summary>
         public InputAction @Throttle => m_Wrapper.m_Flight_Throttle;
-        /// <summary>
-        /// Provides access to the underlying input action "Flight/ThrottleCut".
-        /// </summary>
         /// <summary>
         /// Provides access to the underlying input action "Flight/ThrottleCut".
         /// </summary>
@@ -617,41 +537,25 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action "Flight/ThrottleFull".
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action "Flight/ThrottleFull".
-        /// </summary>
         public InputAction @ThrottleFull => m_Wrapper.m_Flight_ThrottleFull;
         /// <summary>
-        /// Provides access to the underlying input action map instance.
+        /// Provides access to the underlying input action "Flight/AutoSteer".
         /// </summary>
+        public InputAction @AutoSteer => m_Wrapper.m_Flight_AutoSteer;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Flight; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
         public void Disable() { Get().Disable(); }
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
         /// Implicitly converts an <see ref="FlightActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        /// <summary>
-        /// Implicitly converts an <see ref="FlightActions" /> to an <see ref="InputActionMap" /> instance.
-        /// </summary>
         public static implicit operator InputActionMap(FlightActions set) { return set.Get(); }
-        /// <summary>
-        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <param name="instance">Callback instance.</param>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
-        /// </remarks>
-        /// <seealso cref="FlightActions" />
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -676,15 +580,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
             @ThrottleFull.started += instance.OnThrottleFull;
             @ThrottleFull.performed += instance.OnThrottleFull;
             @ThrottleFull.canceled += instance.OnThrottleFull;
+            @AutoSteer.started += instance.OnAutoSteer;
+            @AutoSteer.performed += instance.OnAutoSteer;
+            @AutoSteer.canceled += instance.OnAutoSteer;
         }
 
-        /// <summary>
-        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <remarks>
-        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
-        /// </remarks>
-        /// <seealso cref="FlightActions" />
         /// <summary>
         /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -706,12 +606,11 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
             @ThrottleFull.started -= instance.OnThrottleFull;
             @ThrottleFull.performed -= instance.OnThrottleFull;
             @ThrottleFull.canceled -= instance.OnThrottleFull;
+            @AutoSteer.started -= instance.OnAutoSteer;
+            @AutoSteer.performed -= instance.OnAutoSteer;
+            @AutoSteer.canceled -= instance.OnAutoSteer;
         }
 
-        /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="FlightActions.UnregisterCallbacks(IFlightActions)" />.
-        /// </summary>
-        /// <seealso cref="FlightActions.UnregisterCallbacks(IFlightActions)" />
         /// <summary>
         /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="FlightActions.UnregisterCallbacks(IFlightActions)" />.
         /// </summary>
@@ -722,15 +621,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
                 UnregisterCallbacks(instance);
         }
 
-        /// <summary>
-        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
-        /// </remarks>
-        /// <seealso cref="FlightActions.AddCallbacks(IFlightActions)" />
-        /// <seealso cref="FlightActions.RemoveCallbacks(IFlightActions)" />
-        /// <seealso cref="FlightActions.UnregisterCallbacks(IFlightActions)" />
         /// <summary>
         /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
         /// </summary>
@@ -751,9 +641,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Provides a new <see cref="FlightActions" /> instance referencing this action map.
     /// </summary>
-    /// <summary>
-    /// Provides a new <see cref="FlightActions" /> instance referencing this action map.
-    /// </summary>
     public FlightActions @Flight => new FlightActions(this);
 
     // Warp
@@ -765,16 +652,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Provides access to input actions defined in input action map "Warp".
     /// </summary>
-    /// <summary>
-    /// Provides access to input actions defined in input action map "Warp".
-    /// </summary>
     public struct WarpActions
     {
         private @InputActions m_Wrapper;
-
-        /// <summary>
-        /// Construct a new instance of the input action map wrapper class.
-        /// </summary>
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
@@ -783,13 +663,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action "Warp/WarpIncrease".
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action "Warp/WarpIncrease".
-        /// </summary>
         public InputAction @WarpIncrease => m_Wrapper.m_Warp_WarpIncrease;
-        /// <summary>
-        /// Provides access to the underlying input action "Warp/WarpDecrease".
-        /// </summary>
         /// <summary>
         /// Provides access to the underlying input action "Warp/WarpDecrease".
         /// </summary>
@@ -797,41 +671,21 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action "Warp/WarpCancel".
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action "Warp/WarpCancel".
-        /// </summary>
         public InputAction @WarpCancel => m_Wrapper.m_Warp_WarpCancel;
-        /// <summary>
-        /// Provides access to the underlying input action map instance.
-        /// </summary>
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Warp; }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
         public void Disable() { Get().Disable(); }
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
         /// Implicitly converts an <see ref="WarpActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        /// <summary>
-        /// Implicitly converts an <see ref="WarpActions" /> to an <see ref="InputActionMap" /> instance.
-        /// </summary>
         public static implicit operator InputActionMap(WarpActions set) { return set.Get(); }
-        /// <summary>
-        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <param name="instance">Callback instance.</param>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
-        /// </remarks>
-        /// <seealso cref="WarpActions" />
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -862,13 +716,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
         /// <seealso cref="WarpActions" />
-        /// <summary>
-        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <remarks>
-        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
-        /// </remarks>
-        /// <seealso cref="WarpActions" />
         private void UnregisterCallbacks(IWarpActions instance)
         {
             @WarpIncrease.started -= instance.OnWarpIncrease;
@@ -886,25 +733,12 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="WarpActions.UnregisterCallbacks(IWarpActions)" />.
         /// </summary>
         /// <seealso cref="WarpActions.UnregisterCallbacks(IWarpActions)" />
-        /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="WarpActions.UnregisterCallbacks(IWarpActions)" />.
-        /// </summary>
-        /// <seealso cref="WarpActions.UnregisterCallbacks(IWarpActions)" />
         public void RemoveCallbacks(IWarpActions instance)
         {
             if (m_Wrapper.m_WarpActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        /// <summary>
-        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
-        /// </remarks>
-        /// <seealso cref="WarpActions.AddCallbacks(IWarpActions)" />
-        /// <seealso cref="WarpActions.RemoveCallbacks(IWarpActions)" />
-        /// <seealso cref="WarpActions.UnregisterCallbacks(IWarpActions)" />
         /// <summary>
         /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
         /// </summary>
@@ -925,9 +759,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Provides a new <see cref="WarpActions" /> instance referencing this action map.
     /// </summary>
-    /// <summary>
-    /// Provides a new <see cref="WarpActions" /> instance referencing this action map.
-    /// </summary>
     public WarpActions @Warp => new WarpActions(this);
 
     // Camera
@@ -938,16 +769,9 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Provides access to input actions defined in input action map "Camera".
     /// </summary>
-    /// <summary>
-    /// Provides access to input actions defined in input action map "Camera".
-    /// </summary>
     public struct CameraActions
     {
         private @InputActions m_Wrapper;
-
-        /// <summary>
-        /// Construct a new instance of the input action map wrapper class.
-        /// </summary>
 
         /// <summary>
         /// Construct a new instance of the input action map wrapper class.
@@ -956,13 +780,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action "Camera/Zoom".
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action "Camera/Zoom".
-        /// </summary>
         public InputAction @Zoom => m_Wrapper.m_Camera_Zoom;
-        /// <summary>
-        /// Provides access to the underlying input action "Camera/ToggleMap".
-        /// </summary>
         /// <summary>
         /// Provides access to the underlying input action "Camera/ToggleMap".
         /// </summary>
@@ -970,34 +788,17 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
-        /// <summary>
-        /// Provides access to the underlying input action map instance.
-        /// </summary>
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
         public void Enable() { Get().Enable(); }
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
         public void Disable() { Get().Disable(); }
-        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
         public bool enabled => Get().enabled;
         /// <summary>
         /// Implicitly converts an <see ref="CameraActions" /> to an <see ref="InputActionMap" /> instance.
         /// </summary>
-        /// <summary>
-        /// Implicitly converts an <see ref="CameraActions" /> to an <see ref="InputActionMap" /> instance.
-        /// </summary>
         public static implicit operator InputActionMap(CameraActions set) { return set.Get(); }
-        /// <summary>
-        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <param name="instance">Callback instance.</param>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
-        /// </remarks>
-        /// <seealso cref="CameraActions" />
         /// <summary>
         /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
         /// </summary>
@@ -1025,13 +826,6 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
         /// </remarks>
         /// <seealso cref="CameraActions" />
-        /// <summary>
-        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
-        /// </summary>
-        /// <remarks>
-        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
-        /// </remarks>
-        /// <seealso cref="CameraActions" />
         private void UnregisterCallbacks(ICameraActions instance)
         {
             @Zoom.started -= instance.OnZoom;
@@ -1046,25 +840,12 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CameraActions.UnregisterCallbacks(ICameraActions)" />.
         /// </summary>
         /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
-        /// <summary>
-        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="CameraActions.UnregisterCallbacks(ICameraActions)" />.
-        /// </summary>
-        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
         public void RemoveCallbacks(ICameraActions instance)
         {
             if (m_Wrapper.m_CameraActionsCallbackInterfaces.Remove(instance))
                 UnregisterCallbacks(instance);
         }
 
-        /// <summary>
-        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
-        /// </summary>
-        /// <remarks>
-        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
-        /// </remarks>
-        /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
-        /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
-        /// <seealso cref="CameraActions.UnregisterCallbacks(ICameraActions)" />
         /// <summary>
         /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
         /// </summary>
@@ -1085,15 +866,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// <summary>
     /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
     /// </summary>
-    /// <summary>
-    /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
-    /// </summary>
     public CameraActions @Camera => new CameraActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
-    /// <summary>
-    /// Provides access to the input control scheme.
-    /// </summary>
-    /// <seealso cref="UnityEngine.InputSystem.InputControlScheme" />
     /// <summary>
     /// Provides access to the input control scheme.
     /// </summary>
@@ -1111,19 +885,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
     /// </summary>
     /// <seealso cref="FlightActions.AddCallbacks(IFlightActions)" />
     /// <seealso cref="FlightActions.RemoveCallbacks(IFlightActions)" />
-    /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Flight" which allows adding and removing callbacks.
-    /// </summary>
-    /// <seealso cref="FlightActions.AddCallbacks(IFlightActions)" />
-    /// <seealso cref="FlightActions.RemoveCallbacks(IFlightActions)" />
     public interface IFlightActions
     {
-        /// <summary>
-        /// Method invoked when associated input action "Steering" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         /// <summary>
         /// Method invoked when associated input action "Steering" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1137,19 +900,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        /// <summary>
-        /// Method invoked when associated input action "Throttle" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottle(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "ThrottleCut" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         /// <summary>
         /// Method invoked when associated input action "ThrottleCut" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1163,19 +914,15 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnThrottleFull(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ThrottleFull" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "AutoSteer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        void OnThrottleFull(InputAction.CallbackContext context);
+        void OnAutoSteer(InputAction.CallbackContext context);
     }
-    /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Warp" which allows adding and removing callbacks.
-    /// </summary>
-    /// <seealso cref="WarpActions.AddCallbacks(IWarpActions)" />
-    /// <seealso cref="WarpActions.RemoveCallbacks(IWarpActions)" />
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Warp" which allows adding and removing callbacks.
     /// </summary>
@@ -1189,19 +936,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        /// <summary>
-        /// Method invoked when associated input action "WarpIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWarpIncrease(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "WarpDecrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         /// <summary>
         /// Method invoked when associated input action "WarpDecrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
@@ -1215,19 +950,8 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        /// <summary>
-        /// Method invoked when associated input action "WarpCancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWarpCancel(InputAction.CallbackContext context);
     }
-    /// <summary>
-    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
-    /// </summary>
-    /// <seealso cref="CameraActions.AddCallbacks(ICameraActions)" />
-    /// <seealso cref="CameraActions.RemoveCallbacks(ICameraActions)" />
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Camera" which allows adding and removing callbacks.
     /// </summary>
@@ -1241,19 +965,7 @@ public partial class @InputActions : IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
-        /// <summary>
-        /// Method invoked when associated input action "Zoom" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoom(InputAction.CallbackContext context);
-        /// <summary>
-        /// Method invoked when associated input action "ToggleMap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
-        /// </summary>
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
-        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         /// <summary>
         /// Method invoked when associated input action "ToggleMap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

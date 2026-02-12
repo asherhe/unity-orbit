@@ -25,6 +25,9 @@ namespace Parts
 
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
             _torque = _config.torque * 1000.0;
+
+            // TODO: this is a bit of a hack, implement a more complete system for tallying mass, torque, thrust, etc.
+            craft.Control.maxTorque += _torque;
         }
 
         protected override void OnFixedUpdate()

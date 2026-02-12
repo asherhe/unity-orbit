@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 37122a0c4a5b80546b8ab2c947e423a7
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - _celestialBodyLabelPrefab: {fileID: 5451008072283253895, guid: 642ae6ba9f16e1847bc51aeda572aac3, type: 3}
+  - _spacecraftLabelPrefab: {fileID: 5451008072283253895, guid: 6559770a193d6ba4bbc2a1043a06140f, type: 3}
+  executionOrder: -47
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

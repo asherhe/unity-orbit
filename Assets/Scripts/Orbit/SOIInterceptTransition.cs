@@ -9,7 +9,7 @@ namespace Orbit
     /// <summary>
     /// deals with the detection and handling of intercepts with celestial bodies
     /// </summary>
-    public class SOIInterceptTransition : OrbitTransition
+    public class SOIInterceptTransition : OrbitTransitionHandler
     {
         private UniversalPropagator _prop;
         private EncounterCalculator _enc;
@@ -29,39 +29,44 @@ namespace Orbit
         /// </summary>
         public CelestialBody nextCaptureBody { get; private set; }
 
-        protected override TransitionResult CalcTransitionResult()
+        protected override TransitionResult CalcTransitionResult(double UT)
         {
             nextCapture = null; nextCaptureBody = null;
 
-            EncounterCalculator.Encounter captureEncounter = null;
+            EncounterCalculator.Encounter? earliestEnc = null;
+            double expiry = UT + orbit.period; // TODO: integrate with dynamic bound readjustment
             foreach (var satellite in orbit.body.satellites)
             {
-                var encounters = _enc.GetEncounters(satellite.orbit, Universe.Instance.UT);
+                // TODO: time bounds only work for elliptical so far
+                if (orbit.Shape != OrbitShape.Ellipse) return TransitionResult.None;
+                var encounters = _enc.GetEncounters(satellite.orbit, UT, UT + orbit.period);
                 foreach (var e in encounters)
-                    if (e.distance < satellite.soiRadius && (captureEncounter == null || e.state.time < captureEncounter.state.time))
+                {
+                    if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))
                     {
-                        captureEncounter = e;
-                        captureEncounter.orbitingObject = satellite;
+                        earliestEnc = e;
                     }
+                }
             }
-            if (captureEncounter == null) return TransitionResult.None;
+            if (!earliestEnc.HasValue) return TransitionResult.ExpiresAt(expiry);
+            var captureEncounter = earliestEnc.Value;
 
-            var b = (CelestialBody)captureEncounter.orbitingObject;
+            var body = (CelestialBody)captureEncounter.other.Owner;
             var t = captureEncounter.state.time;
 
-            // estimated time to traverse the SOI radius
-            var soiTrav = b.soiRadius / captureEncounter.state.vel.Magnitude;
+            // estimated time to traverse the SOI radius, doubled for extra wiggle room
+            var soiTrav = 2 * body.soiRadius / (captureEncounter.state.vel - captureEncounter.otherState.vel).Magnitude;
 
             // distance to SOI edge
-            double SOIDistance(double t) => (_prop.GetPosition(t) - b.GetPosition(t)).Magnitude - b.soiRadius;
+            double SOIDistance(double t) => (_prop.GetPosition(t) - body.GetPosition(t)).Magnitude - body.soiRadius;
 
             double captureTime = 0;
             try
             {
                 captureTime = Brent.FindRoot(
                     SOIDistance,
-                    t - 2 * soiTrav, t,
-                    accuracy: 1e-12,
+                    t - soiTrav, t,
+                    accuracy: Math.Abs(t) * 1e-10,
                     maxIterations: 100
                 );
             }
@@ -71,12 +76,12 @@ namespace Orbit
             }
 
             nextCapture = _prop.GetStateVectors(captureTime);
-            var bodyState = b.GetStateVectors(captureTime);
+            var bodyState = body.GetStateVectors(captureTime);
             return new TransitionResult(
                 nextCapture.Value, new OrbitState(
                     nextCapture?.pos - bodyState.pos,
-                    nextCapture?.vel - bodyState.pos,
-                    captureTime, b
+                    nextCapture?.vel - bodyState.vel,
+                    captureTime, body
                 )
             );
         }

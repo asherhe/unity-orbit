@@ -27,7 +27,7 @@
                     "name": "ThrottleCut",
                     "type": "Button",
                     "id": "73107268-d24c-4d71-b41d-e43719b05884",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -36,7 +36,16 @@
                     "name": "ThrottleFull",
                     "type": "Button",
                     "id": "d99893bb-0542-413e-bca3-36a480414858",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "AutoSteer",
+                    "type": "Button",
+                    "id": "ebd5ddf5-57e4-4fc7-bc23-e4548d750449",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -163,6 +172,17 @@
                     "action": "ThrottleFull",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "40a451ee-7d24-464d-b7d7-9ff884331ba4",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard + Mouse",
+                    "action": "AutoSteer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -174,7 +194,7 @@
                     "name": "WarpIncrease",
                     "type": "Button",
                     "id": "ac70b837-97c3-4a77-926f-ab1127e708ab",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -251,7 +271,7 @@
                     "name": "ToggleMap",
                     "type": "Button",
                     "id": "6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false

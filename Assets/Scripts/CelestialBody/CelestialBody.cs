@@ -2,7 +2,6 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class CelestialBody : MonoBehaviour, IOrbitingObject
@@ -88,6 +87,9 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _displayObject;
     private GameObject _surfaceObject;
     private GameObject _atmObject;
+    private GameObject _soiObject;
+    
+    private UI.CelestialBodyLabel _mapLabel;
 
     [SerializeField]
     private GameObject _SOIPrefab;
@@ -154,6 +156,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     public double atmScaleHeight { get; private set; }
 
     /* rendering parameters */
+    public Color color { get; private set; }
     public Material surfaceMaterial { get; private set; }
     public Material atmMaterial { get; private set; }
     private List<Material> _dynamicMaterials;
@@ -171,6 +174,8 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         satellites = new();
 
+        color = _config.color;
+
         if (_config.orbit != null)
         {
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
@@ -183,13 +188,14 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
+            orbit.Owner = this;
             _prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
 
-            Trajectory trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
+            UI.Trajectory trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
             trajectory.name = $"Trajectory {this}";
-            trajectory.Color = _config.color;
+            trajectory.Color = color;
             // we can afford to do high quality for celestial trajectories because they are static
             trajectory.quality = 1e-6;
         }
@@ -307,11 +313,13 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         if (orbit != null)
         {
-            var soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
-            soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
+            _soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
+            _soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 
         SetDynamicMaterialProperties();
+
+        _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
     }
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
@@ -330,7 +338,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
         return parentPos + GetPosition();
     }
-
 
     private void FixedUpdate()
     {

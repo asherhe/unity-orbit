@@ -3,16 +3,13 @@ using Parts;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using Vertx.Debugging;
 
 public class Spacecraft : MonoBehaviour, IOrbitingObject
 {
-    /// <summary>
-    /// invoked when a spacecraft instance is loaded from config
-    /// </summary>
-    public static event Action<Spacecraft> OnSpacecraftLoaded;
-
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
     [Serializable]
@@ -62,11 +59,13 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public OrbitState orbit { get; private set; }
     private IOrbitPropagator _prop;
-    private OrbitTransitionManager _transitionManager;
+    private PatchedConicManager _patchManager;
     private SOIEscapeTransition _soiEscape;
+    private SOIInterceptTransition _soiIntercept;
+
+    private UI.SpacecraftLabel _mapLabel;
 
     public CelestialBody body { get => orbit.body; }
-    private Trajectory _trajectory;
 
     public double Altitude { get => GetPosition().Magnitude - body.radius; }
 
@@ -130,21 +129,16 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent
         );
+        orbit.Owner = this;
+
         _prop = new UniversalPropagator(orbit);
 
-        _transitionManager = new OrbitTransitionManager(orbit);
-        _transitionManager.Add(_soiEscape = new SOIEscapeTransition(orbit));
-        //_transitionManager.Add(new SOIInterceptTransition(orbit));
-        _transitionManager.CheckTransitions();
+        _patchManager = new PatchedConicManager(orbit);
+        _soiEscape = _patchManager.Patches[0].soiEscape;
+        _soiIntercept = _patchManager.Patches[0].soiIntercept;
+        _patchManager.RecalculatePatches();
 
-        // we bind this callback BEFORE we instantiate _trajectory so that the
-        // new orbit bounds are immediately updated in the current tick
-        orbit.OnStateChanged += UpdateTrajectoryBounds;
-
-        _trajectory = TrajectoryManager.Instance.AddTrajectory(orbit);
-        _trajectory.name = $"Trajectory {this}";
-
-        UpdateTrajectoryBounds();
+        _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -207,7 +201,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         foreach (var part in parts) part.OnCraftPartsLoaded();
 
         OnLoaded?.Invoke();
-        OnSpacecraftLoaded?.Invoke(this);
     }
 
     /// <summary>
@@ -227,36 +220,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
-    /// <summary>
-    /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
-    /// </summary>
-    private void UpdateTrajectoryBounds()
-    {
-        // orbit direction
-        var dir = Math.Sign(orbit.h);
-        // true anomalies, timewise - nu1 happens first, then nu2
-        double nu1 = dir * double.NegativeInfinity, nu2 = dir * double.PositiveInfinity;
-
-        // adjust nu bounds, accounting for orbit direction
-        double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
-        double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
-
-        if (_soiEscape.HasTransition)
-        {
-            var nuCapt = orbit.CalcNu(_soiEscape.SOICapture?.pos);
-            SetNu1(nuCapt);
-            SetNu2(-nuCapt);
-        }
-        if (_transitionManager.HasTransition)
-        {
-            var nuTrans = orbit.CalcNu(_transitionManager.NextTransition.State.pos);
-            SetNu2(nuTrans);
-        }
-
-        if (dir == 1) { _trajectory.nuMin = nu1; _trajectory.nuMax = nu2; }
-        else { _trajectory.nuMin = nu2; _trajectory.nuMax = nu1; }
-    }
-
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
     public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
     public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
@@ -266,7 +229,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
-        _transitionManager.UpdateOrbit();
+        _patchManager.Update(Universe.Instance.UT);
     }
 
     private void Update()

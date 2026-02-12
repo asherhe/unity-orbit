@@ -37,7 +37,7 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
     /// <summary>
     /// gets invoked when map view is toggled
     /// </summary>
-    public event Action MapToggled;
+    public event Action OnMapToggled;
 
     protected override void Awake()
     {
@@ -64,7 +64,7 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
         activeMapCamera = Camera.main;
         Camera.main.cullingMask = mapCullingMask;
 
-        MapToggled.Invoke();
+        OnMapToggled.Invoke();
     }
 
     public void EnterFlightView()
@@ -75,6 +75,6 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
         activeMapCamera = minimapCamera;
         Camera.main.cullingMask = flightCullingMask;
 
-        MapToggled.Invoke();
+        OnMapToggled.Invoke();
     }
 }
