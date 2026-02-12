@@ -11,6 +11,9 @@ namespace UI
         /// </summary>
         private Spacecraft _craft;
 
+        [SerializeField]
+        private RectTransform _headingIndicator;
+
         protected override void Awake()
         {
             // run this before base.awake so that colors are updated before UpdateVisuals()
@@ -22,6 +25,12 @@ namespace UI
             base.Awake();
         }
 
+        private void Update()
+        {
+            if (_craft == null) return;
+            var heading = (float)_craft.Newtonian.angle * Mathf.Rad2Deg;
+            _headingIndicator.localEulerAngles = Vector3.forward * (heading + 45.0f);
+        }
         protected override void UpdateVisuals()
         {
             base.UpdateVisuals();
