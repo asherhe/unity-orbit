@@ -1451,7 +1451,6 @@ GameObject:
   m_Component:
   - component: {fileID: 555601239}
   - component: {fileID: 555601240}
-  - component: {fileID: 555601241}
   m_Layer: 5
   m_Name: Map Labels
   m_TagString: Untagged
@@ -1490,22 +1489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37122a0c4a5b80546b8ab2c947e423a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _labelPrefab: {fileID: 0}
---- !u!114 &555601241
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 555601238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ec0bd006ab96b94c873a4573e8cc151, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  follow: {fileID: 0}
-  shouldFollowPosition: 1
-  shouldFollowRotation: 0
+  _labelPrefab: {fileID: 5451008072283253895, guid: 642ae6ba9f16e1847bc51aeda572aac3, type: 3}
 --- !u!1 &579806096
 GameObject:
   m_ObjectHideFlags: 0

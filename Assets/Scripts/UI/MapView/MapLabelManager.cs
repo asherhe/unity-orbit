@@ -17,6 +17,7 @@ namespace UI
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)
         {
             var labelObject = Instantiate(_labelPrefab, transform);
+            labelObject.name = $"{body.bodyName} Label";
             var label = labelObject.GetComponent<CelestialBodyLabel>();
             label.Owner = body;
             _labels.Add(label);
