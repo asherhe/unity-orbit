@@ -55,7 +55,7 @@ namespace Orbit
         /// <summary>
         /// trajectory display for this patch.
         /// </summary>
-        public readonly Trajectory trajectory;
+        public readonly UI.Trajectory trajectory;
 
         /// <summary>
         /// how far removed this Patch is from the original, current OrbitState.
@@ -77,7 +77,7 @@ namespace Orbit
             soiEscape = new(patchOrbit);
             soiIntercept = new(patchOrbit);
 
-            trajectory = TrajectoryManager.Instance.AddTrajectory(patchOrbit);
+            trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
 
             _patchStep = 0;
 
@@ -99,7 +99,7 @@ namespace Orbit
             soiEscape = new(patchOrbit);
             soiIntercept = new(patchOrbit);
 
-            trajectory = TrajectoryManager.Instance.AddTrajectory(patchOrbit);
+            trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
             trajectory.AlphaRange = new Vector2(0.0f, 0.5f);
 
             _patchStep = patch._patchStep + 1;
