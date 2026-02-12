@@ -51,8 +51,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 226f1b7958cfa9247ae9e5e850304a21, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _icon: {fileID: 8300876143179570071}
-  _labelText: {fileID: 7430548474943000832}
+  icon: {fileID: 1196769106614374800}
+  labelText: {fileID: 7430548474943000832}
 --- !u!114 &4081080920974037983
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 6780840801102349375}
   - component: {fileID: 4314466712453714470}
   - component: {fileID: 2453381174224850671}
-  - component: {fileID: 8300876143179570071}
+  - component: {fileID: 1196769106614374800}
   m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
@@ -278,7 +278,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &8300876143179570071
+--- !u!114 &1196769106614374800
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -287,6 +287,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 7231781259626456251}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64e68428fc03b6940a71ca169ef00ffc, type: 3}
+  m_Script: {fileID: 11500000, guid: 51b31b5f548e13f458c137279725e42c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

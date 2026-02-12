@@ -9,7 +9,7 @@ namespace UI
     /// <summary>
     /// indictes an important point on an orbit
     /// </summary>
-    public class PointOfInterest : MonoBehaviour
+    public class PointOfInterest : MapLabel
     {
         protected Sprite _icon;
         
