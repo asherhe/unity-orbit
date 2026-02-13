@@ -56,6 +56,10 @@ namespace Orbit
         /// trajectory display for this patch.
         /// </summary>
         public readonly UI.Trajectory trajectory;
+        /// <summary>
+        /// map view labels for patch apses
+        /// </summary>
+        private readonly UI.ApsisLabel periapsisLabel, apoapsisLabel;
 
         /// <summary>
         /// how far removed this Patch is from the original, current OrbitState.
@@ -78,6 +82,8 @@ namespace Orbit
             soiIntercept = new(patchOrbit);
 
             trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
+            periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
+            apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
 
             _patchStep = 0;
 
@@ -158,11 +164,12 @@ namespace Orbit
                 // feed expiry date as starting point for next iteration
                 t = ExpiryDate;
             } while (HasTransition && ExpiryDate < NextTransition.Time);
-            
-            if (HasTransition) {
+
+            if (HasTransition)
+            {
                 // if we've confirmed that there are no hidden transitions, set the expiry date to infinity
                 ExpiryDate = double.PositiveInfinity;
-                
+
                 // update our own copy of the next orbit state
                 nextOrbit.CopyFrom(NextTransition.NextOrbit);
             }

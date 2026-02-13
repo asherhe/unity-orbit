@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4bcb2d2aac149234c92ba4fba3cb4d41
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - icon: {instanceID: 0}
+  - labelText: {instanceID: 0}
+  - _periapsisIcon: {fileID: -1783579856, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+  - _apoapsisIcon: {fileID: 1224050610, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -11,6 +11,9 @@ namespace UI
     public class MapLabelManager : SingletonBehaviour<MapLabelManager>
     {
         [SerializeField]
+        private GameObject _apsisLabelPrefab;
+
+        [SerializeField]
         private GameObject _celestialBodyLabelPrefab;
         [SerializeField]
         private GameObject _spacecraftLabelPrefab;
@@ -32,6 +35,15 @@ namespace UI
         private void UpdateLabelVisibility()
         {
             gameObject.SetActive(MapViewManager.Instance.activeView == CameraView.MapView);
+        }
+
+        public ApsisLabel AddApsis(OrbitState orbit, ApsisLabel.DisplayMode mode)
+        {
+            var labelObject = Instantiate(_apsisLabelPrefab, transform);
+            var apsisLabel = labelObject.GetComponent<ApsisLabel>();
+            apsisLabel.Orbit = orbit;
+            apsisLabel.Mode = mode;
+            return apsisLabel;
         }
 
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)

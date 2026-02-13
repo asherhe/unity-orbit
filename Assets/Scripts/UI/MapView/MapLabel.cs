@@ -34,17 +34,18 @@ namespace UI
         }
         private Tweener _textAlphaTween;
 
-        private Color _iconColor = Color.white, _textColor = Color.white;
+        protected Color iconColor { get; private set; } = Color.white;
+        protected Color textColor { get; private set; } = Color.white;
         protected void SetColors(Color icon, Color text)
         {
-            _iconColor = icon; _textColor = text;
+            iconColor = icon; textColor = text;
             UpdateVisuals();
         }
 
         protected virtual void Awake()
         {
             rectTransform = transform as RectTransform;
-            
+
             iconImage = icon.GetComponent<Image>();
             icon.OnHoverEnter += OnHoverEnter;
             icon.OnHoverLeave += OnHoverLeave;
@@ -52,8 +53,8 @@ namespace UI
 
         protected virtual void UpdateVisuals()
         {
-            iconImage.color = new Color(_iconColor.r, _iconColor.g, _iconColor.b, Alpha);
-            labelText.color = new Color(_textColor.r, _textColor.g, _textColor.b, Alpha * TextAlpha);
+            iconImage.color = new Color(iconColor.r, iconColor.g, iconColor.b, Alpha);
+            labelText.color = new Color(textColor.r, textColor.g, textColor.b, Alpha * TextAlpha);
             iconImage.raycastTarget = Alpha != 0.0f;
         }
         public void OnHoverEnter()

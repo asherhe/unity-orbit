@@ -13,7 +13,7 @@ namespace UI
 
         protected override void Awake()
         {
-            // run this before base.awake so that colors are updated before UpdateVisuals()
+            // run this before base.Awake so that colors are updated before UpdateVisuals()
             OnOwnerUpdated += () =>
             {
                 _body = (CelestialBody)Owner;

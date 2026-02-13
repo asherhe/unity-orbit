@@ -29,11 +29,8 @@ namespace UI
         {
             if (_craft == null) return;
             var heading = (float)_craft.Newtonian.angle * Mathf.Rad2Deg;
+            // heading texture is offset by 45 degrees
             _headingIndicator.localEulerAngles = Vector3.forward * (heading + 45.0f);
-        }
-        protected override void UpdateVisuals()
-        {
-            base.UpdateVisuals();
         }
     }
 }

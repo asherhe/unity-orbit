@@ -1489,6 +1489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37122a0c4a5b80546b8ab2c947e423a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _apsisLabelPrefab: {fileID: 5451008072283253895, guid: 623c870661506464ab7356d3e2ef0707, type: 3}
   _celestialBodyLabelPrefab: {fileID: 5451008072283253895, guid: 642ae6ba9f16e1847bc51aeda572aac3, type: 3}
   _spacecraftLabelPrefab: {fileID: 5451008072283253895, guid: 6559770a193d6ba4bbc2a1043a06140f, type: 3}
 --- !u!1 &579806096
