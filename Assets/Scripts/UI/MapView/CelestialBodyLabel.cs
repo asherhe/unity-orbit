@@ -33,11 +33,11 @@ namespace UI
             var iconSize = iconImage.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
 
             // alpha for hiding label when we zoom in close enough
-            var hideSOI = (iconSize / r - 2.0f) / 2.0f;
+            var hideRadius = (iconSize / r - 4.0f) / 2.0f;
             // alpha for hiding label to avoid interfering with parent
-            var hideParent = (0.5f - iconSize / a) / 0.5f;
+            var hideParent = (a / iconSize - 1.0f) / 0.5f;
 
-            Alpha = Mathf.Clamp01(Mathf.Min(hideSOI, hideParent));
+            Alpha = Mathf.Clamp01(Mathf.Min(hideRadius, hideParent));
         }
 
         protected override void UpdateVisuals()
