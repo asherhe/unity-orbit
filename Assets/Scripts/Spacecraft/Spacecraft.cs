@@ -115,6 +115,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
         craftName = _config.name;
+        gameObject.name = craftName;
 
         // TODO: initialize fields
         Newtonian.angle = _config.rotation.angle;

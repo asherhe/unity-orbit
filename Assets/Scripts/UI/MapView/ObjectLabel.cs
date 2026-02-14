@@ -30,10 +30,20 @@ namespace UI
 
         public abstract string Name { get; }
 
+        private bool _isTargeted = false;
         /// <summary>
         /// whether this label is the active target
         /// </summary>
-        protected bool isTargeted = false;
+        protected bool IsTargeted
+        {
+            get => _isTargeted;
+            set
+            {
+                if (_isTargeted == value) return;
+                _isTargeted = value;
+                ShowLabel = _isTargeted;
+            }
+        }
 
         protected override void Awake()
         {
@@ -43,23 +53,23 @@ namespace UI
 
             OnOwnerUpdated += () => _follow.follow = Owner.gameObject.transform;
             OnOwnerUpdated += UpdateVisuals;
-            OnOwnerUpdated += SetName;
+            OnOwnerUpdated += UpdateTargeting;
 
             icon.OnClick += ToggleTarget;
-            TargetingSystem.Instance.OnTargetChanged += SetName;
+            TargetingSystem.Instance.OnTargetChanged += UpdateTargeting;
         }
 
         private void ToggleTarget()
         {
-            isTargeted = !isTargeted;
-            ShowLabel = isTargeted;
-            if (isTargeted) TargetingSystem.Instance.Target = Owner;
+            IsTargeted = !IsTargeted;
+            if (IsTargeted) TargetingSystem.Instance.Target = Owner;
             else TargetingSystem.Instance.Target = null;
         }
 
-        private void SetName()
+        private void UpdateTargeting()
         {
-            if (isTargeted) labelText.text = $">{Name}<";
+            IsTargeted = TargetingSystem.Instance.Target == Owner;
+            if (IsTargeted) labelText.text = $">{Name}<";
             else labelText.text = Name;
         }
     }

@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 32549689}
   - component: {fileID: 32549691}
   m_Layer: 5
-  m_Name: Warp Indicator
+  m_Name: Announcement Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Time Warp: x1'
+  m_text: Announcement
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}

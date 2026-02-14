@@ -2,6 +2,7 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 
 public class TargetingSystem : SingletonBehaviour<TargetingSystem>
@@ -22,4 +23,11 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     }
 
     public event Action OnTargetChanged;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        OnTargetChanged += () => AnnouncementDisplay.Instance.Announce(Target == null ? "Targeting Cancelled" : $"Targeting {Target.gameObject.name}");
+    }
 }
