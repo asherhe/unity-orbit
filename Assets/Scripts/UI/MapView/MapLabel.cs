@@ -33,6 +33,27 @@ namespace UI
             set { _textAlpha = value; UpdateVisuals(); }
         }
         private Tweener _textAlphaTween;
+        private float _targetTextAlpha;
+
+        private bool _isHovered = false;
+        /// <summary>
+        /// whether this label is currently being hovered
+        /// </summary>
+        protected bool IsHovered
+        {
+            get => _isHovered;
+            private set { _isHovered = value; TweenTextAlpha(); }
+        }
+
+        private bool _showLabel = false;
+        /// <summary>
+        /// whether to show label text even without hover
+        /// </summary>
+        protected bool ShowLabel
+        {
+            get => _showLabel;
+            set { _showLabel = value; TweenTextAlpha(); }
+        }
 
         protected Color iconColor { get; private set; } = Color.white;
         protected Color textColor { get; private set; } = Color.white;
@@ -57,26 +78,32 @@ namespace UI
             labelText.color = new Color(textColor.r, textColor.g, textColor.b, Alpha * TextAlpha);
             iconImage.raycastTarget = Alpha != 0.0f;
         }
+
+        private void TweenTextAlpha()
+        {
+            var alpha = IsHovered || ShowLabel ? 1.0f : 0.0f;
+            if (_targetTextAlpha != alpha)
+            {
+                _targetTextAlpha = alpha;
+                if (alpha == 1.0f) labelText.gameObject.SetActive(true);
+                _textAlphaTween?.Kill();
+                _textAlphaTween = DOTween.To(
+                    () => TextAlpha,
+                    v => TextAlpha = v,
+                    alpha, 0.25f
+                );
+                if (alpha == 0.0f) _textAlphaTween.OnComplete(() => labelText.gameObject.SetActive(false));
+            }
+        }
         private void OnHoverEnter()
         {
+            IsHovered = true;
             rectTransform.DOScale(1.25f, 0.25f).SetEase(Ease.OutCubic);
-            _textAlphaTween?.Kill();
-            labelText.gameObject.SetActive(true);
-            _textAlphaTween = DOTween.To(
-                () => TextAlpha,
-                v => TextAlpha = v,
-                1.0f, 0.25f
-            );
         }
         private void OnHoverLeave()
         {
+            IsHovered = false;
             rectTransform.DOScale(1.0f, 0.25f).SetEase(Ease.OutCubic);
-            _textAlphaTween?.Kill();
-            _textAlphaTween = DOTween.To(
-                () => TextAlpha,
-                v => TextAlpha = v,
-                0.0f, 0.25f
-            ).OnComplete(() => labelText.gameObject.SetActive(false));
         }
     }
 }

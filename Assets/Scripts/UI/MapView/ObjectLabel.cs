@@ -52,6 +52,7 @@ namespace UI
         private void ToggleTarget()
         {
             isTargeted = !isTargeted;
+            ShowLabel = isTargeted;
             if (isTargeted) TargetingSystem.Instance.Target = Owner;
             else TargetingSystem.Instance.Target = null;
         }
