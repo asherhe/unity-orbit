@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6328856909983868335}
-  - component: {fileID: 3093962373779957952}
+  - component: {fileID: 8607259958162468459}
   m_Layer: 5
-  m_Name: Apsis Map Label
+  m_Name: SOI Transition Map Label
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -38,7 +38,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 16, y: 16}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &3093962373779957952
+--- !u!114 &8607259958162468459
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,13 +47,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5451008072283253895}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bcb2d2aac149234c92ba4fba3cb4d41, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ba73905f39d9d541895290e85f26ed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   icon: {fileID: 1196769106614374800}
   labelText: {fileID: 7430548474943000832}
-  _periapsisIcon: {fileID: -1783579856, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
-  _apoapsisIcon: {fileID: 1224050610, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
 --- !u!1 &6274093736713104357
 GameObject:
   m_ObjectHideFlags: 0
@@ -88,7 +86,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 12, y: 8}
+  m_AnchoredPosition: {x: 12, y: 0}
   m_SizeDelta: {x: 96, y: 10}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1465935535499615095
@@ -119,7 +117,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0m
+  m_text: Orbit transition
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -225,7 +223,7 @@ RectTransform:
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 16, y: 16}
-  m_Pivot: {x: 0.5, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4314466712453714470
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -254,7 +252,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1783579856, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+  m_Sprite: {fileID: 831127747, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1

@@ -5,27 +5,27 @@ using UnityEngine;
 
 namespace UI
 {
-    public abstract class POILabel : MapLabel
+    public abstract class PatchPOILabel : MapLabel
     {
-        private OrbitState _orbit;
+        private Patch _patch;
         /// <summary>
-        /// orbit that is attached to this POILabel
+        /// patch that is attached to this POILabel
         /// </summary>
-        public OrbitState Orbit
+        public Patch Patch
         {
-            get => _orbit;
+            get => _patch;
             set
             {
-                if (_orbit == value) return;
-                if (_orbit != null) _orbit.OnStateChanged -= OnOrbitChange;
-                _orbit = value;
-                _orbit.OnStateChanged += OnOrbitChange;
+                if (_patch == value) return;
+                if (_patch != null) _patch.OnTransitionUpdate -= OnPatchChanged;
+                _patch = value;
+                _patch.OnTransitionUpdate += OnPatchChanged;
             }
         }
 
         private void Start()
         {
-            OnOrbitChange();
+            OnPatchChanged();
         }
 
         /// <summary>
@@ -42,10 +42,10 @@ namespace UI
         /// </summary>
         protected virtual string GetLabelText()
         {
-            return TextDisplay.AddMetricPrefix(bodyPos.Magnitude - Orbit.body.radius) + "m";
+            return TextDisplay.AddMetricPrefix(bodyPos.Magnitude - Patch.patchOrbit.body.radius) + "m";
         }
 
-        protected void OnOrbitChange()
+        protected void OnPatchChanged()
         {
             bodyPos = GetPosition();
             labelText.text = GetLabelText();
@@ -53,7 +53,7 @@ namespace UI
 
         private void Update()
         {
-            var worldPos = Orbit.body.transform.position + bodyPos;
+            var worldPos = Patch.patchOrbit.body.transform.position + bodyPos;
             rectTransform.anchoredPosition = FollowWorldTransformFromScreen.WorldToCanvas(worldPos);
         }
     }

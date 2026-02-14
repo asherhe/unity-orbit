@@ -11,7 +11,9 @@ namespace UI
     public class MapLabelManager : SingletonBehaviour<MapLabelManager>
     {
         [SerializeField]
-        private GameObject _apsisLabelPrefab;
+        private GameObject _apsisLabelPrefab; 
+        [SerializeField]
+        private GameObject _SOITransitionLabelPrefab;
 
         [SerializeField]
         private GameObject _celestialBodyLabelPrefab;
@@ -44,6 +46,13 @@ namespace UI
             apsisLabel.Orbit = orbit;
             apsisLabel.Mode = mode;
             return apsisLabel;
+        }
+        public SOITransitionLabel AddSOITransition(Patch patch)
+        {
+            var labelObject = Instantiate(_SOITransitionLabelPrefab, transform);
+            var soiLabel = labelObject.GetComponent<SOITransitionLabel>();
+            soiLabel.Patch = patch;
+            return soiLabel;
         }
 
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)

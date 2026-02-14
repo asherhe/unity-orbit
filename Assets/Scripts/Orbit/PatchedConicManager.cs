@@ -85,10 +85,6 @@ namespace Orbit
             {
                 _patches[i].SetActive(false);
             }
-
-            // recalculate trajectory bounds now that all new patches have been generated
-            for (i = 0; i < numActivePatches; i++)
-                _patches[i].UpdateTrajectoryBounds();
         }
 
         /// <summary>

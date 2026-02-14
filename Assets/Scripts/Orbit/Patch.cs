@@ -51,15 +51,20 @@ namespace Orbit
         /// </summary>
         public double ExpiryDate { get; private set; }
 
+        /// <summary>
+        /// invoked when transition data is updated
+        /// </summary>
+        public event Action OnTransitionUpdate;
 
         /// <summary>
         /// trajectory display for this patch.
         /// </summary>
-        public readonly UI.Trajectory trajectory;
+        public UI.Trajectory trajectory;
         /// <summary>
         /// map view labels for patch apses
         /// </summary>
-        private readonly UI.ApsisLabel periapsisLabel, apoapsisLabel;
+        private UI.ApsisLabel periapsisLabel, apoapsisLabel;
+        private UI.SOITransitionLabel soiLabel;
 
         /// <summary>
         /// how far removed this Patch is from the original, current OrbitState.
@@ -78,13 +83,6 @@ namespace Orbit
             prevPatch = null;
             rootOrbit = srcOrbit;
 
-            soiEscape = new(patchOrbit);
-            soiIntercept = new(patchOrbit);
-
-            trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
-            periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
-            apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
-
             _patchStep = 0;
 
             SetupPatch();
@@ -102,26 +100,32 @@ namespace Orbit
             patch.nextPatch = this;
             rootOrbit = patch.rootOrbit;
 
-            soiEscape = new(patchOrbit);
-            soiIntercept = new(patchOrbit);
-
-            trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
-            trajectory.AlphaRange = new Vector2(0.0f, 0.5f);
-
             _patchStep = patch._patchStep + 1;
 
             SetupPatch();
+
+            trajectory.AlphaRange = new Vector2(0.1f, 0.5f);
         }
 
         private void SetupPatch()
         {
+            soiEscape = new(patchOrbit);
+            soiIntercept = new(patchOrbit);
+
             transitions.Add(soiEscape);
             transitions.Add(soiIntercept);
 
             NextTransition = null;
             ExpiryDate = double.PositiveInfinity;
 
+            trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
             trajectory.name = $"Trajectory {rootOrbit.Owner} (Patch {_patchStep})";
+
+            periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
+            apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
+            soiLabel = UI.MapLabelManager.Instance.AddSOITransition(this);
+
+            OnTransitionUpdate += UpdateTrajectoryBounds;
         }
 
         /// <summary>
@@ -130,6 +134,9 @@ namespace Orbit
         public void SetActive(bool isActive)
         {
             trajectory.gameObject.SetActive(isActive);
+            periapsisLabel.gameObject.SetActive(isActive);
+            apoapsisLabel.gameObject.SetActive(isActive);
+            soiLabel.gameObject.SetActive(isActive);
         }
 
         public void CheckTransitions() => CheckTransitions(Universe.Instance.UT);
@@ -173,6 +180,8 @@ namespace Orbit
                 // update our own copy of the next orbit state
                 nextOrbit.CopyFrom(NextTransition.NextOrbit);
             }
+
+            OnTransitionUpdate?.Invoke();
         }
 
         /// <summary>

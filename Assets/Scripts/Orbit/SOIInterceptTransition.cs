@@ -51,14 +51,14 @@ namespace Orbit
             if (!earliestEnc.HasValue) return TransitionResult.ExpiresAt(expiry);
             var captureEncounter = earliestEnc.Value;
 
-            var body = (CelestialBody)captureEncounter.other.Owner;
+            nextCaptureBody = (CelestialBody)captureEncounter.other.Owner;
             var t = captureEncounter.state.time;
 
             // estimated time to traverse the SOI radius, doubled for extra wiggle room
-            var soiTrav = 2 * body.soiRadius / (captureEncounter.state.vel - captureEncounter.otherState.vel).Magnitude;
+            var soiTrav = 2 * nextCaptureBody.soiRadius / (captureEncounter.state.vel - captureEncounter.otherState.vel).Magnitude;
 
             // distance to SOI edge
-            double SOIDistance(double t) => (_prop.GetPosition(t) - body.GetPosition(t)).Magnitude - body.soiRadius;
+            double SOIDistance(double t) => (_prop.GetPosition(t) - nextCaptureBody.GetPosition(t)).Magnitude - nextCaptureBody.soiRadius;
 
             double captureTime = 0;
             try
@@ -76,12 +76,12 @@ namespace Orbit
             }
 
             nextCapture = _prop.GetStateVectors(captureTime);
-            var bodyState = body.GetStateVectors(captureTime);
+            var bodyState = nextCaptureBody.GetStateVectors(captureTime);
             return new TransitionResult(
                 nextCapture.Value, new OrbitState(
                     nextCapture?.pos - bodyState.pos,
                     nextCapture?.vel - bodyState.vel,
-                    captureTime, body
+                    captureTime, nextCaptureBody
                 )
             );
         }
