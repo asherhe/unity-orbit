@@ -11,6 +11,8 @@ namespace UI
         /// </summary>
         private Spacecraft _craft;
 
+        public override string Name => _craft.craftName;
+
         [SerializeField]
         private RectTransform _headingIndicator;
 

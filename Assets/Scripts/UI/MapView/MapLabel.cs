@@ -57,7 +57,7 @@ namespace UI
             labelText.color = new Color(textColor.r, textColor.g, textColor.b, Alpha * TextAlpha);
             iconImage.raycastTarget = Alpha != 0.0f;
         }
-        public void OnHoverEnter()
+        private void OnHoverEnter()
         {
             rectTransform.DOScale(1.25f, 0.25f).SetEase(Ease.OutCubic);
             _textAlphaTween?.Kill();
@@ -68,7 +68,7 @@ namespace UI
                 1.0f, 0.25f
             );
         }
-        public void OnHoverLeave()
+        private void OnHoverLeave()
         {
             rectTransform.DOScale(1.0f, 0.25f).SetEase(Ease.OutCubic);
             _textAlphaTween?.Kill();

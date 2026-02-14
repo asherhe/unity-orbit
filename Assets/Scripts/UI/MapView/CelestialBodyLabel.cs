@@ -11,13 +11,14 @@ namespace UI
         /// </summary>
         private CelestialBody _body;
 
+        public override string Name => _body.bodyName;
+
         protected override void Awake()
         {
             // run this before base.Awake so that colors are updated before UpdateVisuals()
             OnOwnerUpdated += () =>
             {
                 _body = (CelestialBody)Owner;
-                labelText.text = _body.bodyName;
                 SetColors(_body.color, _body.color);
             };
             base.Awake();
@@ -38,11 +39,6 @@ namespace UI
             var hideParent = (a / iconSize - 1.0f) / 0.5f;
 
             Alpha = Mathf.Clamp01(Mathf.Min(hideRadius, hideParent));
-        }
-
-        protected override void UpdateVisuals()
-        {
-            base.UpdateVisuals();
         }
     }
 }
