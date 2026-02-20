@@ -12,7 +12,10 @@ namespace UI
         /// </summary>
         protected Vector2d BodyPos { get; private set; }
 
-        protected abstract CelestialBody Body { get; }
+        /// <summary>
+        /// orbit this POILabel is attached to
+        /// </summary>
+        protected abstract OrbitState LabelOrbit { get; }
 
         /// <summary>
         /// determine the desired position of this POI in body space. called on orbit state update
@@ -23,8 +26,14 @@ namespace UI
         /// </summary>
         protected virtual string GetLabelText()
         {
-            return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - Body.radius) + "m";
+            return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - LabelOrbit.body.radius) + "m";
         }
+
+        /// <summary>
+        /// whether to adjust the alpha based on the zoom level.
+        /// true by default, override if you don't want this behaviour
+        /// </summary>
+        protected virtual bool DoZoomAlpha => true;
 
         protected override void Awake()
         {
@@ -45,8 +54,20 @@ namespace UI
 
         private void Update()
         {
-            var worldPos = Body.transform.position + BodyPos;
+            var worldPos = LabelOrbit.body.transform.position + BodyPos;
             rectTransform.anchoredPosition = FollowWorldTransformFromScreen.WorldToCanvas(worldPos);
+
+            if (DoZoomAlpha)
+            {
+                // representative size for orbit
+                float size;
+                if (LabelOrbit.Shape == OrbitShape.Ellipse) size = (float)LabelOrbit.a;
+                else size = (float)LabelOrbit.body.soiRadius;
+                // size of on-screen icon in world space
+                var iconSize = iconImage.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
+                // hide label if zoomed out enough to avoid obscuring more important stuff
+                Alpha = Mathf.Clamp01((size / iconSize - 0.5f) / 0.5f);
+            }
         }
     }
 }

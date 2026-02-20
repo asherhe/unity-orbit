@@ -23,6 +23,6 @@ namespace UI
             }
         }
 
-        protected override CelestialBody Body => Patch.patchOrbit.body;
+        protected override OrbitState LabelOrbit => Patch.patchOrbit;
     }
 }
