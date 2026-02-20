@@ -26,6 +26,12 @@ namespace UI
             return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - Body.radius) + "m";
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            icon.OnClick += () => ShowLabel = !ShowLabel;
+        }
+
         private void Start()
         {
             RefreshLabel();
