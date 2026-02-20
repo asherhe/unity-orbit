@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace UI
 {
-    public class ApsisLabel : POILabel
+    public class ApsisLabel : OrbitPOILabel
     {
         [SerializeField]
         private Sprite _periapsisIcon, _apoapsisIcon;

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace UI
 {
-    public abstract class PatchPOILabel : MapLabel
+    public abstract class PatchPOILabel : POILabel
     {
         private Patch _patch;
         /// <summary>
@@ -17,44 +17,12 @@ namespace UI
             set
             {
                 if (_patch == value) return;
-                if (_patch != null) _patch.OnTransitionUpdate -= OnPatchChanged;
+                if (_patch != null) _patch.OnTransitionUpdate -= RefreshLabel;
                 _patch = value;
-                _patch.OnTransitionUpdate += OnPatchChanged;
+                _patch.OnTransitionUpdate += RefreshLabel;
             }
         }
 
-        private void Start()
-        {
-            OnPatchChanged();
-        }
-
-        /// <summary>
-        /// location of this point of interest in body space
-        /// </summary>
-        protected Vector2d bodyPos;
-
-        /// <summary>
-        /// determine the desired position of this POI in body space. called on orbit state update
-        /// </summary>
-        protected abstract Vector2d GetPosition();
-        /// <summary>
-        /// determine the text to show in the label. called on orbit state update.
-        /// </summary>
-        protected virtual string GetLabelText()
-        {
-            return TextDisplay.AddMetricPrefix(bodyPos.Magnitude - Patch.patchOrbit.body.radius) + "m";
-        }
-
-        protected void OnPatchChanged()
-        {
-            bodyPos = GetPosition();
-            labelText.text = GetLabelText();
-        }
-
-        private void Update()
-        {
-            var worldPos = Patch.patchOrbit.body.transform.position + bodyPos;
-            rectTransform.anchoredPosition = FollowWorldTransformFromScreen.WorldToCanvas(worldPos);
-        }
+        protected override CelestialBody Body => Patch.patchOrbit.body;
     }
 }

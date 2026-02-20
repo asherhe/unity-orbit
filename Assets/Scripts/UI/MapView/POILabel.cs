@@ -7,31 +7,12 @@ namespace UI
 {
     public abstract class POILabel : MapLabel
     {
-        private OrbitState _orbit;
-        /// <summary>
-        /// orbit that is attached to this POILabel
-        /// </summary>
-        public OrbitState Orbit
-        {
-            get => _orbit;
-            set
-            {
-                if (_orbit == value) return;
-                if (_orbit != null) _orbit.OnStateChanged -= OnOrbitChange;
-                _orbit = value;
-                _orbit.OnStateChanged += OnOrbitChange;
-            }
-        }
-
-        private void Start()
-        {
-            OnOrbitChange();
-        }
-
         /// <summary>
         /// location of this point of interest in body space
         /// </summary>
-        protected Vector2d bodyPos;
+        protected Vector2d BodyPos { get; private set; }
+
+        protected abstract CelestialBody Body { get; }
 
         /// <summary>
         /// determine the desired position of this POI in body space. called on orbit state update
@@ -42,18 +23,23 @@ namespace UI
         /// </summary>
         protected virtual string GetLabelText()
         {
-            return TextDisplay.AddMetricPrefix(bodyPos.Magnitude - Orbit.body.radius) + "m";
+            return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - Body.radius) + "m";
         }
 
-        protected void OnOrbitChange()
+        private void Start()
         {
-            bodyPos = GetPosition();
+            RefreshLabel();
+        }
+
+        protected void RefreshLabel()
+        {
+            BodyPos = GetPosition();
             labelText.text = GetLabelText();
         }
 
         private void Update()
         {
-            var worldPos = Orbit.body.transform.position + bodyPos;
+            var worldPos = Body.transform.position + BodyPos;
             rectTransform.anchoredPosition = FollowWorldTransformFromScreen.WorldToCanvas(worldPos);
         }
     }
