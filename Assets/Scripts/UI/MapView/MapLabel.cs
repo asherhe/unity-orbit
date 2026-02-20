@@ -55,8 +55,8 @@ namespace UI
             set { _showLabel = value; TweenTextAlpha(); }
         }
 
-        protected Color iconColor { get; private set; } = Color.white;
-        protected Color textColor { get; private set; } = Color.white;
+        protected Color iconColor { get; private set; }
+        protected Color textColor { get; private set; }
         protected void SetColors(Color icon, Color text)
         {
             iconColor = icon; textColor = text;
@@ -70,6 +70,9 @@ namespace UI
             iconImage = icon.GetComponent<Image>();
             icon.OnHoverEnter += OnHoverEnter;
             icon.OnHoverLeave += OnHoverLeave;
+
+            iconColor = iconImage.color;
+            textColor = labelText.color;
         }
 
         protected virtual void UpdateVisuals()

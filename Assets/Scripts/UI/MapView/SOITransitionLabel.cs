@@ -7,12 +7,6 @@ namespace UI
 {
     public class SOITransitionLabel : PatchPOILabel
     {
-        protected override void Awake()
-        {
-            base.Awake();
-            SetColors(iconColor, new Color(0.1882353f, 0.7568628f, 0.3529412f)); // TODO: change color
-        }
-
         protected override Vector2d GetPosition()
         {
             if (Patch.HasTransition) return Patch.NextTransition.State.pos;

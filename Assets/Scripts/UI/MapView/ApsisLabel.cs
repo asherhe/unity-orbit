@@ -25,12 +25,6 @@ namespace UI
             }
         }
 
-        protected override void Awake()
-        {
-            base.Awake();
-            SetColors(iconColor, new Color(0.1882353f, 0.7568628f, 0.3529412f));
-        }
-
         protected override Vector2d GetPosition()
         {
             // position of apsis in perifocal space
