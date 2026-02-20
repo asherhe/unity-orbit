@@ -16,7 +16,7 @@ namespace UI
         /// orbit this POILabel is attached to
         /// </summary>
         protected abstract OrbitState LabelOrbit { get; }
-
+        
         /// <summary>
         /// determine the desired position of this POI in body space. called on orbit state update
         /// </summary>
@@ -29,6 +29,8 @@ namespace UI
             return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - LabelOrbit.body.radius) + "m";
         }
 
+        public bool IsLabelActive { get => ShowLabel; set => ShowLabel = value; }
+
         /// <summary>
         /// whether to adjust the alpha based on the zoom level.
         /// true by default, override if you don't want this behaviour
@@ -38,7 +40,7 @@ namespace UI
         protected override void Awake()
         {
             base.Awake();
-            icon.OnClick += () => ShowLabel = !ShowLabel;
+            icon.OnClick += () => IsLabelActive = !IsLabelActive;
         }
 
         private void Start()

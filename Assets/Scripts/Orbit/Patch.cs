@@ -10,6 +10,8 @@ namespace Orbit
     /// </summary>
     public class Patch
     {
+        public readonly PatchedConicManager manager;
+
         /// <summary>
         /// reference to the orbit state this Patch encapsulates
         /// </summary>
@@ -76,8 +78,9 @@ namespace Orbit
         /// construct a patch based on the orbit state of an orbiting body.
         /// the resulting Patch is directly linked to the current state of the body.
         /// </summary>
-        public Patch(OrbitState srcOrbit)
+        public Patch(OrbitState srcOrbit, PatchedConicManager manager)
         {
+            this.manager = manager;
             patchOrbit = srcOrbit;
             nextOrbit = new(patchOrbit);
             prevPatch = null;
@@ -91,8 +94,9 @@ namespace Orbit
         /// <summary>
         /// construct a new Patch that follows the given patch
         /// </summary>
-        public Patch(Patch patch)
+        public Patch(Patch patch, PatchedConicManager manager)
         {
+            this.manager = manager;
             patchOrbit = patch.nextOrbit;
             nextOrbit = new(patchOrbit);
             prevPatch = patch;
@@ -124,6 +128,14 @@ namespace Orbit
             periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
             apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
             soiLabel = UI.MapLabelManager.Instance.AddSOITransition(this);
+
+            manager.OnTransition += () =>
+            {
+                bool hasNext = nextPatch != null;
+                periapsisLabel.IsLabelActive = hasNext && nextPatch.periapsisLabel.IsLabelActive;
+                apoapsisLabel.IsLabelActive = hasNext && nextPatch.apoapsisLabel.IsLabelActive;
+                soiLabel.IsLabelActive = hasNext && nextPatch.soiLabel.IsLabelActive;
+            };
 
             OnTransitionUpdate += UpdateTrajectoryBounds;
         }

@@ -32,6 +32,11 @@ namespace Orbit
         public int numActivePatches;
 
         /// <summary>
+        /// invoked when the current orbit transitions from one patch to another
+        /// </summary>
+        public event Action OnTransition;
+
+        /// <summary>
         /// configures a PatchedConicManager linked to an object with orbit state orbit
         /// </summary>
         /// <param name="orbit">OrbitState of the source object that this PatchedConicManager answers to</param>
@@ -39,15 +44,15 @@ namespace Orbit
         public PatchedConicManager(OrbitState orbit, int maxPatches = 6)
         {
             SrcOrbit = orbit;
-            
+
             // bind this before we initialize patches so that the trajectory update code within
             // Patch executes AFTER new transition points are established
             SrcOrbit.OnStateChanged += RecalculatePatches;
 
             // construct linked patches
-            _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit) };
+            _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit, this) };
             for (int i = 1; i < maxPatches; i++)
-                _patches.Add(new Patch(_patches[i - 1]));
+                _patches.Add(new Patch(_patches[i - 1], this));
         }
 
         /// <summary>
@@ -111,6 +116,8 @@ namespace Orbit
                     // quick and dirty solution
 
                     SrcOrbit.CopyFrom(_patches[0].nextOrbit);
+
+                    OnTransition?.Invoke();
                 }
                 else break;
             }

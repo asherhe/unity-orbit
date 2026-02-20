@@ -20,9 +20,15 @@ namespace UI
                 if (_patch != null) _patch.OnTransitionUpdate -= RefreshLabel;
                 _patch = value;
                 _patch.OnTransitionUpdate += RefreshLabel;
+                _patch.manager.OnTransition += OnPatchTransition;
             }
         }
 
         protected override OrbitState LabelOrbit => Patch.patchOrbit;
+
+        protected virtual void OnPatchTransition()
+        {
+            IsLabelActive = false;
+        }
     }
 }
