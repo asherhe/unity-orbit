@@ -34,12 +34,25 @@ namespace Orbit
             nextCapture = null; nextCaptureBody = null;
 
             EncounterCalculator.Encounter? earliestEnc = null;
-            double expiry = UT + orbit.period; // TODO: integrate with dynamic bound readjustment
+            double expiry = Double.PositiveInfinity;
             foreach (var satellite in orbit.body.satellites)
             {
-                // TODO: time bounds only work for elliptical so far
-                if (orbit.Shape != OrbitShape.Ellipse) return TransitionResult.None;
-                var encounters = _enc.GetEncounters(satellite.orbit, UT, UT + orbit.period);
+                if (orbit.apoapsis < satellite.orbit.periapsis - satellite.soiRadius ||
+                    orbit.periapsis > satellite.orbit.apoapsis + satellite.soiRadius) 
+                    continue;
+
+                double tStart, tEnd;
+                if (orbit.Shape == OrbitShape.Ellipse)
+                {
+                    tStart = UT; tEnd = UT + orbit.period;
+                }
+                else
+                {
+                    // TODO: time bounds only work for elliptical so far
+                    return TransitionResult.None;
+                }
+                expiry = Math.Min(expiry, tEnd);
+                var encounters = _enc.GetEncounters(satellite.orbit, tStart, tEnd);
                 foreach (var e in encounters)
                 {
                     if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))
