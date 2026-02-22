@@ -13,11 +13,20 @@ namespace Orbit
     {
         private UniversalPropagator _prop;
         private EncounterCalculator _enc;
+        private SOIEscapeTransition _esc;
 
-        public SOIInterceptTransition(OrbitState orbit) : base(orbit)
+        /// <summary>
+        /// initialize a SOIInterceptTransition for a given orbit
+        /// </summary>
+        /// <param name="orbit">orbit for which to check for intercepts</param>
+        /// <param name="esc">
+        /// SOIEscapeTransition that is also attached to orbit. it is assumed that the results of this transition are checked before this object's CheckTransitions()
+        /// </param>
+        public SOIInterceptTransition(OrbitState orbit, SOIEscapeTransition esc) : base(orbit)
         {
             _prop = new UniversalPropagator(orbit);
             _enc = new EncounterCalculator(orbit);
+            _esc = esc;
         }
 
         /// <summary>
@@ -34,25 +43,26 @@ namespace Orbit
             nextCapture = null; nextCaptureBody = null;
 
             EncounterCalculator.Encounter? earliestEnc = null;
-            double expiry = Double.PositiveInfinity;
+            double expiry = double.PositiveInfinity;
             foreach (var satellite in orbit.body.satellites)
             {
                 if (orbit.apoapsis < satellite.orbit.periapsis - satellite.soiRadius ||
-                    orbit.periapsis > satellite.orbit.apoapsis + satellite.soiRadius) 
+                    orbit.periapsis > satellite.orbit.apoapsis + satellite.soiRadius)
                     continue;
 
-                double tStart, tEnd;
-                if (orbit.Shape == OrbitShape.Ellipse)
+                double tStart = UT, tEnd = UT + 1e8;
+                if (orbit.Shape == OrbitShape.Ellipse) tEnd = UT + orbit.period;
+                if (_esc.HasTransition)
                 {
-                    tStart = UT; tEnd = UT + orbit.period;
-                }
-                else
-                {
-                    // TODO: time bounds only work for elliptical so far
-                    return TransitionResult.None;
+                    tStart = Math.Max(tStart, (double)_esc.SOICapture?.time);
+                    tEnd = Math.Min(tEnd, (double)_esc.SOIEscape?.time);
                 }
                 expiry = Math.Min(expiry, tEnd);
                 var encounters = _enc.GetEncounters(satellite.orbit, tStart, tEnd);
+                Debug.DrawLine(
+                    _prop.GetPosition(tStart) + CameraFocus.Instance.GetRelativePosition(orbit.body),
+                    _prop.GetPosition(tEnd) + CameraFocus.Instance.GetRelativePosition(orbit.body)
+                );
                 foreach (var e in encounters)
                 {
                     if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))

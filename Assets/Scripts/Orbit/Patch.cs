@@ -114,7 +114,7 @@ namespace Orbit
         private void SetupPatch()
         {
             soiEscape = new(patchOrbit);
-            soiIntercept = new(patchOrbit);
+            soiIntercept = new(patchOrbit, soiEscape);
 
             transitions.Add(soiEscape);
             transitions.Add(soiIntercept);
