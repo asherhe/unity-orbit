@@ -35,6 +35,10 @@ namespace Orbit
         /// invoked when the current orbit transitions from one patch to another
         /// </summary>
         public event Action OnTransition;
+        /// <summary>
+        /// invoked when all orbit transition states have been recalculated
+        /// </summary>
+        public event Action OnRecalculated;
 
         /// <summary>
         /// configures a PatchedConicManager linked to an object with orbit state orbit
@@ -90,6 +94,8 @@ namespace Orbit
             {
                 _patches[i].SetActive(false);
             }
+
+            OnRecalculated?.Invoke();
         }
 
         /// <summary>

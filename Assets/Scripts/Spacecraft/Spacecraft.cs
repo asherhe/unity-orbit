@@ -59,9 +59,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     public OrbitState orbit { get; private set; }
     private IOrbitPropagator _prop;
-    private PatchedConicManager _patchManager;
-    private SOIEscapeTransition _soiEscape;
-    private SOIInterceptTransition _soiIntercept;
+    public PatchedConicManager patches { get; private set; }
 
     private UI.SpacecraftLabel _mapLabel;
 
@@ -134,10 +132,8 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
         _prop = new UniversalPropagator(orbit);
 
-        _patchManager = new PatchedConicManager(orbit);
-        _soiEscape = _patchManager.Patches[0].soiEscape;
-        _soiIntercept = _patchManager.Patches[0].soiIntercept;
-        _patchManager.RecalculatePatches();
+        patches = new PatchedConicManager(orbit);
+        patches.RecalculatePatches();
 
         _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
 
@@ -230,7 +226,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
 
     private void FixedUpdate()
     {
-        _patchManager.Update(Universe.Instance.UT);
+        patches.Update(Universe.Instance.UT);
     }
 
     private void Update()

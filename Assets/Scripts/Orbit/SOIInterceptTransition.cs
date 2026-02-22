@@ -50,19 +50,9 @@ namespace Orbit
                     orbit.periapsis > satellite.orbit.apoapsis + satellite.soiRadius)
                     continue;
 
-                double tStart = UT, tEnd = UT + 1e8;
-                if (orbit.Shape == OrbitShape.Ellipse) tEnd = UT + orbit.period;
-                if (_esc.HasTransition)
-                {
-                    tStart = Math.Max(tStart, (double)_esc.SOICapture?.time);
-                    tEnd = Math.Min(tEnd, (double)_esc.SOIEscape?.time);
-                }
+                var (tStart, tEnd) = EncounterCalculator.CalcTBounds(orbit, UT, _esc);
                 expiry = Math.Min(expiry, tEnd);
                 var encounters = _enc.GetEncounters(satellite.orbit, tStart, tEnd);
-                Debug.DrawLine(
-                    _prop.GetPosition(tStart) + CameraFocus.Instance.GetRelativePosition(orbit.body),
-                    _prop.GetPosition(tEnd) + CameraFocus.Instance.GetRelativePosition(orbit.body)
-                );
                 foreach (var e in encounters)
                 {
                     if (e.Distance < satellite.soiRadius && (!earliestEnc.HasValue || e.state.time < earliestEnc?.state.time))

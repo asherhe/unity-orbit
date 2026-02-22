@@ -120,5 +120,17 @@ namespace Orbit
 
             return encounters;
         }
+
+        public static (double, double) CalcTBounds(OrbitState orbit, double UT, SOIEscapeTransition esc)
+        {
+            double tStart = UT, tEnd = UT + 1e8;
+            if (orbit.Shape == OrbitShape.Ellipse) tEnd = UT + orbit.period;
+            if (esc.HasTransition)
+            {
+                tStart = Math.Max(tStart, (double)esc.SOICapture?.time);
+                tEnd = Math.Min(tEnd, (double)esc.SOIEscape?.time);
+            }
+            return (tStart, tEnd);
+        }
     }
 }
