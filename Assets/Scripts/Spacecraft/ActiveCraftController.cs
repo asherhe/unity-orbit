@@ -7,10 +7,8 @@ using UnityEngine.InputSystem;
 /// provides user control to the active spacecraft
 /// </summary>
 [RequireComponent(typeof(Spacecraft))]
-public class ActiveCraftController : MonoBehaviour
+public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
 {
-    public static ActiveCraftController Instance { get; private set; }
-
     private InputActions _inputActions;
 
     /// <summary>
@@ -28,10 +26,9 @@ public class ActiveCraftController : MonoBehaviour
     /// </summary>
     public float throttlingRate = 0.3f;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null || Instance == this) Instance = this;
-        else Destroy(this);
+        base.Awake();
 
         craft = GetComponent<Spacecraft>();
 
