@@ -71,6 +71,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
 
     private void RecalculateEncounters()
     {
+        if (Target == null) return;
         encounters = new List<TargetEncounter>();
         foreach (var patch in activePatches.Patches)
         {
