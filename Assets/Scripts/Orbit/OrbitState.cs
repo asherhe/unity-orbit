@@ -23,11 +23,11 @@ namespace Orbit
         /// </summary>
         public double GM { get => body.GM; }
 
-        private IOrbitingObject _owner;
+        private OrbitingObject _owner;
         /// <summary>
         /// the orbiting object that occupies this orbit. possibly <c>null</c>
         /// </summary>
-        public IOrbitingObject Owner
+        public OrbitingObject Owner
         {
             get
             {

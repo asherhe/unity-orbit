@@ -7,11 +7,11 @@ using UnityEngine;
 
 public class TargetingSystem : SingletonBehaviour<TargetingSystem>
 {
-    private IOrbitingObject _target;
+    private OrbitingObject _target;
     /// <summary>
     /// currently active targeted object. null if no target is active
     /// </summary>
-    public IOrbitingObject Target
+    public OrbitingObject Target
     {
         get => _target;
         set

@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CelestialBody : MonoBehaviour, IOrbitingObject
+public class CelestialBody : OrbitingObject
 {
     private CelestialBodyConfig _config;
     [Serializable]
@@ -100,12 +100,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     public string bodyName { get; private set; }
 
     /// <summary>
-    /// orbit of this body
-    /// </summary>
-    public OrbitState orbit { get; private set; }
-    private IOrbitPropagator _prop;
-
-    /// <summary>
     /// celestial body that this body is a satellite of
     /// </summary>
     public CelestialBody parent { get => orbit.body; }
@@ -189,7 +183,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
                 parent
             );
             orbit.Owner = this;
-            _prop = new UniversalPropagator(orbit);
+            prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
         }
@@ -331,13 +325,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         }
     }
 
-    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
-    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
-    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
-    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
-    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
-    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
-
     /// <summary>
     /// get the current position of this body, with the sun at the origin
     /// </summary>
@@ -345,7 +332,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     {
         var parentPos = Vector2d.zero;
         if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
-        return parentPos + GetPosition();
+        return parentPos + Position;
     }
 
     private void FixedUpdate()

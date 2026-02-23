@@ -71,7 +71,7 @@ namespace Orbit
             var soiTrav = 2 * nextCaptureBody.soiRadius / (captureEncounter.state.vel - captureEncounter.otherState.vel).Magnitude;
 
             // distance to SOI edge
-            double SOIDistance(double t) => (_prop.GetPosition(t) - nextCaptureBody.GetPosition(t)).Magnitude - nextCaptureBody.soiRadius;
+            double SOIDistance(double t) => (_prop.GetPosition(t) - nextCaptureBody.GetPositionAt(t)).Magnitude - nextCaptureBody.soiRadius;
 
             double captureTime = 0;
             try
@@ -89,7 +89,7 @@ namespace Orbit
             }
 
             nextCapture = _prop.GetStateVectors(captureTime);
-            var bodyState = nextCaptureBody.GetStateVectors(captureTime);
+            var bodyState = nextCaptureBody.GetStateVectorsAt(captureTime);
             return new TransitionResult(
                 nextCapture.Value, new OrbitState(
                     nextCapture?.pos - bodyState.pos,

@@ -100,7 +100,7 @@ namespace UI
 
         private void FixedUpdate()
         {
-            _prograde = _craft.GetVelocity();
+            _prograde = _craft.Velocity;
         }
 
         private void ToggleInterface()

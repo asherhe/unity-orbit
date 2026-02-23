@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Vertx.Debugging;
 
-public class Spacecraft : MonoBehaviour, IOrbitingObject
+public class Spacecraft : OrbitingObject
 {
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
@@ -57,15 +57,13 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     private GameObject _partsGameObject;
 
-    public OrbitState orbit { get; private set; }
-    private IOrbitPropagator _prop;
     public PatchedConicManager patches { get; private set; }
 
     private UI.SpacecraftLabel _mapLabel;
 
     public CelestialBody body { get => orbit.body; }
 
-    public double Altitude { get => GetPosition().Magnitude - body.radius; }
+    public double Altitude { get => Position.Magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.
@@ -131,7 +129,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         );
         orbit.Owner = this;
 
-        _prop = new UniversalPropagator(orbit);
+        prop = new UniversalPropagator(orbit);
 
         patches = new PatchedConicManager(orbit);
         patches.RecalculatePatches();
@@ -220,13 +218,6 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             Newtonian.momentOfInertia += mass * (part.craftPos - Newtonian.CenterOfMass).Magnitude;
         }
     }
-
-    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
-    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
-    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
-    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
-    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
-    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
 
     private void FixedUpdate()
     {

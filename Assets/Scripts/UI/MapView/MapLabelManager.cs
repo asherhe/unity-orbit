@@ -72,7 +72,7 @@ namespace UI
             return (SpacecraftLabel)SetupObjectLabel(labelObject, craft);
         }
 
-        private ObjectLabel SetupObjectLabel(GameObject labelObject, IOrbitingObject obj)
+        private ObjectLabel SetupObjectLabel(GameObject labelObject, OrbitingObject obj)
         {
             var label = labelObject.GetComponent<ObjectLabel>();
             label.Owner = obj;

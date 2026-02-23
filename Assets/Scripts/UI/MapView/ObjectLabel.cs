@@ -14,8 +14,8 @@ namespace UI
     {
         protected FollowWorldTransformFromScreen _follow;
 
-        private Orbit.IOrbitingObject _owner;
-        public Orbit.IOrbitingObject Owner
+        private Orbit.OrbitingObject _owner;
+        public Orbit.OrbitingObject Owner
         {
             get => _owner;
             set

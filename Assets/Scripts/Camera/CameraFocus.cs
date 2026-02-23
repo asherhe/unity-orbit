@@ -9,19 +9,19 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
     /// the object that the camera is focused on
     /// TODO: dynamically change focused object
     /// </summary>
-    public IOrbitingObject Focus { get => ActiveCraftController.Instance.craft; }
+    public OrbitingObject Focus { get => ActiveCraftController.Instance.craft; }
 
     /// <summary>
     /// get the current location of an orbit, relative to the location of the focused object.
     /// </summary>
     /// <returns></returns>
-    public Vector2d GetRelativePosition(IOrbitingObject obj)
+    public Vector2d GetRelativePosition(OrbitingObject obj)
     {
         if (Focus == obj) return Vector2d.zero;
 
         // get lowest common ancestor of the two orbits
-        IOrbitingObject cur;
-        LinkedList<IOrbitingObject> focusPath = new(), objPath = new();
+        OrbitingObject cur;
+        LinkedList<OrbitingObject> focusPath = new(), objPath = new();
         focusPath.AddFirst(cur = Focus);
         while (cur.orbit != null)
         {
@@ -35,8 +35,8 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
             objPath.AddFirst(cur);
         }
         // look for the first difference
-        IOrbitingObject common = focusPath.First.Value;
-        LinkedListNode<IOrbitingObject> focusNode = focusPath.First, objNode = objPath.First;
+        OrbitingObject common = focusPath.First.Value;
+        LinkedListNode<OrbitingObject> focusNode = focusPath.First, objNode = objPath.First;
         while (focusNode.Value == objNode.Value)
         {
             common = focusNode.Value;
