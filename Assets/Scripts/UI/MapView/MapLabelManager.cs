@@ -11,7 +11,7 @@ namespace UI
     public class MapLabelManager : SingletonBehaviour<MapLabelManager>
     {
         [SerializeField]
-        private GameObject _apsisLabelPrefab; 
+        private GameObject _apsisLabelPrefab;
         [SerializeField]
         private GameObject _SOITransitionLabelPrefab;
 
@@ -26,7 +26,10 @@ namespace UI
         {
             base.Awake();
 
-            MapViewManager.Instance.OnMapToggled += UpdateLabelVisibility;
+            MapViewManager.WhenInstantiated(() =>
+            {
+                MapViewManager.Instance.OnMapToggled += UpdateLabelVisibility;
+            });
         }
 
         private void Start()

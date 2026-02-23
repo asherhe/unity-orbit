@@ -125,17 +125,20 @@ namespace Orbit
             trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
             trajectory.name = $"Trajectory {rootOrbit.Owner} (Patch {_patchStep})";
 
-            periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
-            apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
-            soiLabel = UI.MapLabelManager.Instance.AddSOITransition(this);
-
-            manager.OnTransition += () =>
+            UI.MapLabelManager.WhenInstantiated(() =>
             {
-                bool hasNext = nextPatch != null;
-                periapsisLabel.IsLabelActive = hasNext && nextPatch.periapsisLabel.IsLabelActive;
-                apoapsisLabel.IsLabelActive = hasNext && nextPatch.apoapsisLabel.IsLabelActive;
-                soiLabel.IsLabelActive = hasNext && nextPatch.soiLabel.IsLabelActive;
-            };
+                periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
+                apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
+                soiLabel = UI.MapLabelManager.Instance.AddSOITransition(this);
+
+                manager.OnTransition += () =>
+                {
+                    bool hasNext = nextPatch != null;
+                    periapsisLabel.IsLabelActive = hasNext && nextPatch.periapsisLabel.IsLabelActive;
+                    apoapsisLabel.IsLabelActive = hasNext && nextPatch.apoapsisLabel.IsLabelActive;
+                    soiLabel.IsLabelActive = hasNext && nextPatch.soiLabel.IsLabelActive;
+                };
+            });
 
             OnTransitionUpdate += UpdateTrajectoryBounds;
         }

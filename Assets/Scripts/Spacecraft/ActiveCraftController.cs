@@ -28,8 +28,6 @@ public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
 
     protected override void Awake()
     {
-        base.Awake();
-
         craft = GetComponent<Spacecraft>();
 
         craft.OnLoaded += () =>
@@ -47,6 +45,7 @@ public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
 
         _inputActions.Flight.AutoSteer.performed += ctx => command.IsAutoSteerEnabled = !command.IsAutoSteerEnabled;
 
+        base.Awake();
     }
 
     private void Update()

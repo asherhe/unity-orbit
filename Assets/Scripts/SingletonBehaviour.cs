@@ -1,11 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
 {
-    private static Action OnInstantiated;
+    private static event Action OnInstantiated;
 
     public static T Instance { get; private set; }
 
@@ -14,7 +15,7 @@ public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
         if (Instance != null && Instance != this) Destroy(this);
         else if (Instance == null) Instance = this as T;
 
-        OnInstantiated();
+        OnInstantiated?.Invoke();
     }
 
     /// <summary>
@@ -24,6 +25,29 @@ public class SingletonBehaviour<T> : MonoBehaviour where T : MonoBehaviour
     public static bool WhenInstantiated(Action callback)
     {
         if (Instance != null) { callback(); return true; }
-        else { OnInstantiated += callback; return false; }
+
+        Action handler = null;
+        handler = () =>
+        {
+            OnInstantiated -= handler;
+            callback();
+        };
+        OnInstantiated += handler;
+        return false;
+    }
+
+    public static Task WaitForInstantiation()
+    {
+        if (Instance != null) return Task.CompletedTask;
+
+        var tcs = new TaskCompletionSource<bool>();
+        Action handler = null;
+        handler = () =>
+        {
+            OnInstantiated -= handler;
+            tcs.TrySetResult(true);
+        };
+        OnInstantiated += handler;
+        return tcs.Task;
     }
 }

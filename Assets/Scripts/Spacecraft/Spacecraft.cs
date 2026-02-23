@@ -119,6 +119,7 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         Newtonian.angle = _config.rotation.angle;
         Newtonian.angularMomentum = _config.rotation.momentum;
 
+        await CelestialBodyManager.WaitForInstantiation();
         var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
         orbit = new OrbitState(
             _config.orbit.h,
@@ -135,7 +136,10 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         patches = new PatchedConicManager(orbit);
         patches.RecalculatePatches();
 
-        _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
+        UI.MapLabelManager.WhenInstantiated(() =>
+        {
+            _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
+        });
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,

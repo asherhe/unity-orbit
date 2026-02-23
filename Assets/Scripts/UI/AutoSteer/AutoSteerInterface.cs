@@ -48,12 +48,15 @@ namespace UI
 
             gameObject.SetActive(false);
 
-            _craft = ActiveCraftController.Instance.craft;
-            _craft.OnLoaded += () =>
+            ActiveCraftController.WhenInstantiated(() =>
             {
-                _command = ActiveCraftController.Instance.command;
-                _command.OnAutoSteerToggled += ToggleInterface;
-            };
+                _craft = ActiveCraftController.Instance.craft;
+                _craft.OnLoaded += () =>
+                {
+                    _command = ActiveCraftController.Instance.command;
+                    _command.OnAutoSteerToggled += ToggleInterface;
+                };
+            });
 
             _handle.OnHandleDragged += OnHandleDrag;
             _toggleGroup.OnActiveSwitched += OnHoldModeChanged;

@@ -57,12 +57,14 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     {
         base.Awake();
 
-        var activeCraft = ActiveCraftController.Instance.craft;
-        activeCraft.OnLoaded += () =>
-        {
-            activePatches = activeCraft.patches;
-            activePatches.OnRecalculated += RecalculateEncounters;
-        };
+        ActiveCraftController.WhenInstantiated(() => {
+            var activeCraft = ActiveCraftController.Instance.craft;
+            activeCraft.OnLoaded += () =>
+            {
+                activePatches = activeCraft.patches;
+                activePatches.OnRecalculated += RecalculateEncounters;
+            };
+        });
 
         OnTargetChanged += () => AnnouncementDisplay.Instance.Announce(Target == null ? "Targeting Cancelled" : $"Targeting {Target.gameObject.name}");
     }

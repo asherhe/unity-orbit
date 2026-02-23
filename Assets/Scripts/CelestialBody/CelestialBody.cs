@@ -88,7 +88,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _surfaceObject;
     private GameObject _atmObject;
     private GameObject _soiObject;
-    
+
     private UI.CelestialBodyLabel _mapLabel;
 
     [SerializeField]
@@ -192,12 +192,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             _prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
-
-            UI.Trajectory trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
-            trajectory.name = $"Trajectory {this}";
-            trajectory.Color = color;
-            // we can afford to do high quality for celestial trajectories because they are static
-            trajectory.quality = 1e-6;
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))
@@ -319,7 +313,22 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         SetDynamicMaterialProperties();
 
-        _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
+        UI.MapLabelManager.WhenInstantiated(() =>
+        {
+            _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
+        });
+
+        if (orbit != null)
+        {
+            UI.TrajectoryManager.WhenInstantiated(() =>
+            {
+                var trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
+                trajectory.name = $"Trajectory {this}";
+                trajectory.Color = color;
+                // we can afford to do high quality for celestial trajectories because they are static
+                trajectory.quality = 1e-6;
+            });
+        }
     }
 
     public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);

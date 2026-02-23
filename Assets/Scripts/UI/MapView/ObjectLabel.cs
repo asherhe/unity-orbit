@@ -56,7 +56,11 @@ namespace UI
             OnOwnerUpdated += UpdateTargeting;
 
             icon.OnClick += ToggleTarget;
-            TargetingSystem.Instance.OnTargetChanged += UpdateTargeting;
+         
+            TargetingSystem.WhenInstantiated(() =>
+            {
+                TargetingSystem.Instance.OnTargetChanged += UpdateTargeting;
+            });
         }
 
         private void ToggleTarget()

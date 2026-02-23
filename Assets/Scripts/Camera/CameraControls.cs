@@ -77,11 +77,11 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         public float zoomLevel;
     }
     [SerializeField]
-    private ViewZoomLevel []_zoomLevels;
+    private ViewZoomLevel[] _zoomLevels;
     public void OnBeforeSerialize()
     {
         int i;
-        
+
         _zoomBounds = new ViewZoomBound[zoomBounds.Count];
         i = 0;
         foreach (var kvp in zoomBounds)
@@ -95,7 +95,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
 
         _zoomLevels = new ViewZoomLevel[zoomLevels.Count];
         i = 0;
-        foreach(var kvp in zoomLevels)
+        foreach (var kvp in zoomLevels)
         {
             _zoomLevels[i] = new ViewZoomLevel();
             _zoomLevels[i].view = kvp.Key;
