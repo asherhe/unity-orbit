@@ -35,19 +35,29 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
         /// </summary>
         public Patch patch;
         /// <summary>
+        /// which encounter of the patch is this? (0 is first encounter to happen)
+        /// </summary>
+        public int number;
+        /// <summary>
         /// data about the encounter from EncounterCalculator
         /// </summary>
         public EncounterCalculator.Encounter encounter;
 
-        public TargetEncounter(Patch patch, EncounterCalculator.Encounter encounter)
+        public TargetEncounter(Patch patch, int number, EncounterCalculator.Encounter encounter)
         {
-            this.patch = patch; this.encounter = encounter;
+            this.patch = patch;
+            this.number = number;
+            this.encounter = encounter;
         }
     }
+
+    public enum EncounterObject { Active, Target }
+
+    private List<TargetEncounter> _encounters = new();
     /// <summary>
     /// all encounters with the target
     /// </summary>
-    List<TargetEncounter> encounters;
+    public IEnumerable<TargetEncounter> Encounters { get => _encounters.AsReadOnly(); }
     /// <summary>
     /// invoked once new encounter data has been determined
     /// </summary>
@@ -57,7 +67,8 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     {
         base.Awake();
 
-        ActiveCraftController.WhenInstantiated(() => {
+        ActiveCraftController.WhenInstantiated(() =>
+        {
             var activeCraft = ActiveCraftController.Instance.craft;
             activeCraft.OnLoaded += () =>
             {
@@ -67,22 +78,26 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
         });
 
         OnTargetChanged += () => AnnouncementDisplay.Instance.Announce(Target == null ? "Targeting Cancelled" : $"Targeting {Target.gameObject.name}");
+        OnTargetChanged += RecalculateEncounters;
+
+        gameObject.AddComponent<UI.TargetEncounterLabels>();
     }
 
     private void RecalculateEncounters()
     {
         if (Target == null) return;
-        encounters = new List<TargetEncounter>();
-        foreach (var patch in activePatches.Patches)
+
+        _encounters.Clear();
+        foreach (var patch in activePatches.ActivePatches)
         {
             if (patch.patchOrbit.body != Target.orbit.body) continue;
 
-            var (tStart, tEnd) = EncounterCalculator.CalcTBounds(patch.patchOrbit, Universe.Instance.UT, patch.soiEscape);
-            
+            var UT = patch.prevPatch == null ? Universe.Instance.UT : patch.prevPatch.NextTransition.Time;
+            var (tStart, tEnd) = EncounterCalculator.CalcTBounds(patch.patchOrbit, UT, patch.soiEscape);
             var encCalc = new EncounterCalculator(patch.patchOrbit);
             var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
-            foreach (var encounter in encs)
-                encounters.Add(new(patch, encounter));
+            for (int i = 0; i < encs.Count; i++)
+                _encounters.Add(new(patch, i, encs[i]));
         }
 
         OnEncounterUpdate?.Invoke();

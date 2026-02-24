@@ -14,6 +14,8 @@ namespace UI
         private GameObject _apsisLabelPrefab;
         [SerializeField]
         private GameObject _SOITransitionLabelPrefab;
+        [SerializeField]
+        private GameObject _encounterLabelGroupPrefab;
 
         [SerializeField]
         private GameObject _celestialBodyLabelPrefab;
@@ -56,6 +58,11 @@ namespace UI
             var soiLabel = labelObject.GetComponent<SOITransitionLabel>();
             soiLabel.Patch = patch;
             return soiLabel;
+        }
+        public EncounterLabelGroup AddEncounterLabelGroup()
+        {
+            var labelObject = Instantiate(_encounterLabelGroupPrefab, transform);
+            return labelObject.GetComponent<EncounterLabelGroup>();
         }
 
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)

@@ -22,9 +22,20 @@ namespace Orbit
         /// </summary>
         private readonly List<Patch> _patches;
         /// <summary>
-        /// all patches of this orbit
+        /// all patches of this orbit, whether active or inactive
         /// </summary>
-        public IList<Patch> Patches { get => _patches.AsReadOnly(); }
+        public IEnumerable<Patch> AllPatches { get => _patches.AsReadOnly(); }
+        /// <summary>
+        /// all active patches of this orbit
+        /// </summary>
+        public IEnumerable<Patch> ActivePatches
+        {
+            get
+            {
+                for (int i = 0; i < numActivePatches; i++)
+                    yield return _patches[i];
+            }
+        }
 
         /// <summary>
         /// number of patches actually predicted to exist
