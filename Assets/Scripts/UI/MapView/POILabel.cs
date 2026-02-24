@@ -66,7 +66,7 @@ namespace UI
                 if (LabelOrbit.Shape == OrbitShape.Ellipse) size = (float)LabelOrbit.a;
                 else size = (float)LabelOrbit.body.soiRadius;
                 // size of on-screen icon in world space
-                var iconSize = iconImage.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
+                var iconSize = icon.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
                 // hide label if zoomed out enough to avoid obscuring more important stuff
                 Alpha = Mathf.Clamp01((size / iconSize - 0.5f) / 0.5f);
             }

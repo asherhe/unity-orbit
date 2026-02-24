@@ -31,7 +31,7 @@ namespace UI
             var r = (float)_body.radius;
             var a = (float)_body.orbit.a;
             // size of on-screen icon in world space
-            var iconSize = iconImage.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
+            var iconSize = icon.rectTransform.rect.width * IntegerCanvasScale.Instance.Canvas2World;
 
             // alpha for hiding label when we zoom in close enough
             var hideRadius = (iconSize / r - 4.0f) / 2.0f;

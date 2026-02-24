@@ -41,7 +41,7 @@ namespace UI
         }
         private void UpdateIcon()
         {
-            iconImage.sprite = Mode == DisplayMode.Periapsis ? _periapsisIcon : _apoapsisIcon;
+            icon.sprite = Mode == DisplayMode.Periapsis ? _periapsisIcon : _apoapsisIcon;
         }
     }
 }

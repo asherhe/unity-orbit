@@ -12,7 +12,6 @@ namespace UI
     public class MapLabel : MonoBehaviour
     {
         public RectTransform rectTransform { get; private set; }
-        protected Image iconImage;
 
         [SerializeField]
         protected MapIcon icon;
@@ -67,19 +66,17 @@ namespace UI
         {
             rectTransform = transform as RectTransform;
 
-            iconImage = icon.GetComponent<Image>();
             icon.OnHoverEnter += OnHoverEnter;
             icon.OnHoverLeave += OnHoverLeave;
 
-            iconColor = iconImage.color;
+            icon.OnInitialized += () => iconColor = icon.color;
             textColor = labelText.color;
         }
 
         protected virtual void UpdateVisuals()
         {
-            iconImage.color = new Color(iconColor.r, iconColor.g, iconColor.b, Alpha);
+            icon.color = new Color(iconColor.r, iconColor.g, iconColor.b, Alpha);
             labelText.color = new Color(textColor.r, textColor.g, textColor.b, Alpha * TextAlpha);
-            iconImage.raycastTarget = Alpha != 0.0f;
         }
 
         private void TweenTextAlpha()

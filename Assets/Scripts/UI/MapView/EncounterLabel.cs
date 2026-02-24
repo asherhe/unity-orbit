@@ -26,7 +26,7 @@ namespace UI
         {
             DisplayPrefs prefs = _displayPrefs[enc.number];
 
-            iconImage.sprite = prefs.icon;
+            icon.sprite = prefs.icon;
             SetColors(iconColor, prefs.color);
 
             this.mode = mode;
