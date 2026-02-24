@@ -2,9 +2,8 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UI.Colorable;
+using TMPro;
 using UnityEngine;
-using static Orbit.EncounterCalculator;
 
 namespace UI
 {
@@ -14,9 +13,17 @@ namespace UI
         private TargetingSystem.TargetEncounter enc;
         private StateVectors state;
 
+        private TMP_Text _iconText;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _iconText = icon.iconGraphic as TMP_Text;
+        }
+
         public void SetEncounter(TargetingSystem.TargetEncounter enc, TargetingSystem.EncounterObject mode)
         {
-            (icon.iconObject as TMPColorAdapter).text.text = (enc.number + 1).ToString();
+            _iconText.text = (enc.number + 1).ToString();
 
             this.mode = mode;
             this.enc = enc;
@@ -39,6 +46,8 @@ namespace UI
         }
         protected override string GetLabelText()
         {
+            MatchTrajectoryColor();
+
             var name = $"Encounter {enc.number + 1}";
             if (mode == TargetingSystem.EncounterObject.Active) return $"{name}={TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
             else return $"{name}:Target";

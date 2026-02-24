@@ -69,7 +69,7 @@ namespace UI
             icon.OnHoverEnter += OnHoverEnter;
             icon.OnHoverLeave += OnHoverLeave;
 
-            icon.OnInitialized += () => iconColor = icon.color;
+            iconColor = icon.color;
             textColor = labelText.color;
         }
 

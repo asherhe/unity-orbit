@@ -71,5 +71,14 @@ namespace UI
                 Alpha = Mathf.Clamp01((size / iconSize - 0.5f) / 0.5f);
             }
         }
+
+        /// <summary>
+        /// match the text and icon color to that of the trajectory corresponding to this orbit
+        /// </summary>
+        protected void MatchTrajectoryColor()
+        {
+            var trajColor = TrajectoryManager.Instance.GetTrajectoryOf(LabelOrbit).Color;
+            SetColors(trajColor, trajColor);
+        }
     }
 }

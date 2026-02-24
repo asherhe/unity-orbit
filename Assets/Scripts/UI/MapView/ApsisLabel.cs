@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
-using UI.Colorable;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -9,6 +9,8 @@ namespace UI
     {
         [SerializeField]
         private Sprite _periapsisIcon, _apoapsisIcon;
+
+        private Image _iconImage;
 
         public enum DisplayMode
         {
@@ -26,8 +28,16 @@ namespace UI
             }
         }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            _iconImage = icon.iconGraphic as Image;
+        }
+
         protected override Vector2d GetPosition()
         {
+            MatchTrajectoryColor();
+
             // position of apsis in perifocal space
             var perifocal = Vector2d.right;
             if (Mode == DisplayMode.Periapsis) perifocal *= Orbit.periapsis;
@@ -42,7 +52,7 @@ namespace UI
         }
         private void UpdateIcon()
         {
-            (icon.iconObject as ImageColorAdapter).image.sprite = (Mode == DisplayMode.Periapsis) ? _periapsisIcon : _apoapsisIcon;
+            _iconImage.sprite = (Mode == DisplayMode.Periapsis) ? _periapsisIcon : _apoapsisIcon;
         }
     }
 }

@@ -2,8 +2,8 @@ using Colourful;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UI.Colorable;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -13,28 +13,28 @@ namespace UI
         /// gameobject that represents the tag display
         /// </summary>
         [SerializeField]
-        private ColorableUIObject _tagObject;
+        private Graphic _tagGraphic;
 
         private IColorConverter<RGBColor, LabColor> _conv;
 
-        private Color _color;
         public override Color color
         {
-            get => _color;
+            get => _tagGraphic.color;
             set
             {
-                _color = value;
-                _tagObject.Color = _color;
-                
-                LabColor lab = _conv.Convert(new RGBColor(_color.r, _color.g, _color.b));
+                _tagGraphic.color = value;
+                _tagGraphic.raycastTarget = color.a != 0.0f;
+
+                LabColor lab = _conv.Convert(new RGBColor(color.r, color.g, color.b));
                 var val = lab.L < 90 ? 1.0f : 0.0f;
-                iconObject.Color = new Color(val, val, val, _color.a);
+                iconGraphic.color = new Color(val, val, val, color.a);
             }
         }
 
         protected override void Awake()
         {
             base.Awake();
+            iconGraphic.raycastTarget = false;
             _conv = new ConverterBuilder().FromRGB().ToLab().Build();
         }
     }
