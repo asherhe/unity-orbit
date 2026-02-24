@@ -112,7 +112,7 @@ public class CelestialBody : OrbitingObject
     /// <summary>
     /// radius of this celestial body's SOI
     /// </summary>
-    public double soiRadius { get; private set; }
+    public double soiRadius { get; private set; } = double.PositiveInfinity;
 
 
     /// <summary>

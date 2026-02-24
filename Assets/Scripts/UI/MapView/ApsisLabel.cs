@@ -32,6 +32,11 @@ namespace UI
             if (Mode == DisplayMode.Periapsis) perifocal *= Orbit.periapsis;
             else perifocal *= -Orbit.apoapsis;
 
+            // hide label if it's not supposed to be shown
+            var isEscaped = Mode == DisplayMode.Apoapsis && Orbit.apoapsis > Orbit.body.soiRadius;
+            var isUnderground = Mode == DisplayMode.Periapsis && Orbit.periapsis < Orbit.body.radius;
+            gameObject.SetActive(!(isEscaped || isUnderground));
+
             return Orbit.PerifocalToBody(perifocal);
         }
         private void UpdateIcon()
