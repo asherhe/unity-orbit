@@ -2,6 +2,7 @@ using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UI.Colorable;
 using UnityEngine;
 using static Orbit.EncounterCalculator;
 
@@ -9,25 +10,13 @@ namespace UI
 {
     public class EncounterLabel : OrbitPOILabel
     {
-        [Serializable]
-        private struct DisplayPrefs
-        {
-            public Sprite icon;
-            public Color color;
-        }
-        [SerializeField]
-        private List<DisplayPrefs> _displayPrefs = new();
-
         private TargetingSystem.EncounterObject mode;
         private TargetingSystem.TargetEncounter enc;
         private StateVectors state;
 
         public void SetEncounter(TargetingSystem.TargetEncounter enc, TargetingSystem.EncounterObject mode)
         {
-            DisplayPrefs prefs = _displayPrefs[enc.number];
-
-            icon.sprite = prefs.icon;
-            SetColors(iconColor, prefs.color);
+            (icon.iconObject as TMPColorAdapter).text.text = (enc.number + 1).ToString();
 
             this.mode = mode;
             this.enc = enc;
@@ -51,7 +40,7 @@ namespace UI
         protected override string GetLabelText()
         {
             var name = $"Encounter {enc.number + 1}";
-            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}:{TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
+            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}={TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
             else return $"{name}:Target";
         }
     }

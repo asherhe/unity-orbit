@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UI.Colorable;
 using UnityEngine;
 
 namespace UI
@@ -41,7 +42,7 @@ namespace UI
         }
         private void UpdateIcon()
         {
-            icon.sprite = Mode == DisplayMode.Periapsis ? _periapsisIcon : _apoapsisIcon;
+            (icon.iconObject as ImageColorAdapter).image.sprite = (Mode == DisplayMode.Periapsis) ? _periapsisIcon : _apoapsisIcon;
         }
     }
 }

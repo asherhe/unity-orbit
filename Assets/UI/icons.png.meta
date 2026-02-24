@@ -344,7 +344,7 @@ TextureImporter:
       name: poi_periapsis
       rect:
         serializedVersion: 2
-        x: 0
+        x: 16
         y: 192
         width: 16
         height: 16
@@ -365,7 +365,7 @@ TextureImporter:
       name: poi_apoapsis
       rect:
         serializedVersion: 2
-        x: 16
+        x: 32
         y: 192
         width: 16
         height: 16
@@ -386,7 +386,7 @@ TextureImporter:
       name: poi_capture
       rect:
         serializedVersion: 2
-        x: 32
+        x: 48
         y: 192
         width: 16
         height: 16
@@ -407,12 +407,12 @@ TextureImporter:
       name: poi_escape
       rect:
         serializedVersion: 2
-        x: 48
+        x: 64
         y: 192
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -425,43 +425,22 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: poi_approach_1
+      name: tag_icon
       rect:
         serializedVersion: 2
-        x: 64
+        x: 0
         y: 192
         width: 16
         height: 16
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
+      alignment: 0
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: baccd48493099994eab255fb648636a9
-      internalID: -2098560842
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poi_approach_2
-      rect:
-        serializedVersion: 2
-        x: 80
-        y: 192
-        width: 16
-        height: 16
-      alignment: 7
-      pivot: {x: 0.5, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b3927430470251345be51ce0c7c2ea46
-      internalID: 376356622
+      spriteID: 9fa781e5daa730445ab69ab588981494
+      internalID: -1548797983
       vertices: []
       indices: 
       edges: []
@@ -494,6 +473,7 @@ TextureImporter:
       poi_escape: 831127747
       poi_periapsis: -1783579856
       sun_body: -2061752127
+      tag_icon: -1548797983
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
