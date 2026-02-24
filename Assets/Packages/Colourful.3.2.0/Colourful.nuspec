@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Colourful</id>
+    <version>3.2.0+build.454</version>
+    <authors>Tomáš Pažourek</authors>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <icon>logo_64.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://github.com/tompazourek/Colourful</projectUrl>
+    <description>Open source .NET library for working with color spaces.</description>
+    <releaseNotes>https://github.com/tompazourek/Colourful/releases</releaseNotes>
+    <copyright>Copyright 2023 Tomáš Pažourek</copyright>
+    <tags>adobe-rgb bradford c-sharp cct chromatic-adaptation chromaticity cie-lab cie-luv cie-xyy cie-xyz color-difference color-space conversion delta-e lab lms luv rgb srgb xyz</tags>
+    <repository type="git" url="https://github.com/tompazourek/Colourful" commit="0672868ef0752655fb09e854728137b2de607968" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.5" />
+      <group targetFramework=".NETStandard1.1">
+        <dependency id="NETStandard.Library" version="1.6.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net6.0" />
+      <group targetFramework="net8.0" />
+      <group targetFramework=".NETStandard2.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Drawing" targetFramework=".NETFramework4.5" />
+    </frameworkAssemblies>
+  </metadata>
+</package>

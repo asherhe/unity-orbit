@@ -1,0 +1,3008 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Colourful</name>
+    </assembly>
+    <members>
+        <member name="T:Colourful.ConverterBuilder">
+            <summary>
+            Primary API to be used to create color converters. It provides a fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.ConverterBuilder.#ctor(System.Collections.Generic.IEnumerable{Colourful.Internals.IConversionStrategy})">
+            <summary>
+            If you want to customize the conversion process, provide your own list of conversion strategies.
+            Otherwise, use the parameterless constructor that uses <see cref="M:Colourful.Internals.ConversionStrategies.GetDefault(System.Double[0:,0:])" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.ConverterBuilder.#ctor(System.Double[0:,0:])">
+            <summary>
+            Creates a builder with all the defaults (all built-in strategies).
+            </summary>
+            <param name="lmsTransformationMatrix">Optionally pick LMS transformation matrix (<see cref="T:Colourful.LMSTransformationMatrix" />) used for LMS-XYZ conversion and chromatic adaptation for color spaces with different white points. If empty, <see cref="F:Colourful.LMSTransformationMatrix.Bradford" /> will be used.</param>
+        </member>
+        <member name="M:Colourful.ConverterBuilder.#ctor">
+            <summary>
+            Creates a builder with all the defaults (all built-in strategies with default settings).
+            </summary>
+        </member>
+        <member name="M:Colourful.ConverterBuilder.From``1(Colourful.Internals.IConversionMetadata)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.IFluentConverterBuilder">
+            <summary>
+            Fluent interface for <see cref="T:Colourful.ConverterBuilder" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.IFluentConverterBuilder.From``1(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Saves the metadata about the source color space, and proceeds.
+            Intended only for internal implementation.
+            Use the FromXXX extension methods.
+            </summary>
+            <typeparam name="TSource">Source space.</typeparam>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <returns>Fluent interface.</returns>
+        </member>
+        <member name="T:Colourful.IFluentConverterBuilderFrom`1">
+            <summary>
+            Fluent interface for <see cref="T:Colourful.ConverterBuilder" />.
+            </summary>
+            <typeparam name="TSource">Source space.</typeparam>
+        </member>
+        <member name="M:Colourful.IFluentConverterBuilderFrom`1.To``1(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Saves the metadata about the target color space, and proceeds.
+            Intended only for internal implementation.
+            Use the ToXXX extension methods.
+            </summary>
+            <typeparam name="TTarget">Target space.</typeparam>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <returns>Fluent interface.</returns>
+        </member>
+        <member name="T:Colourful.IFluentConverterBuilderFromTo`2">
+            <summary>
+            Fluent interface for <see cref="T:Colourful.ConverterBuilder" />.
+            </summary>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+        </member>
+        <member name="M:Colourful.IFluentConverterBuilderFromTo`2.Build">
+            <summary>
+            Builds the converter.
+            </summary>
+            <returns>Converter instance.</returns>
+        </member>
+        <member name="T:Colourful.Internals.BypassConverter`1">
+            <summary>
+            Bypasses the conversions, returns the same input as output.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.BypassConverter`1.Convert(`0@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.CompositeConverter`3">
+            <summary>
+            Composes first converter (from source to intermediate space) with second converter (from intermediate to target space)
+            to create the final source to target converter.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.CompositeConverter`3.FirstConverter">
+            <summary>
+            First converter (from source to intermediate space).
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.CompositeConverter`3.SecondConverter">
+            <summary>
+            Second converter (from intermediate to target space).
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.CompositeConverter`3.#ctor(Colourful.IColorConverter{`0,`1},Colourful.IColorConverter{`1,`2})">
+            <summary>
+            Creates a composite converter from two converters.
+            </summary>
+            <param name="firstConverter">First converter (from source to intermediate space).</param>
+            <param name="secondConverter">Second converter (from intermediate to target space).</param>
+        </member>
+        <member name="M:Colourful.Internals.CompositeConverter`3.Convert(`0@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.ConversionMetadata">
+            <inheritdoc />
+        </member>
+        <member name="F:Colourful.Internals.ConversionMetadata.Empty">
+            <summary>
+            No conversion metadata, empty instance.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadata.#ctor(System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Creates new instance given an array of items.
+            </summary>
+            <param name="setItems">Items to set as the metadata.</param>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadata.GetItemOrDefault``1(System.String@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadata.CloneWith(System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.ConversionMetadataKeys">
+            <summary>
+            Keys for values in <see cref="T:Colourful.Internals.IConversionMetadata" /> that are used by the built-in color spaces.
+            </summary>
+        </member>
+        <member name="F:Colourful.Internals.ConversionMetadataKeys.WhitePoint">
+            <summary>
+            White point of the color converted. The value is a <see cref="T:System.Nullable`1" />.
+            </summary>
+        </member>
+        <member name="F:Colourful.Internals.ConversionMetadataKeys.RGBPrimaries">
+            <summary>
+            RGB primaries of the color converted. The value is a <see cref="T:System.Nullable`1" />.
+            </summary>
+        </member>
+        <member name="F:Colourful.Internals.ConversionMetadataKeys.Companding">
+            <summary>
+            Companding function of the color converted. The value is a <see cref="T:Colourful.Internals.ICompanding" />.
+            </summary>
+        </member>
+        <member name="T:Colourful.Internals.ConversionMetadataUtils">
+            <summary>
+            Utilities for working with <see cref="T:Colourful.Internals.IConversionMetadata" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetWhitePoint(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.WhitePoint" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetWhitePointItem(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.WhitePoint" /> as Key-Value pair.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetWhitePointRequired(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.WhitePoint" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.EqualWhitePoints(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@)">
+            <summary>
+            Returns true if the nodes have the same white point.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.CreateWhitePoint(System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Creates a new item for <see cref="F:Colourful.Internals.ConversionMetadataKeys.WhitePoint" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetRGBPrimaries(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.RGBPrimaries" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetRGBPrimariesItem(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.RGBPrimaries" /> as Key-Value pair.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetRGBPrimariesRequired(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.RGBPrimaries" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.EqualRGBPrimaries(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@)">
+            <summary>
+            Returns true if the nodes have the same RGB primaries.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.CreateRGBPrimaries(System.Nullable{Colourful.Internals.RGBPrimaries}@)">
+            <summary>
+            Creates a new item for <see cref="F:Colourful.Internals.ConversionMetadataKeys.RGBPrimaries" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetCompanding(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.Companding" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetCompandingItem(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.Companding" /> as Key-Value pair.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.GetCompandingRequired(Colourful.Internals.IConversionMetadata)">
+            <summary>
+            Helper extension method to get <see cref="F:Colourful.Internals.ConversionMetadataKeys.Companding" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.EqualCompanding(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@)">
+            <summary>
+            Returns true if the nodes have the same companding.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionMetadataUtils.CreateCompanding(Colourful.Internals.ICompanding@)">
+            <summary>
+            Creates a new item for <see cref="F:Colourful.Internals.ConversionMetadataKeys.Companding" />.
+            </summary>
+        </member>
+        <member name="T:Colourful.Internals.ConversionStrategies">
+            <summary>
+            Easy access to the built-in conversion strategies.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ConversionStrategies.GetDefault(System.Double[0:,0:])">
+            <summary>
+            Returns list of conversion strategies that are built-in to the library.
+            </summary>
+            <param name="lmsTransformationMatrix">Optionally pick LMS transformation matrix (<see cref="T:Colourful.LMSTransformationMatrix" />) used for LMS-XYZ conversion and chromatic adaptation for color spaces with different white points. If empty, <see cref="F:Colourful.LMSTransformationMatrix.Bradford" /> will be used.</param>
+        </member>
+        <member name="T:Colourful.Internals.ConverterAbstractFactory">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.ConverterAbstractFactory.#ctor(System.Collections.Generic.IEnumerable{Colourful.Internals.IConversionStrategy})">
+            <summary>
+            Constructs a new instance.
+            </summary>
+            <param name="conversionStrategies">Conversion strategies to use.</param>
+        </member>
+        <member name="M:Colourful.Internals.ConverterAbstractFactory.CreateConverter``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.IConversionMetadata">
+            <summary>
+            Conversion metadata used by the conversion strategies to decide how to compose converters.
+            It can be thought of as an extensible collection of key-value pairs.
+            See <see cref="T:Colourful.Internals.ConversionMetadataKeys" /> for keys of the built-in items.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.IConversionMetadata.GetItemOrDefault``1(System.String@)">
+            <param name="key">Item key.</param>
+            <returns>Item value (or default value if not found).</returns>
+        </member>
+        <member name="M:Colourful.Internals.IConversionMetadata.CloneWith(System.Collections.Generic.KeyValuePair{System.String,System.Object}[])">
+            <summary>
+            Clones the metadata and modifies its items.
+            </summary>
+            <param name="setItems">Item values to set.</param>
+        </member>
+        <member name="T:Colourful.Internals.IConversionStrategy">
+            <summary>
+            Strategy of a color space that helps to determine the order of conversions.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.IConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <summary>
+            Processes the conversions in case the source and target spaces are the same.
+            These conversions are attempted 1st (it might result in a bypass conversions <see cref="T:Colourful.Internals.BypassConverter`1" />).
+            </summary>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <param name="converterAbstractFactory">Backreference to the converter factory to facilitate recursion.</param>
+            <typeparam name="TColor">Both the source and target space.</typeparam>
+            <returns>If the inputs apply to the strategy, it returns a converter. Otherwise, returns null.</returns>
+        </member>
+        <member name="M:Colourful.Internals.IConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <summary>
+            Processes the conversions between the source and the target. The intention is to process the direct conversions here.
+            These conversions are attempted 2nd (after <see cref="M:Colourful.Internals.IConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)" />).
+            </summary>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <param name="converterAbstractFactory">Backreference to the converter factory to facilitate recursion.</param>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+            <returns>If the inputs apply to the strategy, it returns a converter. Otherwise, returns null.</returns>
+        </member>
+        <member name="M:Colourful.Internals.IConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <summary>
+            Processes the conversions between the source and an unknown target. The intention is to process the conversions through an intermediate space.
+            These conversions are attempted 3rd (after <see cref="M:Colourful.Internals.IConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)" />).
+            </summary>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <param name="converterAbstractFactory">Backreference to the converter factory to facilitate recursion.</param>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+            <returns>If the inputs apply to the strategy, it returns a converter. Otherwise, returns null.</returns>
+        </member>
+        <member name="M:Colourful.Internals.IConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <summary>
+            Processes the conversions between unknown source and the target. The intention is to process the conversions through an intermediate space.
+            These conversions are attempted 4th (last, after <see cref="M:Colourful.Internals.IConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)" />).
+            </summary>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <param name="converterAbstractFactory">Backreference to the converter factory to facilitate recursion.</param>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+            <returns>If the inputs apply to the strategy, it returns a converter. Otherwise, returns null.</returns>
+        </member>
+        <member name="T:Colourful.Internals.IConverterAbstractFactory">
+            <summary>
+            Processes conversion strategies and creates the converters.
+            It is an implementation hidden behind the more friendly <see cref="T:Colourful.ConverterBuilder" /> API.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.IConverterAbstractFactory.CreateConverter``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@)">
+            <summary>
+            Creates a converter between the source and target color spaces.
+            If the conversion cannot be done, it crashes.
+            </summary>
+            <param name="sourceMetadata">Metadata about the source space.</param>
+            <param name="targetMetadata">Metadata about the target space.</param>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+            <returns>Converter that can be repeatedly used to convert colors.</returns>
+        </member>
+        <member name="T:Colourful.Internals.HunterLabConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.HunterLabConversionUtils">
+            <summary>
+            Utils for conversions between XYZ and Hunter Lab.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionUtils.ComputeKa(Colourful.XYZColor@)">
+            <summary>
+            Computes the Ka parameter.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.HunterLabConversionUtils.ComputeKb(Colourful.XYZColor@)">
+            <summary>
+            Computes the Kb parameter.
+            </summary>
+        </member>
+        <member name="T:Colourful.Internals.HunterLabToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.HunterLabToXYZConverter.#ctor(Colourful.XYZColor@)">
+            <param name="sourceWhitePoint">White point of the source color.</param>
+        </member>
+        <member name="M:Colourful.Internals.HunterLabToXYZConverter.Convert(Colourful.HunterLabColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToHunterLabConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToHunterLabConverter.#ctor(Colourful.XYZColor@)">
+            <param name="targetWhitePoint">White point of the target color</param>
+        </member>
+        <member name="M:Colourful.Internals.XYZToHunterLabConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.JzazbzConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.JzazbzToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzToXYZConverter.Convert(Colourful.JzazbzColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToJzazbzConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToJzazbzConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.JzazbzToJzCzhzConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzazbzToJzCzhzConverter.Convert(Colourful.JzazbzColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.JzCzhzConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzCzhzConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzCzhzConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzCzhzConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzCzhzConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.JzCzhzToJzazbzConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.JzCzhzToJzazbzConverter.Convert(Colourful.JzCzhzColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LabConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LabToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabToXYZConverter.#ctor(Colourful.XYZColor@)">
+            <param name="sourceWhitePoint">White point of the source color.</param>
+        </member>
+        <member name="M:Colourful.Internals.LabToXYZConverter.Convert(Colourful.LabColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToLabConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToLabConverter.#ctor(Colourful.XYZColor@)">
+            <param name="targetWhitePoint">White point of the target color.</param>
+        </member>
+        <member name="M:Colourful.Internals.XYZToLabConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LabToLChabConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LabToLChabConverter.Convert(Colourful.LabColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LChabConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChabConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChabConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChabConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChabConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LChabToLabConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChabToLabConverter.Convert(Colourful.LChabColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LChuvConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChuvConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChuvConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChuvConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChuvConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LChuvToLuvConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LChuvToLuvConverter.Convert(Colourful.LChuvColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LuvToLChuvConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvToLChuvConverter.Convert(Colourful.LuvColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LinearRGBConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LinearRGBConversionUtils">
+            <summary>
+            Utils for conversions between Linear RGB and XYZ.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionUtils.GetRGBToXYZMatrix(Colourful.Internals.RGBPrimaries@,Colourful.XYZColor@)">
+            <summary>
+            Computes the RGB/XYZ matrix.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBConversionUtils.GetXYZToRGBMatrix(Colourful.Internals.RGBPrimaries@,Colourful.XYZColor@)">
+            <summary>
+            Computes the XYZ/RGB matrix.
+            </summary>
+        </member>
+        <member name="T:Colourful.Internals.LinearRGBToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBToXYZConverter.#ctor(Colourful.XYZColor@,Colourful.Internals.RGBPrimaries@)">
+            <param name="sourceWhitePoint">White point of the RGB working space.</param>
+            <param name="sourcePrimaries">Chromaticity of RGB working space primaries.</param>
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBToXYZConverter.Convert(Colourful.LinearRGBColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToLinearRGBConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToLinearRGBConverter.#ctor(Colourful.XYZColor@,Colourful.Internals.RGBPrimaries@)">
+            <param name="targetWhitePoint">White point of the RGB working space.</param>
+            <param name="targetPrimaries">Chromaticity of RGB working space primaries.</param>
+        </member>
+        <member name="M:Colourful.Internals.XYZToLinearRGBConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LMSConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LMSConversionStrategy.#ctor(System.Double[0:,0:])">
+            <param name="transformationMatrix">Definition of the cone response domain (see <see cref="T:Colourful.LMSTransformationMatrix" />).</param>
+        </member>
+        <member name="M:Colourful.Internals.LMSConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LMSConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LMSConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LMSConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LMSToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LMSToXYZConverter.#ctor(System.Double[0:,0:]@)">
+            <param name="transformationMatrix">Definition of the cone response domain (see <see cref="T:Colourful.LMSTransformationMatrix" />).</param>
+        </member>
+        <member name="M:Colourful.Internals.LMSToXYZConverter.Convert(Colourful.LMSColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.VonKriesChromaticAdaptation">
+            <summary>
+            Basic implementation of the von Kries chromatic adaptation model.
+            </summary>
+            <remarks>
+            Transformation described here:
+            http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.VonKriesChromaticAdaptation.#ctor(Colourful.LMSColor@,Colourful.LMSColor@)">
+            <param name="sourceWhitePoint">Source white point.</param>
+            <param name="targetWhitePoint">Target white point.</param>
+        </member>
+        <member name="M:Colourful.Internals.VonKriesChromaticAdaptation.Convert(Colourful.LMSColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToLMSConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToLMSConverter.#ctor(System.Double[0:,0:]@)">
+            <param name="transformationMatrix">Definition of the cone response domain (see <see cref="T:Colourful.LMSTransformationMatrix" />)</param>
+        </member>
+        <member name="M:Colourful.Internals.XYZToLMSConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LuvConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LuvToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LuvToXYZConverter.#ctor(Colourful.XYZColor@)">
+            <param name="sourceWhitePoint">White point of the source color.</param>
+        </member>
+        <member name="M:Colourful.Internals.LuvToXYZConverter.Convert(Colourful.LuvColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToLuvConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToLuvConverter.#ctor(Colourful.XYZColor@)">
+            <param name="targetWhitePoint">White point of the target color.</param>
+        </member>
+        <member name="M:Colourful.Internals.XYZToLuvConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.LinearRGBToRGBConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBToRGBConverter.#ctor(Colourful.Internals.ICompanding)">
+            <param name="targetCompanding">Companding function of the target RGB working space.</param>
+        </member>
+        <member name="M:Colourful.Internals.LinearRGBToRGBConverter.Convert(Colourful.LinearRGBColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.RGBConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.RGBToLinearRGBConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBToLinearRGBConverter.#ctor(Colourful.Internals.ICompanding)">
+            <param name="sourceCompanding">Companding function of the source RGB working space.</param>
+        </member>
+        <member name="M:Colourful.Internals.RGBToLinearRGBConverter.Convert(Colourful.RGBColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.GammaCompanding">
+            <summary>
+            Gamma companding.
+            </summary>
+            <remarks>
+            For more info see:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.#ctor(System.Double@)">
+            <summary>
+            Constructs with given gamma.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.GammaCompanding.Gamma">
+            <summary>
+            Gamma.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.ConvertToLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.ConvertToNonLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.Equals(Colourful.Internals.GammaCompanding)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.op_Equality(Colourful.Internals.GammaCompanding,Colourful.Internals.GammaCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.GammaCompanding.op_Inequality(Colourful.Internals.GammaCompanding,Colourful.Internals.GammaCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.ICompanding">
+            <summary>
+            Pair of companding functions for <see cref="T:Colourful.Internals.IRGBWorkingSpace" />.
+            Used for conversion to XYZ and backwards.
+            See also: <seealso cref="P:Colourful.Internals.IRGBWorkingSpace.Companding" />
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.ICompanding.ConvertToLinear(System.Double@)">
+            <summary>
+            Inverse companding. The input companded channel is made linear with respect to the energy.
+            </summary>
+            <remarks>
+            For more info see:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.ICompanding.ConvertToNonLinear(System.Double@)">
+            <summary>
+            Companding. The input uncompanded channel (linear) is made nonlinear (depends on the RGB color system).
+            </summary>
+            <remarks>
+            For more info see:
+            http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html
+            </remarks>
+        </member>
+        <member name="T:Colourful.Internals.LCompanding">
+            <summary>
+            L* companding.
+            </summary>
+            <remarks>
+            For more info see:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.ConvertToLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.ConvertToNonLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.Equals(Colourful.Internals.LCompanding)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.op_Equality(Colourful.Internals.LCompanding,Colourful.Internals.LCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.LCompanding.op_Inequality(Colourful.Internals.LCompanding,Colourful.Internals.LCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.Rec2020Companding">
+            <summary>
+            Rec. 2020 companding function (for 12-bit).
+            </summary>
+            <remarks>
+            http://en.wikipedia.org/wiki/Rec._2020
+            For 10-bits, companding is identical to <see cref="T:Colourful.Internals.Rec709Companding" />
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.ConvertToLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.ConvertToNonLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.Equals(Colourful.Internals.Rec2020Companding)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.op_Equality(Colourful.Internals.Rec2020Companding,Colourful.Internals.Rec2020Companding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.Rec2020Companding.op_Inequality(Colourful.Internals.Rec2020Companding,Colourful.Internals.Rec2020Companding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.Rec709Companding">
+            <summary>
+            Rec. 709 companding function.
+            </summary>
+            <remarks>
+            http://en.wikipedia.org/wiki/Rec._709
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.ConvertToLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.ConvertToNonLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.Equals(Colourful.Internals.Rec709Companding)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.op_Equality(Colourful.Internals.Rec709Companding,Colourful.Internals.Rec709Companding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.Rec709Companding.op_Inequality(Colourful.Internals.Rec709Companding,Colourful.Internals.Rec709Companding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.sRGBCompanding">
+            <summary>
+            sRGB companding.
+            </summary>
+            <remarks>
+            For more info see:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.ConvertToLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.ConvertToNonLinear(System.Double@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.Equals(Colourful.Internals.sRGBCompanding)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.op_Equality(Colourful.Internals.sRGBCompanding,Colourful.Internals.sRGBCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.sRGBCompanding.op_Inequality(Colourful.Internals.sRGBCompanding,Colourful.Internals.sRGBCompanding)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.IRGBWorkingSpace">
+            <summary>
+            RGB working color space.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.IRGBWorkingSpace.WhitePoint">
+            <summary>
+            White point of the color space.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.IRGBWorkingSpace.Primaries">
+            <summary>
+            Chromaticity of the primaries.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.IRGBWorkingSpace.Companding">
+            <summary>
+            The companding function associated with the RGB color system.
+            Used for conversion to XYZ and backwards.
+            See this for more information:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            http://www.brucelindbloom.com/index.html?Eqn_XYZ_to_RGB.html
+            </summary>
+        </member>
+        <member name="T:Colourful.Internals.RGBPrimaries">
+            <summary>
+            Chromaticity of RGB primaries.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.#ctor(Colourful.xyChromaticity@,Colourful.xyChromaticity@,Colourful.xyChromaticity@)">
+            <summary>
+            Constructs RGB primaries.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.RGBPrimaries.R">
+            <summary>
+            Red.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.RGBPrimaries.G">
+            <summary>
+            Green.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.RGBPrimaries.B">
+            <summary>
+            Blue.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.Equals(Colourful.Internals.RGBPrimaries)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.op_Equality(Colourful.Internals.RGBPrimaries,Colourful.Internals.RGBPrimaries)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.RGBPrimaries.op_Inequality(Colourful.Internals.RGBPrimaries,Colourful.Internals.RGBPrimaries)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.RGBWorkingSpace">
+            <inheritdoc cref="T:Colourful.Internals.IRGBWorkingSpace" />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.#ctor(Colourful.XYZColor@,Colourful.Internals.ICompanding@,Colourful.Internals.RGBPrimaries@)">
+            <summary>
+            Constructs RGB working space using a white point, companding, and primeries.
+            </summary>
+        </member>
+        <member name="P:Colourful.Internals.RGBWorkingSpace.WhitePoint">
+            <inheritdoc />
+        </member>
+        <member name="P:Colourful.Internals.RGBWorkingSpace.Primaries">
+            <inheritdoc />
+        </member>
+        <member name="P:Colourful.Internals.RGBWorkingSpace.Companding">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.Equals(Colourful.Internals.IRGBWorkingSpace)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.op_Equality(Colourful.Internals.RGBWorkingSpace,Colourful.Internals.RGBWorkingSpace)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.Internals.RGBWorkingSpace.op_Inequality(Colourful.Internals.RGBWorkingSpace,Colourful.Internals.RGBWorkingSpace)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.Internals.xyYConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.xyYToXYZConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYToXYZConverter.Convert(Colourful.xyYColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZToxyYConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZToxyYConverter.Convert(Colourful.XYZColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.XYZConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.XYZConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.xyConversionStrategy">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyConversionStrategy.TrySame``1(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyConversionStrategy.TryConvert``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyConversionStrategy.TryConvertToAnyTarget``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyConversionStrategy.TryConvertFromAnySource``2(Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConversionMetadata@,Colourful.Internals.IConverterAbstractFactory@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.xyToxyYConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyToxyYConverter.Convert(Colourful.xyChromaticity@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.xyYToxyConverter">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.Internals.xyYToxyConverter.Convert(Colourful.xyYColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.Internals.MathUtils">
+            <summary>
+            Math helper functions.
+            </summary>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.Pow2(System.Double@)">
+            <summary>
+            Compute x^2.
+            </summary>
+            <param name="x">Base.</param>
+            <returns>Result of the exponentiation.</returns>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.Pow3(System.Double@)">
+            <summary>
+            Compute x^3.
+            </summary>
+            <param name="x">Base.</param>
+            <returns>Result of the exponentiation.</returns>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.Pow4(System.Double@)">
+            <summary>
+            Compute x^4.
+            </summary>
+            <param name="x">Base.</param>
+            <returns>Result of the exponentiation.</returns>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.Pow7(System.Double@)">
+            <summary>
+            Compute x^7.
+            </summary>
+            <param name="x">Base.</param>
+            <returns>Result of the exponentiation.</returns>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.SinDeg(System.Double@)">
+            <summary>
+            Compute sine of angle in degrees.
+            </summary>
+            <param name="x">Given angle.</param>
+        </member>
+        <member name="M:Colourful.Internals.MathUtils.CosDeg(System.Double@)">
+            <summary>
+            Compute cosine of angle in degrees.
+            </summary>
+            <param name="x">Given angle.</param>
+        </member>
+        <member name="M:Colourful.Internals.MatrixUtils.Inverse(System.Double[0:,0:]@)">
+            <summary>
+            Matrix inverse for 3 by 3 matrices.
+            </summary>
+        </member>
+        <member name="T:Colourful.CIE76ColorDifference">
+            <summary>
+            CIE Delta-E 1976 color difference formula.
+            </summary>
+        </member>
+        <member name="M:Colourful.CIE76ColorDifference.ComputeDifference(Colourful.LabColor@,Colourful.LabColor@)">
+            <param name="x">Reference color.</param>
+            <param name="y">Sample color.</param>
+            <returns>Delta-E (1976) color difference.</returns>
+        </member>
+        <member name="T:Colourful.CIE94ColorDifference">
+            <summary>
+            CIE Delta-E 1994 color difference formula.
+            </summary>
+            <remarks>
+            Implementation notes:
+            http://www.brucelindbloom.com/Eqn_DeltaE_CIE94.html
+            </remarks>
+        </member>
+        <member name="M:Colourful.CIE94ColorDifference.#ctor">
+            <summary>
+            Construct using weighting factors for <see cref="F:Colourful.CIE94ColorDifferenceApplication.GraphicArts" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.CIE94ColorDifference.#ctor(Colourful.CIE94ColorDifferenceApplication@)">
+            <summary>
+            Construct using weighting factors for given application of color difference.
+            </summary>
+            <param name="application">A <see cref="T:Colourful.CIE94ColorDifferenceApplication" /> value specifying the application area. Different weighting factors are used in the computation depending on the application.</param>
+        </member>
+        <member name="M:Colourful.CIE94ColorDifference.ComputeDifference(Colourful.LabColor@,Colourful.LabColor@)">
+            <param name="x">Reference color.</param>
+            <param name="y">Sample color.</param>
+            <returns>Delta-E (1994) color difference.</returns>
+        </member>
+        <member name="T:Colourful.CIE94ColorDifferenceApplication">
+            <summary>
+            Application area for CIE Delta-E 1994.
+            See <see cref="T:Colourful.CIE94ColorDifference" /> for usage.
+            </summary>
+        </member>
+        <member name="F:Colourful.CIE94ColorDifferenceApplication.GraphicArts">
+            <summary>
+            Graphic arts.
+            </summary>
+        </member>
+        <member name="F:Colourful.CIE94ColorDifferenceApplication.Textiles">
+            <summary>
+            Textiles.
+            </summary>
+        </member>
+        <member name="T:Colourful.CIEDE2000ColorDifference">
+            <summary>
+            CIE Delta-E 2000 color difference formula.
+            </summary>
+        </member>
+        <member name="M:Colourful.CIEDE2000ColorDifference.ComputeDifference(Colourful.LabColor@,Colourful.LabColor@)">
+            <param name="x">Reference color.</param>
+            <param name="y">Sample color.</param>
+            <remarks>Implemented according to: Sharma, Gaurav; Wencheng Wu, Edul N. Dalal (2005). "The CIEDE2000 color-difference formula: Implementation notes, supplementary test data, and mathematical observations" (http://www.ece.rochester.edu/~gsharma/ciede2000/ciede2000noteCRNA.pdf)</remarks>
+            <returns>Delta-E (2000) color difference.</returns>
+        </member>
+        <member name="T:Colourful.CMCColorDifference">
+            <summary>
+            CMC l:c (1984) color difference formula.
+            </summary>
+            <remarks>
+            Equations: http://www.brucelindbloom.com/index.html?Eqn_DeltaE_CMC.html
+            </remarks>
+        </member>
+        <member name="F:Colourful.CMCColorDifference._c">
+            <summary>
+            Chroma.
+            </summary>
+        </member>
+        <member name="F:Colourful.CMCColorDifference._l">
+            <summary>
+            Lightness.
+            </summary>
+        </member>
+        <member name="M:Colourful.CMCColorDifference.#ctor(Colourful.CMCColorDifferenceThreshold@)">
+            <summary>
+            Constructs with given recommended threshold parameters.
+            </summary>
+        </member>
+        <member name="M:Colourful.CMCColorDifference.#ctor(System.Double@,System.Double@)">
+            <summary>
+            Constructs with arbitrary threshold parameters.
+            </summary>
+        </member>
+        <member name="M:Colourful.CMCColorDifference.ComputeDifference(Colourful.LabColor@,Colourful.LabColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.CMCColorDifferenceThreshold">
+            <summary>
+            Weighting parameters for CMC l:c color difference formula.
+            <see cref="T:Colourful.CMCColorDifference" /> for usage.
+            </summary>
+        </member>
+        <member name="F:Colourful.CMCColorDifferenceThreshold.Acceptability">
+            <summary>
+            2:1 (l:c).
+            </summary>
+        </member>
+        <member name="F:Colourful.CMCColorDifferenceThreshold.Imperceptibility">
+            <summary>
+            1:1 (l:c).
+            </summary>
+        </member>
+        <member name="T:Colourful.EuclideanDistanceColorDifference`1">
+            <summary>
+            Euclidean distance between two color vectors.
+            </summary>
+        </member>
+        <member name="M:Colourful.EuclideanDistanceColorDifference`1.ComputeDifference(`0@,`0@)">
+            <summary>
+            Computes distance between two color vectors as euclidean distance.
+            </summary>
+        </member>
+        <member name="T:Colourful.IColorDifference`1">
+            <summary>
+            Computes distance between two vectors in color space.
+            </summary>
+            <typeparam name="TColor">Color space</typeparam>
+        </member>
+        <member name="M:Colourful.IColorDifference`1.ComputeDifference(`0@,`0@)">
+            <summary>
+            Computes distance between color x and y.
+            </summary>
+        </member>
+        <member name="T:Colourful.JzCzhzDEzColorDifference">
+            <summary>
+            Delta Ez color difference for JzCzhz color space.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzDEzColorDifference.ComputeDifference(Colourful.JzCzhzColor@,Colourful.JzCzhzColor@)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.InvalidConversionException">
+            <summary>
+            Exception when trying to create a converter for an impossible conversion.
+            </summary>
+        </member>
+        <member name="P:Colourful.InvalidConversionException.SourceType">
+            <summary>
+            Source color type
+            </summary>
+        </member>
+        <member name="P:Colourful.InvalidConversionException.TargetType">
+            <summary>
+            Target color type
+            </summary>
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.Type,System.Type)">
+            <param name="sourceType">Source color type</param>
+            <param name="targetType">Target color type</param>
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.String,System.Exception)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.String,System.Exception,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.InvalidConversionException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.MissingConversionMetadataException">
+            <summary>
+            Exception when trying to create a converter for an impossible conversion.
+            </summary>
+        </member>
+        <member name="P:Colourful.MissingConversionMetadataException.Key">
+            <summary>
+            Conversion metadata key, see <see cref="M:Colourful.Internals.IConversionMetadata.GetItemOrDefault``1(System.String@)" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.String,System.String)">
+            <param name="message">Exception message</param>
+            <param name="key">Key that was missing</param>
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.String)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.String,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.String,System.Exception)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.String,System.Exception,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.MissingConversionMetadataException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.HunterLabColor">
+            <summary>
+            Hunter Lab color.
+            </summary>
+        </member>
+        <member name="M:Colourful.HunterLabColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L (lightness) (from 0 to 100).</param>
+            <param name="a">a (usually from -100 to 100).</param>
+            <param name="b">b (usually from -100 to 100).</param>
+        </member>
+        <member name="M:Colourful.HunterLabColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.HunterLabColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.HunterLabColor.L">
+            <summary>
+            L (lightness).
+            Ranges usually from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.HunterLabColor.a">
+            <summary>
+            a.
+            Ranges usually from -100 to 100.
+            Negative values indicate green while positive values indicate magenta.
+            </summary>
+        </member>
+        <member name="F:Colourful.HunterLabColor.b">
+            <summary>
+            b.
+            Ranges usually from -100 to 100.
+            Negative values indicate blue and positive values indicate yellow.
+            </summary>
+        </member>
+        <member name="P:Colourful.HunterLabColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.HunterLabColor.Equals(Colourful.HunterLabColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.HunterLabColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.HunterLabColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.HunterLabColor.op_Equality(Colourful.HunterLabColor,Colourful.HunterLabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.HunterLabColor.op_Inequality(Colourful.HunterLabColor,Colourful.HunterLabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.HunterLabColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.HunterLabColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.HunterLabConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.HunterLabConverterBuilderExtensions.FromHunterLab(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.HunterLabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For HunterLab, the <see cref="F:Colourful.Illuminants.C" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.HunterLabConverterBuilderExtensions.FromHunterLab(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.HunterLabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.C" /> white point for HunterLab.
+            </summary>
+        </member>
+        <member name="M:Colourful.HunterLabConverterBuilderExtensions.ToHunterLab``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.HunterLabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For HunterLab, the <see cref="F:Colourful.Illuminants.C" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.HunterLabConverterBuilderExtensions.ToHunterLab``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.HunterLabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.C" /> white point for HunterLab.
+            </summary>
+        </member>
+        <member name="T:Colourful.IColorConverter`2">
+            <summary>
+            Converts color between two color spaces.
+            </summary>
+            <typeparam name="TSource">Source space.</typeparam>
+            <typeparam name="TTarget">Target space.</typeparam>
+        </member>
+        <member name="M:Colourful.IColorConverter`2.Convert(`0@)">
+            <summary>
+            Converts the color from the source space to the target space.
+            </summary>
+        </member>
+        <member name="T:Colourful.IColorSpace">
+            <summary>
+            Identifier of color spaces. Used only for generic constraints.
+            </summary>
+        </member>
+        <member name="T:Colourful.IColorVector">
+            <summary>
+            Color that can be represented as a vector in its color space.
+            </summary>
+        </member>
+        <member name="P:Colourful.IColorVector.Vector">
+            <summary>
+            Vector.
+            </summary>
+        </member>
+        <member name="T:Colourful.JzazbzColor">
+            <summary>
+            Jz az bz color space introduced in Safdar &amp; al. (2017).
+            See: https://www.osapublishing.org/oe/abstract.cfm?uri=oe-25-13-15131
+            </summary>
+        </member>
+        <member name="M:Colourful.JzazbzColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="jz">J_z (lightness) (from 0 to 1).</param>
+            <param name="az">a_z (redness-greenness) (from -1 to 1).</param>
+            <param name="bz">b_z (yellowness-blueness) (from -1 to 1).</param>
+        </member>
+        <member name="M:Colourful.JzazbzColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.JzazbzColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.JzazbzColor.Jz">
+            <summary>
+            J_z (lightness).
+            Ranges usually between 0 and 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.JzazbzColor.az">
+            <summary>
+            a_z (redness-greenness).
+            Ranges usually between -1 and 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.JzazbzColor.bz">
+            <summary>
+            b_z (yellowness-blueness).
+            Ranges usually between -1 and 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.JzazbzColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.JzazbzColor.Equals(Colourful.JzazbzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzazbzColor.Equals(System.Object)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzazbzColor.GetHashCode">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzazbzColor.op_Equality(Colourful.JzazbzColor,Colourful.JzazbzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzazbzColor.op_Inequality(Colourful.JzazbzColor,Colourful.JzazbzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzazbzColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzazbzColor.ToString">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.JzazbzConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzazbzConverterBuilderExtensions.FromJzazbz(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.JzazbzColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Jzazbz, the <see cref="F:Colourful.Illuminants.D65" /> is used.</param>
+        </member>
+        <member name="M:Colourful.JzazbzConverterBuilderExtensions.FromJzazbz(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.JzazbzColor" />.
+            Assuming the <see cref="F:Colourful.Illuminants.D65" /> white point for Jzazbz.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzazbzConverterBuilderExtensions.ToJzazbz``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.JzazbzColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Jzazbz, the <see cref="F:Colourful.Illuminants.D65" /> is used.</param>
+        </member>
+        <member name="M:Colourful.JzazbzConverterBuilderExtensions.ToJzazbz``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.JzazbzColor" />.
+            Assuming the <see cref="F:Colourful.Illuminants.D65" /> white point for Jzazbz.
+            </summary>
+        </member>
+        <member name="T:Colourful.JzCzhzColor">
+            <summary>
+            Jz Cz hz, cylindrical form of <see cref="T:Colourful.JzazbzColor">Jzazbz</see>.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="jz">J_z (lightness) (from 0 to 1).</param>
+            <param name="cz">C_z (chroma) (from 0 and 1).</param>
+            <param name="hz">h_z (hue in degrees) (from 0 to 360).</param>
+        </member>
+        <member name="M:Colourful.JzCzhzColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.JzCzhzColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.JzCzhzColor.Jz">
+            <summary>
+            J_z (lightness).
+            Ranges usually between 0 and 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.JzCzhzColor.Cz">
+            <summary>
+            C_z (chroma).
+            Ranges usually between 0 and 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.JzCzhzColor.hz">
+            <summary>
+            h_z (hue in degrees).
+            Ranges usually between 0 and 360.
+            </summary>
+        </member>
+        <member name="P:Colourful.JzCzhzColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="P:Colourful.JzCzhzColor.Saturation">
+            <summary>
+            Computes saturation of the color (chroma normalized by lightness).
+            Ranges from 0 to 100.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzColor.FromSaturation(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Constructs the color using saturation instead of chromas.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzColor.Equals(Colourful.JzCzhzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzCzhzColor.Equals(System.Object)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzCzhzColor.GetHashCode">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzCzhzColor.op_Equality(Colourful.JzCzhzColor,Colourful.JzCzhzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzCzhzColor.op_Inequality(Colourful.JzCzhzColor,Colourful.JzCzhzColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.JzCzhzColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzColor.ToString">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="T:Colourful.JzCzhzConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzConverterBuilderExtensions.FromJzCzhz(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.JzCzhzColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For JzCzhz, the <see cref="F:Colourful.Illuminants.D65" /> is used.</param>
+        </member>
+        <member name="M:Colourful.JzCzhzConverterBuilderExtensions.FromJzCzhz(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.JzCzhzColor" />.
+            Assuming the <see cref="F:Colourful.Illuminants.D65" /> white point for JzCzhz.
+            </summary>
+        </member>
+        <member name="M:Colourful.JzCzhzConverterBuilderExtensions.ToJzCzhz``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.JzCzhzColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For JzCzhz, the <see cref="F:Colourful.Illuminants.D65" /> is used.</param>
+        </member>
+        <member name="M:Colourful.JzCzhzConverterBuilderExtensions.ToJzCzhz``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.JzCzhzColor" />.
+            Assuming the <see cref="F:Colourful.Illuminants.D65" /> white point for JzCzhz.
+            </summary>
+        </member>
+        <member name="T:Colourful.LabColor">
+            <summary>
+            CIE L*a*b* (1976) color.
+            </summary>
+        </member>
+        <member name="M:Colourful.LabColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L* (lightness) (from 0 to 100).</param>
+            <param name="a">a* (usually from -100 to 100).</param>
+            <param name="b">b* (usually from -100 to 100).</param>
+        </member>
+        <member name="M:Colourful.LabColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LabColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.LabColor.L">
+            <summary>
+            L* (lightness).
+            Ranges usually from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LabColor.a">
+            <summary>
+            a*.
+            Ranges usually from -100 to 100.
+            Negative values indicate green while positive values indicate magenta.
+            </summary>
+        </member>
+        <member name="F:Colourful.LabColor.b">
+            <summary>
+            b*.
+            Ranges usually from -100 to 100.
+            Negative values indicate blue and positive values indicate yellow.
+            </summary>
+        </member>
+        <member name="P:Colourful.LabColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LabColor.Equals(Colourful.LabColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LabColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LabColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LabColor.op_Equality(Colourful.LabColor,Colourful.LabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LabColor.op_Inequality(Colourful.LabColor,Colourful.LabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LabColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LabColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LabConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LabConverterBuilderExtensions.FromLab(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Lab, the <see cref="F:Colourful.Illuminants.D50" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LabConverterBuilderExtensions.FromLab(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D50" /> white point for Lab.
+            </summary>
+        </member>
+        <member name="M:Colourful.LabConverterBuilderExtensions.ToLab``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Lab, the <see cref="F:Colourful.Illuminants.D50" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LabConverterBuilderExtensions.ToLab``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D50" /> white point for Lab.
+            </summary>
+        </member>
+        <member name="T:Colourful.LChabColor">
+            <summary>
+            CIE L*C*h°, cylindrical form of <see cref="T:Colourful.LabColor">CIE L*a*b* (1976)</see>.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L* (lightness) (from 0 to 100).</param>
+            <param name="c">C* (chroma) (from 0 to 100).</param>
+            <param name="h">h° (hue in degrees) (from 0 to 360).</param>
+        </member>
+        <member name="M:Colourful.LChabColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LChabColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.LChabColor.L">
+            <summary>
+            L* (lightness).
+            Ranges usuallyfrom 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LChabColor.C">
+            <summary>
+            C* (chroma).
+            Ranges usually from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LChabColor.h">
+            <summary>
+            h° (hue in degrees).
+            Ranges usually from 0 to 360.
+            </summary>
+        </member>
+        <member name="P:Colourful.LChabColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="P:Colourful.LChabColor.Saturation">
+            <summary>
+            Computes saturation of the color (chroma normalized by lightness).
+            Ranges from 0 to 100.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabColor.FromSaturation(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Constructs the color using saturation instead of chromas.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabColor.Equals(Colourful.LChabColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChabColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChabColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChabColor.op_Equality(Colourful.LChabColor,Colourful.LChabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LChabColor.op_Inequality(Colourful.LChabColor,Colourful.LChabColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LChabColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LChabConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabConverterBuilderExtensions.FromLChab(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LChab, the <see cref="F:Colourful.Illuminants.D50" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LChabConverterBuilderExtensions.FromLChab(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D50" /> white point for LChab.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChabConverterBuilderExtensions.ToLChab``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChabColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LChab, the <see cref="F:Colourful.Illuminants.D50" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LChabConverterBuilderExtensions.ToLChab``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChabColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D50" /> white point for LChab.
+            </summary>
+        </member>
+        <member name="T:Colourful.LChuvColor">
+            <summary>
+            CIE L*C*h°, cylindrical form of <see cref="T:Colourful.LuvColor">CIE L*u*v* (1976)</see>.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L* (lightness) (from 0 to 100).</param>
+            <param name="c">C* (chroma) (from 0 to 100).</param>
+            <param name="h">h° (hue in degrees) (from 0 to 360).</param>
+        </member>
+        <member name="M:Colourful.LChuvColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LChuvColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.LChuvColor.L">
+            <summary>
+            L* (lightness).
+            Ranges usually from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LChuvColor.C">
+            <summary>
+            C* (chroma).
+            Ranges usually from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LChuvColor.h">
+            <summary>
+            h° (hue in degrees).
+            Ranges usually from 0 to 360.
+            </summary>
+        </member>
+        <member name="P:Colourful.LChuvColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="P:Colourful.LChuvColor.Saturation">
+            <summary>
+            Computes saturation of the color (chroma normalized by lightness).
+            Ranges from 0 to 100.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvColor.FromSaturation(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Constructs the color using saturation instead of chromas.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvColor.Equals(Colourful.LChuvColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChuvColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChuvColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LChuvColor.op_Equality(Colourful.LChuvColor,Colourful.LChuvColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LChuvColor.op_Inequality(Colourful.LChuvColor,Colourful.LChuvColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LChuvColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LChuvConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvConverterBuilderExtensions.FromLChuv(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LChuv, the <see cref="F:Colourful.Illuminants.D65" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LChuvConverterBuilderExtensions.FromLChuv(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D65" /> white point for LChuv.
+            </summary>
+        </member>
+        <member name="M:Colourful.LChuvConverterBuilderExtensions.ToLChuv``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LChuv, the <see cref="F:Colourful.Illuminants.D65" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LChuvConverterBuilderExtensions.ToLChuv``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D65" /> white point for LChuv.
+            </summary>
+        </member>
+        <member name="T:Colourful.LinearRGBColor">
+            <summary>
+            RGB color with specified <see cref="T:Colourful.Internals.IRGBWorkingSpace">working space</see>, which has linear channels (not companded).
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="r">Red (from 0 to 1).</param>
+            <param name="g">Green (from 0 to 1).</param>
+            <param name="b">Blue (from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LinearRGBColor.Vector" />, expected 3 dimensions (range from 0 to 1).</param>
+        </member>
+        <member name="F:Colourful.LinearRGBColor.R">
+            <summary>
+            Red.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.LinearRGBColor.G">
+            <summary>
+            Green.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.LinearRGBColor.B">
+            <summary>
+            Blue.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.LinearRGBColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.Equals(Colourful.LinearRGBColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.op_Equality(Colourful.LinearRGBColor,Colourful.LinearRGBColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.op_Inequality(Colourful.LinearRGBColor,Colourful.LinearRGBColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LinearRGBColor.FromGray(System.Double@)">
+            <summary>
+            Creates RGB color with all channels equal.
+            </summary>
+            <param name="value">Gray value (from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.Clamp">
+            <summary>
+            Returns a new color that has each channel clamped. If the channel was lower than 0, it'll be 0. If it was higher than 1, it'll be 1.
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.NormalizeIntensity">
+            <summary>
+            Returns a new color that has channels within the range, and at least one channel is maxed out to 1.
+            Does this by dividing all channels by the maximum channel value out of those three.
+            This is useful for scenarios where we're working with chromaticity.
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LinearRGBConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBConverterBuilderExtensions.FromLinearRGB(Colourful.ConverterBuilder,Colourful.Internals.IRGBWorkingSpace@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="rgbWorkingSpace">Optionally, you can set an RGB working space. The <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> is the usual default.</param>
+        </member>
+        <member name="M:Colourful.LinearRGBConverterBuilderExtensions.FromLinearRGB(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> RGB working space.
+            </summary>
+        </member>
+        <member name="M:Colourful.LinearRGBConverterBuilderExtensions.ToLinearRGB``1(Colourful.IFluentConverterBuilderFrom{``0},Colourful.Internals.IRGBWorkingSpace@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="rgbWorkingSpace">Optionally, you can set an RGB working space. The <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> is the usual default.</param>
+        </member>
+        <member name="M:Colourful.LinearRGBConverterBuilderExtensions.ToLinearRGB``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> RGB working space.
+            </summary>
+        </member>
+        <member name="T:Colourful.LMSColor">
+            <summary>
+            LMS color space represented by the response of the three types of cones of the human eye.
+            </summary>
+        </member>
+        <member name="M:Colourful.LMSColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L (usually from 0 to 1).</param>
+            <param name="m">M (usually from 0 to 1).</param>
+            <param name="s">S (usually from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.LMSColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LMSColor.Vector" />, expected 3 dimensions (usually from 0 to 1)</param>
+        </member>
+        <member name="F:Colourful.LMSColor.L">
+            <summary>
+            Long wavelengths (red) cone response (Rho).
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSColor.M">
+            <summary>
+            Medium wavelengths (green) cone response (Gamma).
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSColor.S">
+            <summary>
+            Short wavelengths (blue) cone response (Beta).
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.LMSColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LMSColor.Equals(Colourful.LMSColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LMSColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LMSColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LMSColor.op_Equality(Colourful.LMSColor,Colourful.LMSColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LMSColor.op_Inequality(Colourful.LMSColor,Colourful.LMSColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LMSColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LMSColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LMSConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LMSConverterBuilderExtensions.FromLMS(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LMSColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LMS, there is no default.</param>
+        </member>
+        <member name="M:Colourful.LMSConverterBuilderExtensions.FromLMS(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LMSColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="M:Colourful.LMSConverterBuilderExtensions.ToLMS``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LMSColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For LMS, there is no default.</param>
+        </member>
+        <member name="M:Colourful.LMSConverterBuilderExtensions.ToLMS``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LMSColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="T:Colourful.LMSTransformationMatrix">
+            <summary>
+            Matrix used for transformation from XYZ to LMS, defining the cone response domain.
+            </summary>
+            <remarks>
+            Matrix data obtained from:
+            Two New von Kries Based Chromatic Adaptation Transforms Found by Numerical Optimization
+            S. Bianco, R. Schettini
+            DISCo, Department of Informatics, Systems and Communication, University of Milan-Bicocca, viale Sarca 336, 20126 Milan, Italy
+            http://www.ivl.disco.unimib.it/papers2003/CRA-CAT.pdf
+            </remarks>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.VonKriesHPEAdjusted">
+            <summary>
+            Von Kries chromatic adaptation transform matrix (Hunt-Pointer-Estevez adjusted for D65).
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.VonKriesHPE">
+            <summary>
+            Von Kries chromatic adaptation transform matrix (Hunt-Pointer-Estevez for equal energy).
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.XYZScaling">
+            <summary>
+            XYZ scaling chromatic adaptation transform matrix.
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.Bradford">
+            <summary>
+            Bradford chromatic adaptation transform matrix (used in CMCCAT97).
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.BradfordSharp">
+            <summary>
+            Spectral sharpening and the Bradford transform.
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.CMCCAT2000">
+            <summary>
+            CMCCAT2000 (fitted from all available color data sets).
+            </summary>
+        </member>
+        <member name="F:Colourful.LMSTransformationMatrix.CAT02">
+            <summary>
+            CAT02 (optimized for minimizing CIELAB differences).
+            </summary>
+        </member>
+        <member name="T:Colourful.LuvColor">
+            <summary>
+            CIE L*u*v* (1976) color.
+            </summary>
+        </member>
+        <member name="M:Colourful.LuvColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="l">L* (lightness) (from 0 to 100).</param>
+            <param name="u">u* (usually from -100 to 100).</param>
+            <param name="v">v* (usually from -100 to 100).</param>
+        </member>
+        <member name="M:Colourful.LuvColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.LuvColor.Vector" />, expected 3 dimensions.</param>
+        </member>
+        <member name="F:Colourful.LuvColor.L">
+            <summary>
+            L* (lightness).
+            Ranges from 0 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LuvColor.u">
+            <summary>
+            u*.
+            Ranges usually from -100 to 100.
+            </summary>
+        </member>
+        <member name="F:Colourful.LuvColor.v">
+            <summary>
+            v*.
+            Ranges usually from -100 to 100.
+            </summary>
+        </member>
+        <member name="P:Colourful.LuvColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LuvColor.Equals(Colourful.LuvColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LuvColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LuvColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.LuvColor.op_Equality(Colourful.LuvColor,Colourful.LuvColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LuvColor.op_Inequality(Colourful.LuvColor,Colourful.LuvColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.LuvColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.LuvColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.LuvConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.LuvConverterBuilderExtensions.FromLuv(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Luv, the <see cref="F:Colourful.Illuminants.D65" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LuvConverterBuilderExtensions.FromLuv(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LuvColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D65" /> white point for Luv.
+            </summary>
+        </member>
+        <member name="M:Colourful.LuvConverterBuilderExtensions.ToLuv``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For Luv, the <see cref="F:Colourful.Illuminants.D65" /> is usually used.</param>
+        </member>
+        <member name="M:Colourful.LuvConverterBuilderExtensions.ToLuv``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LuvColor" />.
+            Assuming the usual <see cref="F:Colourful.Illuminants.D65" /> white point for Luv.
+            </summary>
+        </member>
+        <member name="T:Colourful.RGBColor">
+            <summary>
+            RGB color with specified <see cref="T:Colourful.Internals.IRGBWorkingSpace">working space</see>.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="r">Red (from 0 to 1).</param>
+            <param name="g">Green (from 0 to 1).</param>
+            <param name="b">Blue (from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.RGBColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.RGBColor.Vector" />, expected 3 dimensions (range from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.RGBColor.#ctor(System.Drawing.Color@)">
+            <param name="color"></param>
+        </member>
+        <member name="F:Colourful.RGBColor.R">
+            <summary>
+            Red.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBColor.G">
+            <summary>
+            Green.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBColor.B">
+            <summary>
+            Blue.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.RGBColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.RGBColor.Equals(Colourful.RGBColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.RGBColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.RGBColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.RGBColor.op_Equality(Colourful.RGBColor,Colourful.RGBColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.RGBColor.op_Inequality(Colourful.RGBColor,Colourful.RGBColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.RGBColor.FromGray(System.Double@)">
+            <summary>
+            Creates RGB color with all channels equal.
+            </summary>
+            <param name="value">Gray value (from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.RGBColor.FromRGB8Bit(System.Byte@,System.Byte@,System.Byte@)">
+            <summary>
+            Creates RGB color from 8-bit channels ranging from 0 to 255.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.FromColor(System.Drawing.Color@)">
+            <summary>
+            Creates RGB color from 8-bit channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.ToColor">
+            <summary>
+            Convert to <see cref="T:System.Drawing.Color" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.op_Implicit(Colourful.RGBColor)~System.Drawing.Color">
+            <summary>
+            Convert to <see cref="T:System.Drawing.Color" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.op_Explicit(System.Drawing.Color)~Colourful.RGBColor">
+            <summary>
+            Convert from <see cref="T:System.Drawing.Color" />.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.ToRGB8Bit(System.Byte@,System.Byte@,System.Byte@)">
+            <summary>
+            Returns channel values as 8-bit values ranging from 0 to 255.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.Clamp">
+            <summary>
+            Returns a new color that has each channel clamped. If the channel was lower than 0, it'll be 0. If it was higher than 1, it'll be 1.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.NormalizeIntensity">
+            <summary>
+            Returns a new color that has channels within the range, and at least one channel is maxed out to 1.
+            Does this by dividing all channels by the maximum channel value out of those three.
+            This is useful for scenarios where we're working with chromaticity.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.RGBConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBConverterBuilderExtensions.FromRGB(Colourful.ConverterBuilder,Colourful.Internals.IRGBWorkingSpace@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="rgbWorkingSpace">Optionally, you can set an RGB working space. The <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> is the usual default.</param>
+        </member>
+        <member name="M:Colourful.RGBConverterBuilderExtensions.FromRGB(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> RGB working space.
+            </summary>
+        </member>
+        <member name="M:Colourful.RGBConverterBuilderExtensions.ToRGB``1(Colourful.IFluentConverterBuilderFrom{``0},Colourful.Internals.IRGBWorkingSpace@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="rgbWorkingSpace">Optionally, you can set an RGB working space. The <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> is the usual default.</param>
+        </member>
+        <member name="M:Colourful.RGBConverterBuilderExtensions.ToRGB``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.LChuvColor" />.
+            Assuming the usual <see cref="F:Colourful.RGBWorkingSpaces.sRGB" /> RGB working space.
+            </summary>
+        </member>
+        <member name="T:Colourful.RGBWorkingSpaces">
+            <remarks>
+            Chromaticity of primaries taken from:
+            http://www.brucelindbloom.com/index.html?WorkingSpaceInfo.html
+            </remarks>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.sRGB">
+            <summary>
+            sRGB.
+            </summary>
+            <remarks>
+            Uses proper companding function, according to:
+            http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+            </remarks>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.sRGBSimplified">
+            <summary>
+            Simplified sRGB (uses <see cref="T:Colourful.Internals.GammaCompanding">gamma companding</see> instead of <see cref="T:Colourful.Internals.sRGBCompanding" />).
+            See also <see cref="F:Colourful.RGBWorkingSpaces.sRGB" />.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.Rec709">
+            <summary>
+            Rec. 709 (ITU-R Recommendation BT.709).
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.Rec2020">
+            <summary>
+            Rec. 2020 (ITU-R Recommendation BT.2020).
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.ECIRGBv2">
+            <summary>
+            ECI RGB v2.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.AdobeRGB1998">
+            <summary>
+            Adobe RGB (1998).
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.ApplesRGB">
+            <summary>
+            Apple sRGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.BestRGB">
+            <summary>
+            Best RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.BetaRGB">
+            <summary>
+            Beta RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.BruceRGB">
+            <summary>
+            Bruce RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.CIERGB">
+            <summary>
+            CIE RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.ColorMatchRGB">
+            <summary>
+            ColorMatch RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.DonRGB4">
+            <summary>
+            Don RGB 4.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.EktaSpacePS5">
+            <summary>
+            Ekta Space PS5.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.NTSCRGB">
+            <summary>
+            NTSC RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.PALSECAMRGB">
+            <summary>
+            PAL/SECAM RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.ProPhotoRGB">
+            <summary>
+            ProPhoto RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.SMPTECRGB">
+            <summary>
+            SMPTE-C RGB.
+            </summary>
+        </member>
+        <member name="F:Colourful.RGBWorkingSpaces.WideGamutRGB">
+            <summary>
+            Wide Gamut RGB.
+            </summary>
+        </member>
+        <member name="T:Colourful.xyYColor">
+            <summary>
+            CIE xyY color space (derived from <see cref="T:Colourful.XYZColor" /> color space).
+            </summary>
+        </member>
+        <member name="M:Colourful.xyYColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="x">x (usually from 0 to 1) chromaticity.</param>
+            <param name="y">y (usually from 0 to 1) chromaticity.</param>
+            <param name="luminance">Y (luminance) (usually from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.xyYColor.#ctor(Colourful.xyChromaticity@,System.Double@)">
+            <param name="chromaticity">Chromaticity (x and y together).</param>
+            <param name="luminance">Y (luminance) (usually from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.xyYColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.xyYColor.Vector" />, expected 3 dimensions (usually from 0 to 1).</param>
+        </member>
+        <member name="F:Colourful.xyYColor.x">
+            <summary>
+            Chromaticity x.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.xyYColor.y">
+            <summary>
+            Chromaticity y.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.xyYColor.Luminance">
+            <summary>
+            Y channel (luminance).
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.xyYColor.Chromaticity">
+            <summary>
+            Chromaticity (identical to x and y).
+            </summary>
+        </member>
+        <member name="P:Colourful.xyYColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyYColor.Equals(Colourful.xyYColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyYColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyYColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyYColor.op_Equality(Colourful.xyYColor,Colourful.xyYColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.xyYColor.op_Inequality(Colourful.xyYColor,Colourful.xyYColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.xyYColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyYColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.xyYConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyYConverterBuilderExtensions.FromxyY(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.xyYColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For xyY, there is no default.</param>
+        </member>
+        <member name="M:Colourful.xyYConverterBuilderExtensions.FromxyY(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.xyYColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyYConverterBuilderExtensions.ToxyY``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.xyYColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For xyY, there is no default.</param>
+        </member>
+        <member name="M:Colourful.xyYConverterBuilderExtensions.ToxyY``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.xyYColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="T:Colourful.Illuminants">
+            <summary>
+            Standard illuminants.
+            </summary>
+            <remarks>
+            Coefficients taken from:
+            http://www.brucelindbloom.com/index.html?Eqn_ChromAdapt.html
+            <br />
+            Descriptions taken from:
+            http://en.wikipedia.org/wiki/Standard_illuminant
+            </remarks>
+        </member>
+        <member name="F:Colourful.Illuminants.A">
+            <summary>
+            Incandescent / Tungsten.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.B">
+            <summary>
+            Direct sunlight at noon (obsolete).
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.C">
+            <summary>
+            Average / North sky Daylight (obsolete).
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.D50">
+            <summary>
+            Horizon Light. ICC profile PCS.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.D55">
+            <summary>
+            Mid-morning / Mid-afternoon Daylight.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.D65">
+            <summary>
+            Noon Daylight: Television, sRGB color space.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.D75">
+            <summary>
+            North sky Daylight.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.E">
+            <summary>
+            Equal energy.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.F2">
+            <summary>
+            Cool White Fluorescent.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.F7">
+            <summary>
+            D65 simulator, Daylight simulator.
+            </summary>
+        </member>
+        <member name="F:Colourful.Illuminants.F11">
+            <summary>
+            Philips TL84, Ultralume 40.
+            </summary>
+        </member>
+        <member name="T:Colourful.XYZColor">
+            <summary>
+            CIE 1931 XYZ color space.
+            </summary>
+        </member>
+        <member name="M:Colourful.XYZColor.#ctor(System.Double@,System.Double@,System.Double@)">
+            <param name="x">X (usually from 0 to 1).</param>
+            <param name="y">Y (usually from 0 to 1).</param>
+            <param name="z">Z (usually from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.XYZColor.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.XYZColor.Vector" />, expected 3 dimensions (usually from 0 to 1).</param>
+        </member>
+        <member name="F:Colourful.XYZColor.X">
+            <summary>
+            X.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.XYZColor.Y">
+            <summary>
+            Y.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.XYZColor.Z">
+            <summary>
+            Z.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.XYZColor.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.XYZColor.Equals(Colourful.XYZColor)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.XYZColor.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.XYZColor.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.XYZColor.op_Equality(Colourful.XYZColor,Colourful.XYZColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.XYZColor.op_Inequality(Colourful.XYZColor,Colourful.XYZColor)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.XYZColor.Deconstruct(System.Double@,System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.XYZColor.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.XYZConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.XYZConverterBuilderExtensions.FromXYZ(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.XYZColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For XYZ, there is no default.</param>
+        </member>
+        <member name="M:Colourful.XYZConverterBuilderExtensions.FromXYZ(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.XYZColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="M:Colourful.XYZConverterBuilderExtensions.ToXYZ``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.XYZColor" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For XYZ, there is no default.</param>
+        </member>
+        <member name="M:Colourful.XYZConverterBuilderExtensions.ToXYZ``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.XYZColor" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="T:Colourful.xyChromaticity">
+            <summary>
+            CIE xy chromaticity space.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyChromaticity.#ctor(System.Double@,System.Double@)">
+            <param name="x">Chromaticity x (usually from 0 to 1).</param>
+            <param name="y">Chromaticity y (usually from 0 to 1).</param>
+        </member>
+        <member name="M:Colourful.xyChromaticity.#ctor(System.Double[]@)">
+            <param name="vector"><see cref="P:Colourful.xyChromaticity.Vector" />, expected 2 dimensions.</param>
+        </member>
+        <member name="F:Colourful.xyChromaticity.x">
+            <summary>
+            Chromaticity x.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="F:Colourful.xyChromaticity.y">
+            <summary>
+            Chromaticity y.
+            Ranges usually from 0 to 1.
+            </summary>
+        </member>
+        <member name="P:Colourful.xyChromaticity.Vector">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyChromaticity.Equals(Colourful.xyChromaticity)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyChromaticity.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyChromaticity.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="M:Colourful.xyChromaticity.op_Equality(Colourful.xyChromaticity,Colourful.xyChromaticity)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.xyChromaticity.op_Inequality(Colourful.xyChromaticity,Colourful.xyChromaticity)">
+            <inheritdoc cref="T:System.Object" />
+        </member>
+        <member name="M:Colourful.xyChromaticity.Deconstruct(System.Double@,System.Double@)">
+            <summary>
+            Deconstructs color into individual channels.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyChromaticity.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:Colourful.xyConverterBuilderExtensions">
+            <summary>
+            Extensions for the <see cref="T:Colourful.ConverterBuilder" /> fluent interface.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyConverterBuilderExtensions.Fromxy(Colourful.ConverterBuilder,System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.xyChromaticity" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For xy, there is no default.</param>
+        </member>
+        <member name="M:Colourful.xyConverterBuilderExtensions.Fromxy(Colourful.ConverterBuilder)">
+            <summary>
+            Specifies that the source space is <see cref="T:Colourful.xyChromaticity" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="M:Colourful.xyConverterBuilderExtensions.Toxy``1(Colourful.IFluentConverterBuilderFrom{``0},System.Nullable{Colourful.XYZColor}@)">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.xyChromaticity" />.
+            </summary>
+            <param name="builder"></param>
+            <param name="whitePoint">Optionally, you can set a white point. For xy, there is no default.</param>
+        </member>
+        <member name="M:Colourful.xyConverterBuilderExtensions.Toxy``1(Colourful.IFluentConverterBuilderFrom{``0})">
+            <summary>
+            Specifies that the target space is <see cref="T:Colourful.xyChromaticity" />.
+            Note that there's no white points specified, but it might be needed.
+            </summary>
+        </member>
+        <member name="T:Colourful.CCTConverter">
+            <summary>
+            Can compute chromaticity from CCT (Correlated color temperature) and also
+            compute CCT of given chromaticity.
+            </summary>
+        </member>
+        <member name="M:Colourful.CCTConverter.GetChromaticityOfCCT(System.Double@)">
+            <summary>
+            Returns chromaticity of given CCT (specified in K).
+            </summary>
+        </member>
+        <member name="M:Colourful.CCTConverter.GetCCTOfChromaticity(Colourful.xyChromaticity@)">
+            <summary>
+            Returns CCT (specified in K) of given chromaticity.
+            Ranges usually from around 0 to 25000.
+            </summary>
+        </member>
+        <member name="T:Colourful.ClampHelper">
+            <summary>
+            Utilities to crop range of values or vectors.
+            </summary>
+        </member>
+        <member name="M:Colourful.ClampHelper.Clamp(System.Double,System.Double,System.Double)">
+            <summary>
+            If the given value is less than the minimum, returns the minimum value.
+            If the given value is greater than the maximum, returns the maximum value.
+            Otherwise, returns the value
+            </summary>
+        </member>
+        <member name="M:Colourful.ClampHelper.Clamp(System.Double[],System.Double,System.Double)">
+            <summary>
+            If any value is less than the minimum, replace it with the minimum value.
+            If any value is greater than the maximum, replace it with the maximum value.
+            Otherwise, copy the value.
+            </summary>
+        </member>
+        <member name="M:Colourful.ClampHelper.Clamp(System.Double[],System.Double[],System.Double[])">
+            <summary>
+            If any value is less than the corresponding minimum, replace it with the minimum value.
+            If any value is greater than the corresponding maximum, replace it with the maximum value.
+            Otherwise, copy the value.
+            </summary>
+        </member>
+        <member name="T:Colourful.CylindricalFormulas">
+            <summary>
+            Formulas useful for cylindrical color spaces (<see cref="T:Colourful.LChabColor" /> and <see cref="T:Colourful.LChuvColor" />).
+            </summary>
+        </member>
+        <member name="M:Colourful.CylindricalFormulas.GetSaturation(System.Double@,System.Double@)">
+            <summary>
+            Returns saturation of the color (chroma normalized by lightness).
+            </summary>
+        </member>
+        <member name="M:Colourful.CylindricalFormulas.GetChroma(System.Double@,System.Double@)">
+            <summary>
+            Gets chroma from saturation and lightness.
+            </summary>
+        </member>
+        <member name="M:Colourful.CylindricalFormulas.ConvertToLCh(System.Double[]@)">
+            <summary>
+            Converts a vector in form of Lightness, Chroma1, Chroma2 into Lightness, Chroma, Hue.
+            </summary>
+        </member>
+        <member name="M:Colourful.CylindricalFormulas.ConvertFromLCh(System.Double[]@)">
+            <summary>
+            Converts a vector in form of Lightness, Chroma, Hue into Lightness, Chroma1, Chroma2.
+            </summary>
+        </member>
+        <member name="T:Colourful.MacbethColorChecker">
+            <summary>
+            Colors of the Macbeth ColorChecker.
+            Assume that the RGB colors are in sRGB working space.
+            </summary>
+            <remarks>
+            Values obtained from: http://xritephoto.com/documents/literature/en/ColorData-1p_EN.pdf
+            </remarks>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.DarkSkin">
+            <summary>
+            Dark skin (color #1).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.LightSkin">
+            <summary>
+            Light skin (color #2).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.BlueSky">
+            <summary>
+            Blue sky (color #3).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Foliage">
+            <summary>
+            Foliage (color #4).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.BlueFlower">
+            <summary>
+            Blue flower (color #5).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.BluishGreen">
+            <summary>
+            Bluish green (color #6).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Orange">
+            <summary>
+            Orange (color #7).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.PurplishBlue">
+            <summary>
+            Purplish blue (color #8).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.ModerateRed">
+            <summary>
+            Moderate red (color #9).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Purple">
+            <summary>
+            Purple (color #10).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.YellowGreen">
+            <summary>
+            Yellow green (color #11).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.OrangeYellow">
+            <summary>
+            Orange Yellow (color #12).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Blue">
+            <summary>
+            Blue (color #13).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Green">
+            <summary>
+            Green (color #14).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Red">
+            <summary>
+            Red (color #15).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Yellow">
+            <summary>
+            Yellow (color #16).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Magenta">
+            <summary>
+            Magenta (color #17).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Cyan">
+            <summary>
+            Cyan (color #18).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.White">
+            <summary>
+            White (color #19).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Neutral8">
+            <summary>
+            Neutral 8 (color #20).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Neutral6p5">
+            <summary>
+            Neutral 6.5 (color #21).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Neutral5">
+            <summary>
+            Neutral 5 (color #22).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Neutral3p5">
+            <summary>
+            Neutral 3.5 (color #23).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Black">
+            <summary>
+            Black (color #24).
+            </summary>
+        </member>
+        <member name="F:Colourful.MacbethColorChecker.Colors">
+            <summary>
+            Array of 24 colors of the Macbeth ColorChecker.
+            </summary>
+        </member>
+    </members>
+</doc>
