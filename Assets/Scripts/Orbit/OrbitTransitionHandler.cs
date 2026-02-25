@@ -63,7 +63,8 @@ namespace Orbit
             {
                 this.state = state;
                 this.nextState = nextState;
-                nextOrbit = new OrbitState(nextState, nextBody);
+                if (nextBody == null || StateVectors.IsNone(nextState)) nextOrbit = null;
+                else nextOrbit = new OrbitState(nextState, nextBody);
                 this.expiryDate = expiryDate;
             }
 
