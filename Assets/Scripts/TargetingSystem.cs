@@ -88,6 +88,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
         if (Target == null) return;
 
         _encounters.Clear();
+        int i = 0;
         foreach (var patch in activePatches.ActivePatches)
         {
             if (patch.patchOrbit.body != Target.orbit.body) continue;
@@ -96,8 +97,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
             var (tStart, tEnd) = EncounterCalculator.CalcTBounds(patch.patchOrbit, UT, patch.soiEscape);
             var encCalc = new EncounterCalculator(patch.patchOrbit);
             var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
-            for (int i = 0; i < encs.Count; i++)
-                _encounters.Add(new(patch, i, encs[i]));
+            foreach (var enc in encs) _encounters.Add(new(patch, i++, enc));
         }
 
         OnEncounterUpdate?.Invoke();

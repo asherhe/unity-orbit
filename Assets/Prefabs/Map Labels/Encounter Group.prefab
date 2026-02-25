@@ -321,6 +321,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 5486699568743672915}
   labelText: {fileID: 4544481550639810843}
+  _colorSeries:
+  - {r: 0.21792093, g: 0.62489283, b: 0.90943396, a: 0}
+  - {r: 0.61625, g: 0.21960786, b: 0.9098039, a: 0}
+  - {r: 0.21960786, g: 0.9098039, b: 0.2854317, a: 0}
 --- !u!1 &2758274024958623900
 GameObject:
   m_ObjectHideFlags: 0
@@ -642,6 +646,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 7622919860595809148}
   labelText: {fileID: 5683200166401135786}
+  _colorSeries:
+  - {r: 0.21792093, g: 0.62489283, b: 0.90943396, a: 0}
+  - {r: 0.61625, g: 0.21960786, b: 0.9098039, a: 0}
+  - {r: 0.21960786, g: 0.9098039, b: 0.2854317, a: 0}
 --- !u!1 &4701271977206744231
 GameObject:
   m_ObjectHideFlags: 0

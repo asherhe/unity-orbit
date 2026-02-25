@@ -15,6 +15,9 @@ namespace UI
 
         private TMP_Text _iconText;
 
+        [SerializeField]
+        private List<Color> _colorSeries;
+
         protected override void Awake()
         {
             base.Awake();
@@ -46,10 +49,11 @@ namespace UI
         }
         protected override string GetLabelText()
         {
-            MatchTrajectoryColor();
-
-            var name = $"Encounter {enc.number + 1}";
-            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}={TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
+            var encColor = _colorSeries[enc.number % _colorSeries.Count];
+            SetColors(encColor, encColor);
+            
+            var name = $"Approach {enc.number + 1}";
+            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}: {TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
             else return $"{name}:Target";
         }
     }
