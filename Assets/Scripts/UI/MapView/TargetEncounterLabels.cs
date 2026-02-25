@@ -10,7 +10,7 @@ namespace UI
         /// <summary>
         /// object pool for encounter label objects
         /// </summary>
-        private ObjectPool<EncounterLabelGroup> _labelPool;
+        private LinkedList<EncounterLabelGroup> _labelPool = new();
         /// <summary>
         /// currently active labels in the pool
         /// </summary>
@@ -18,28 +18,25 @@ namespace UI
 
         private void Awake()
         {
-            _labelPool = new(
-                CreatePooledItem,
-                OnTakeFromPool,
-                OnReturnedToPool,
-                OnDestroyPoolObject,
-                collectionCheck: true,
-                defaultCapacity: 4,
-                maxSize: 40
-            );
+            _labelPool = new();
 
             TargetingSystem.WhenInstantiated(() => { TargetingSystem.Instance.OnEncounterUpdate += UpdateLabels; });
         }
 
         private void UpdateLabels()
         {
-            foreach (var label in _activeLabels) _labelPool.Release(label);
+            foreach (var label in _activeLabels) DeactivateItem(label);
             _activeLabels.Clear();
+
+            var node = GetFirstItem();
             foreach (var enc in TargetingSystem.Instance.Encounters)
             {
-                var label = _labelPool.Get();
+                var label = node.Value;
+                ActivateItem(label);
                 _activeLabels.AddLast(label);
                 label.Encounter = enc;
+
+                node = GetNextItem(node);
             }
         }
 
@@ -49,8 +46,17 @@ namespace UI
             label.gameObject.SetActive(false);
             return label;
         }
-        private void OnTakeFromPool(EncounterLabelGroup label) { label.gameObject.SetActive(true); }
-        private void OnReturnedToPool(EncounterLabelGroup label) { label.gameObject.SetActive(false); }
-        private void OnDestroyPoolObject(EncounterLabelGroup label) { Destroy(label.gameObject); }
+        private LinkedListNode<EncounterLabelGroup> GetFirstItem()
+        {
+            if (_labelPool.Count == 0) return _labelPool.AddLast(CreatePooledItem());
+            else return _labelPool.First;
+        }
+        private LinkedListNode<EncounterLabelGroup> GetNextItem(LinkedListNode<EncounterLabelGroup> node)
+        {
+            if (node.Next != null) return node.Next;
+            return _labelPool.AddLast(CreatePooledItem());
+        }
+        private void ActivateItem(EncounterLabelGroup label) { label.gameObject.SetActive(true); }
+        private void DeactivateItem(EncounterLabelGroup label) { label.gameObject.SetActive(false); }
     }
 }
