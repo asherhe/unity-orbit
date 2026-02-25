@@ -51,6 +51,12 @@ namespace Parts
         public float ThrottleInput;
 
         /// <summary>
+        /// whether or not this CommandPlugin is supplying active control to the spacecraft.
+        /// the effect of steering control is ignored as steering input will constantly be happening when autosteer is active
+        /// </summary>
+        public bool HasControlInput { get => craft.Control.Throttle > 0.0f; }
+
+        /// <summary>
         /// target direction for autosteer in radians
         /// </summary>
         public float autosteerTarget;
@@ -81,11 +87,12 @@ namespace Parts
 
         protected override void OnFixedUpdate()
         {
+            var warp = Universe.Instance.Timewarp;
             // no control allowed in high timewarp
-            if (Universe.Instance.Timewarp.TimewarpScale > 10.0)
+            if (warp.TimewarpScale > warp.maxControlWarp)
             {
                 craft.Control.SteeringControl = 0;
-                if (Universe.Instance.Timewarp.TimewarpScale > 50.0) craft.Control.Throttle = 0;
+                craft.Control.Throttle = 0;
                 return;
             }
 

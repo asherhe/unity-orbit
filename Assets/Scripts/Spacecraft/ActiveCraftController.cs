@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,13 +14,25 @@ public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
 
     /// <summary>
     /// the active spacecraft
+    /// NOTE: still hard-coded in inspector, one day we will add craft switching
     /// </summary>
+    [SerializeField]
     public Spacecraft craft { get; private set; }
 
+    private Parts.CommandPlugin _command;
     /// <summary>
     /// active command plugin on spacecraft
     /// </summary>
-    public Parts.CommandPlugin command { get; private set; }
+    public Parts.CommandPlugin command
+    {
+        get => _command; private set
+        {
+            _command = value;
+            OnCommandChange?.Invoke();
+        }
+    }
+
+    public event Action OnCommandChange;
 
     /// <summary>
     /// throttle change rate per second
