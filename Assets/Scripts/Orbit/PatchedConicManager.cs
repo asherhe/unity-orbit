@@ -22,6 +22,10 @@ namespace Orbit
         /// </summary>
         private readonly List<Patch> _patches;
         /// <summary>
+        /// the first (and current) conic patch. guarenteed to be active
+        /// </summary>
+        public Patch FirstPatch { get => _patches[0]; }
+        /// <summary>
         /// all patches of this orbit, whether active or inactive
         /// </summary>
         public IEnumerable<Patch> AllPatches { get => _patches.AsReadOnly(); }
