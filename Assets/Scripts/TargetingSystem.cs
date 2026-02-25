@@ -97,6 +97,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
 
                 var UT = patch.prevPatch == null ? Universe.Instance.UT : patch.prevPatch.NextTransition.Time;
                 var (tStart, tEnd) = EncounterCalculator.CalcTBounds(patch.patchOrbit, UT, patch.soiEscape);
+                if (patch.HasTransition) tEnd = Math.Min(tEnd, patch.NextTransition.Time);
                 var encCalc = new EncounterCalculator(patch.patchOrbit);
                 var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
                 foreach (var enc in encs) _encounters.AddLast(new TargetEncounter(patch, i++, enc));
