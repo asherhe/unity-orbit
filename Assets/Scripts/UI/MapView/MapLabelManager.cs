@@ -31,14 +31,14 @@ namespace UI
         {
             base.Awake();
 
-            // spacecraft > celestial body > SOI transition > apses > encounters
+            // spacecraft > celestial body > SOI transition > encounters > apses
             // instantiate in reverse order because draw order shows newest first
-
-            _encounterContainer = new GameObject("Encounter Label Group Container").transform;
-            _encounterContainer.SetParent(transform, worldPositionStays: false);
 
             _apsisContainer = new GameObject("Apsis Label Container").transform;
             _apsisContainer.SetParent(transform, worldPositionStays: false);
+
+            _encounterContainer = new GameObject("Encounter Label Group Container").transform;
+            _encounterContainer.SetParent(transform, worldPositionStays: false);
 
             _SOITransitionContainer = new GameObject("SOI Transition Label Container").transform;
             _SOITransitionContainer.SetParent(transform, worldPositionStays: false);
