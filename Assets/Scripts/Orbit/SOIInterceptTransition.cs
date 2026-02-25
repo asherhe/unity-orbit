@@ -91,10 +91,10 @@ namespace Orbit
             nextCapture = _prop.GetStateVectors(captureTime);
             var bodyState = nextCaptureBody.GetStateVectorsAt(captureTime);
             return new TransitionResult(
-                nextCapture.Value, new OrbitState(
+                nextCapture.Value, nextCaptureBody, new StateVectors(
+                    captureTime,
                     nextCapture?.pos - bodyState.pos,
-                    nextCapture?.vel - bodyState.vel,
-                    captureTime, nextCaptureBody
+                    nextCapture?.vel - bodyState.vel
                 )
             );
         }

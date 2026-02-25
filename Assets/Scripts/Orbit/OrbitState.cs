@@ -180,6 +180,15 @@ namespace Orbit
         {
             UpdateFromStateVectors(pos, vel, t, body);
         }
+        /// <summary>
+        /// construct an orbit from cartesian state vectors
+        /// </summary>
+        /// <param name="state">state vectors at epoch</param>
+        /// <param name="body">parent celestial body</param>
+        public OrbitState(StateVectors state, CelestialBody body)
+        {
+            UpdateFromStateVectors(state.pos, state.vel, state.time, body);
+        }
 
         public OrbitState(OrbitState other)
         {
@@ -416,6 +425,9 @@ namespace Orbit
             this.pos = pos;
             this.vel = vel;
         }
+
+        public static StateVectors None = new StateVectors(double.NaN, null, null);
+        public static bool IsNone(StateVectors state) => double.IsNaN(state.time) && state.pos == null && state.vel == null;
 
         public override string ToString() => $"[ t={time}; p={pos}; v={vel} ]";
     }

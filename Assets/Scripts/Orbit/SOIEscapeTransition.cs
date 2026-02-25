@@ -80,10 +80,10 @@ namespace Orbit
             var bodyState = orbit.body.GetStateVectorsAt(t2);
 
             return new TransitionResult(
-                SOIEscape.Value, new OrbitState(
+                SOIEscape.Value, orbit.body.parent, new StateVectors(
+                    t2,
                     bodyState.pos + SOIEscape?.pos,
-                    bodyState.vel + SOIEscape?.vel,
-                    t2, orbit.body.parent
+                    bodyState.vel + SOIEscape?.vel
                 )
             );
         }
