@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UI;
 using UnityEngine;
+using static Orbit.EncounterCalculator;
 
 public class TargetingSystem : SingletonBehaviour<TargetingSystem>
 {
@@ -59,6 +60,12 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     /// all encounters with the target
     /// </summary>
     public IEnumerable<TargetEncounter> Encounters { get => _encounters; }
+
+    /// <summary>
+    /// the time at which we need to recalculate target appraoches
+    /// </summary>
+    private double approachExpiryTime = double.PositiveInfinity;
+
     /// <summary>
     /// invoked once new encounter data has been determined
     /// </summary>
@@ -87,6 +94,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     private void RecalculateEncounters()
     {
         _encounters.Clear();
+        approachExpiryTime = double.PositiveInfinity;
 
         if (Target != null)
         {
@@ -98,67 +106,87 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
                 var UT = patch.prevPatch == null ? Universe.Instance.UT : patch.prevPatch.NextTransition.Time;
                 var (tStart, tEnd) = EncounterCalculator.CalcTBounds(patch.patchOrbit, UT, patch.soiEscape);
                 if (patch.HasTransition) tEnd = Math.Min(tEnd, patch.NextTransition.Time);
+
                 var encCalc = new EncounterCalculator(patch.patchOrbit);
                 var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
+
+                approachExpiryTime = Math.Min(tEnd, approachExpiryTime);
                 foreach (var enc in encs) _encounters.AddLast(new TargetEncounter(patch, i++, enc));
+
             }
+
+            if (_encounters.Count > 0) approachExpiryTime = _encounters.First.Value.encounter.state.time;
         }
 
         OnEncounterUpdate?.Invoke();
     }
 
+    /// <summary>
+    /// advance encounter data if necessary. should be called within FixedUpdate()
+    /// </summary>
+    private void UpdateEncounters(double UT)
+    {
+        if (patchManager == null) return;
+        if (UT < approachExpiryTime) return;
+
+        // eliminate patches we've already passed
+        while (_encounters.Count > 0 && UT >= _encounters.First.Value.encounter.state.time)
+            _encounters.RemoveFirst();
+
+        // reassign encounter numbers
+        int i = 0;
+        var node = _encounters.First;
+        while (node != null)
+        {
+            var encounter = node.Value;
+            encounter.number = i++;
+            node.Value = encounter;
+            node = node.Next;
+        }
+
+        var currPatch = patchManager.FirstPatch;
+        if (currPatch.HasTransition || currPatch.patchOrbit.Shape != OrbitShape.Ellipse)
+        {
+            // the current patch is not stable, we know that all approaches have been accounted for
+            OnEncounterUpdate?.Invoke();
+        }
+        else
+        {
+            // this is an elliptical, noninturrupted orbit for the forseeable future
+            var tStart = UT;
+            var tEnd = UT + 1.5 * currPatch.patchOrbit.period; // often times the next approach is just over one period past the previous one, the 1.5 accounts for this
+
+            // we can't be certain that there are no transitions between now and the ending time bound
+            if (currPatch.ExpiryDate < tEnd)
+            {
+                // advance transition preduction until it is safe
+                while (currPatch.ExpiryDate < tEnd)
+                    currPatch.CheckTransitions(currPatch.ExpiryDate);
+
+                if (currPatch.HasTransition)
+                {
+                    // recalculate transitions if we detect one to
+                    // this automatically triggers a recalculation of target encounters so we don't need to invoke OnEncounterUpdate
+                    patchManager.RecalculatePatches(currPatch.ExpiryDate);
+                    return;
+                }
+            }
+
+            // encounter time bound is guarenteed to be transition-free
+            // append new transitions
+            var encCalc = new EncounterCalculator(currPatch.patchOrbit);
+            var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
+            foreach (var enc in encs) _encounters.AddLast(new TargetEncounter(currPatch, i++, enc));
+
+            approachExpiryTime = tEnd;
+            if (_encounters.Count > 0) approachExpiryTime = _encounters.First.Value.encounter.state.time;
+
+            OnEncounterUpdate?.Invoke();
+        }
+    }
+
     private void FixedUpdate()
     {
-        // eliminate patches we've already passed
-        var t = Universe.Instance.UT;
-        bool hasPassedEncounter = false;
-        while (_encounters.Count > 0 && Universe.Instance.UT >= (t = _encounters.First.Value.encounter.state.time))
-        {
-            _encounters.RemoveFirst();
-            hasPassedEncounter = true;
-        }
-        if (hasPassedEncounter)
-        {
-            // reassign encounter numbers
-            int i = 0;
-            var node = _encounters.First;
-            while (node != null)
-            {
-                var encounter = node.Value;
-                encounter.number = i++;
-                node.Value = encounter;
-                node = node.Next;
-            }
-
-            var currPatch = patchManager.FirstPatch;
-            if (currPatch.HasTransition || currPatch.patchOrbit.Shape != OrbitShape.Ellipse)
-            {
-                // the current patch is not stable, we know that all approaches have been accounted for
-                OnEncounterUpdate?.Invoke();
-            }
-            else
-            {
-                // this is an elliptical, noninturrupted orbit for the forseeable future
-                var tStart = Universe.Instance.UT;
-                var tEnd = Universe.Instance.UT + 1.5 * currPatch.patchOrbit.period; // often times the next approach is just over one period past the previous one, the 1.5 accounts for this
-
-                if (tEnd > currPatch.ExpiryDate)
-                {
-                    // we can't be certain that there are no transitions between now and the ending time bound
-                    // nudge the prediction a little further to see if it really does work
-                    patchManager.Update(Universe.Instance.UT);
-                    // this automatically triggers a recalculation of target encounters so we don't need to invoke OnEncounterUpdate
-                }
-                else
-                {
-                    // encounter time bound is guarenteed to be transition-free
-                    // append new transitions
-                    var encCalc = new EncounterCalculator(currPatch.patchOrbit);
-                    var encs = encCalc.GetEncounters(Target.orbit, tStart, tEnd);
-                    foreach (var enc in encs) _encounters.AddLast(new TargetEncounter(currPatch, i++, enc));
-                    OnEncounterUpdate?.Invoke();
-                }
-            }
-        }
+        UpdateEncounters(Universe.Instance.UT);
     }
 }
