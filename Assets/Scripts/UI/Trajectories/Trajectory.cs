@@ -22,7 +22,7 @@ namespace UI
             {
                 if (_orbit == value) return;
                 _orbit = value;
-                GenerateTrajectory();
+                UpdateVisuals();
             }
         }
 
@@ -90,9 +90,15 @@ namespace UI
         public double quality = 2e-4;
 
         /// <summary>
-        /// boundaries that restrict the range of true anomalies we draw. true anomaly is always in [ -PI, +PI ]
+        /// boundaries that restrict the range of true anomalies we draw. nu1 is normalized to [ -PI, +PI ].
+        /// note that boundaries here occur time-wise - the orbit will reach nu1 first, then nu2
         /// </summary>
-        public double nuMin = double.NegativeInfinity, nuMax = double.PositiveInfinity;
+        public double nu1 = double.NegativeInfinity, nu2 = double.PositiveInfinity;
+
+        /// <summary>
+        /// whether to clip the trajectory to the current location of the orbit
+        /// </summary>
+        public bool clipToCurrent = false;
 
         private void Awake()
         {
@@ -126,55 +132,24 @@ namespace UI
             }
         }
 
-        /// <summary>
-        /// determine true anomaly bounds for trajectory drawing
-        /// </summary>
-        private (double, double) CalcNuBounds()
-        {
-            double nu1, nu2;
-            if (Orbit.e < 1.0)
-            {
-                nu1 = -Math.PI;
-                nu2 = Math.PI;
-                _trajectoryMesh.isLooped = true;
-            }
-            else
-            {
-                // true anomaly to maxRenderDistance
-                double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
-                nu1 = -asymptote;
-                nu2 = asymptote;
-                _trajectoryMesh.isLooped = false;
-            }
-
-            // cancel looping if trajectory gets clipped
-            if (nu1 < nuMin || nu2 > nuMax) _trajectoryMesh.isLooped = false;
-
-            nu1 = Math.Max(nu1, nuMin);
-            nu2 = Math.Min(nu2, nuMax);
-
-            // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
-            if (_trajectoryMesh.isLooped) { nu1 = 0; nu2 = 2 * Math.PI; }
-
-            return (nu1, nu2);
-        }
-
         // saved orbital parameters
 
         /// <summary>
         /// coefficient for the determination of universal anomaly
         /// </summary>
-        double coeff;
+        private double coeff;
+
+        private double sqrtGM;
 
         /// <summary>
         /// characteristic time for this orbit's animation (equivalent to one animation period in real time)
         /// </summary>
-        double tcharacteristic;
+        private double tcharacteristic;
 
         /// <summary>
         /// SOI escape calculator for time scaling
         /// </summary>
-        SOIEscapeTransition _esc;
+        private SOIEscapeTransition _esc;
 
         /// <summary>
         /// initialize some orbital parameters used for driving the animation
@@ -182,9 +157,26 @@ namespace UI
         private void InitParams()
         {
             _prop = new UniversalPropagator(_orbit);
-            _esc = new SOIEscapeTransition(_orbit);
+            //_esc = new SOIEscapeTransition(_orbit); // TODO: use this to make hyperbolic and parabolic trajectories linear time
 
+            if (double.IsFinite(nu1))
+            {
+                // normalize nu1 to [-PI, PI)
+                var phase = 2 * Math.PI * Math.Floor(nu1 / (2 * Math.PI) + 0.5);
+                nu1 -= phase;
+                nu2 -= phase;
+            }
+            else if (double.IsFinite(nu2))
+            {
+                // one-sided interval: normalize nu2 to [-PI, PI)
+                nu2 -= 2 * Math.PI * Math.Floor(nu2 / (2 * Math.PI) + 0.5);
+            }
+
+
+            // cache value so we don't have to recompute it
             coeff = _prop.AnomCoeff;
+
+            sqrtGM = Math.Sqrt(Orbit.GM);
 
             switch (Orbit.Shape)
             {
@@ -214,9 +206,77 @@ namespace UI
         }
 
         /// <summary>
+        /// determine true anomaly bounds for trajectory drawing
+        /// </summary>
+        private (double, double) CalcNuBounds()
+        {
+            var dir = Math.Sign(Orbit.h);
+
+            double nuMin, nuMax;
+            if (Orbit.Shape == OrbitShape.Ellipse)
+            {
+                nuMin = double.NegativeInfinity;
+                nuMax = double.PositiveInfinity;
+            }
+            else
+            {
+                // true anomaly to maxRenderDistance
+                double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
+                nuMin = -asymptote;
+                nuMax = asymptote;
+            }
+            // ensure the two are in the right order chronologically
+            nuMin *= dir; nuMax *= dir;
+
+            // proper setters for chonological ordering
+            void SetNuMin(double nu) => nuMin = dir == 1 ? Math.Max(nuMin, nu) : Math.Min(nuMin, nu);
+            void SetNuMax(double nu) => nuMax = dir == 1 ? Math.Min(nuMax, nu) : Math.Max(nuMax, nu);
+
+            if (clipToCurrent)
+            {
+                // set lower time bound to orbit position
+                var pos = _prop.GetPosition(Universe.Instance.UT);
+                var nuPos = Orbit.CalcNu(pos);
+                SetNuMin(nuPos);
+            }
+
+            // clip orbit
+
+            if (double.IsFinite(nuMin))
+            {
+                // normalize nuMin to [-PI, PI)
+                var phase = 2 * Math.PI * Math.Floor(nuMin / (2 * Math.PI) + 0.5);
+                nuMin -= phase;
+                nuMax -= phase;
+            }
+            else if (double.IsFinite(nuMax))
+            {
+                // one-sided interval: normalize nuMax to [-PI, PI)
+                nuMax -= 2 * Math.PI * Math.Floor(nuMax / (2 * Math.PI) + 0.5);
+            }
+
+            // if the upper time bound reaches past apoapsis, normalize so we can properly clip with Min and Max
+            if (dir * nuMax - 2 * Math.PI > dir * nu1) { nuMin -= dir * 2 * Math.PI; nuMax -= dir * 2 * Math.PI; }
+            if (dir * nu2 - 2 * Math.PI > dir * nuMin) { nu1 -= dir * 2 * Math.PI; nu2 -= dir * 2 * Math.PI; }
+
+            // apply clipping
+            if (double.IsFinite(nu1)) SetNuMin(nu1);
+            if (double.IsFinite(nu2)) SetNuMax(nu2);
+
+            // check if looped
+            _trajectoryMesh.isLooped = Math.Abs(nuMax - nuMin) >= 2 * Math.PI;
+
+            // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
+            if (_trajectoryMesh.isLooped) { nuMin = 0; nuMax = 2 * Math.PI; }
+
+            // swap to correct order
+            if (nuMin > nuMax) (nuMin, nuMax) = (nuMax, nuMin);
+
+            return (nuMin, nuMax);
+        }
+
+        /// <summary>
         /// determine animation parameter at a given true anomaly.
-        /// ELLIPTICAL ORBITS - normalizes each orbital revolution to [0,1]
-        /// PARABOLIC ORBITS - 
         /// </summary>
         private double CalcU(double nu)
         {
@@ -224,7 +284,7 @@ namespace UI
             var chi = coeff * danomaly;
 
             // time since epoch
-            var u = _prop.UniversalKepler(chi) / Math.Sqrt(Orbit.GM);
+            var u = _prop.UniversalKepler(chi) / sqrtGM;
 
             // orbit time for one full cycle of the trajectory animation
             u /= tcharacteristic;
@@ -249,17 +309,13 @@ namespace UI
 
         private Point ConstructPoint(double r, double nu) => new Point(r, nu, CalcU(nu), Orbit);
 
-        public void GenerateTrajectory()
+        private void GenerateTrajectory()
         {
-            _follow.follow = Orbit.body.transform;
-
-            InitParams();
-
-            var (nu1, nu2) = CalcNuBounds();
+            var (nuMin, nuMax) = CalcNuBounds();
 
             LinkedList<Point> points = new();
-            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nu1), nu1));
-            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nu2), nu2));
+            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nuMin), nuMin));
+            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nuMax), nuMax));
 
             // error tolerance
             double tol = Orbit.p * quality;
@@ -285,7 +341,7 @@ namespace UI
                 }
             }
 
-            SubdivideMesh(points.First, points.Last, nu1, nu2, 64);
+            SubdivideMesh(points.First, points.Last, nuMin, nuMax, 64);
 
             if (_trajectoryMesh.isLooped)
             {
@@ -307,6 +363,22 @@ namespace UI
 
             _trajectoryMesh.SetPointList(points);
             _trajectoryMesh.UpdateMesh();
+        }
+
+        public void UpdateVisuals()
+        {
+            _follow.follow = Orbit.body.transform;
+
+            InitParams();
+
+            GenerateTrajectory();
+        }
+
+        private void Update()
+        {
+            // clipToCurrent requires real-time trajectory updates
+            if (clipToCurrent) GenerateTrajectory();
+            // maybe try interpolation of cutoff point
         }
     }
 }

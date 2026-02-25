@@ -16,7 +16,8 @@ plugins:
   EnginePlugin:
     # isp: 316 # s
     isp: 1000 # ridiculously good isp for testing
-    thrust: 26.7 # kN
+    # thrust: 26.7 # kN
+    thrust: 100 # better thrust for faster testing
     propellantRatio:
       NTO: 1.5
       Hydrazine: 1.0

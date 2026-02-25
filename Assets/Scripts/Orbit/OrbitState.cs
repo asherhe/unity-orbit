@@ -101,7 +101,7 @@ namespace Orbit
         /// </summary>
         public double M0 { get; private set; }
         /// <summary>
-        /// true anomaly at epoch
+        /// true anomaly at epoch. normalized to [ -PI, PI ]
         /// </summary>
         public double nu0 { get; private set; }
         /// <summary>

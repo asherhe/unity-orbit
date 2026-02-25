@@ -140,7 +140,7 @@ namespace Orbit
                 };
             });
 
-            OnTransitionUpdate += UpdateTrajectoryBounds;
+            OnTransitionUpdate += UpdateTrajectoryPrefs;
         }
 
         /// <summary>
@@ -200,10 +200,12 @@ namespace Orbit
         }
 
         /// <summary>
-        /// reset the bounds on the currently displayed conic patch based on encounters and SOI captures
+        /// reset the display preferences (clipping bounds, etc.) on the currently displayed conic patch based on encounters and SOI captures
         /// </summary>
-        public void UpdateTrajectoryBounds()
+        public void UpdateTrajectoryPrefs()
         {
+            trajectory.clipToCurrent = false;
+
             // orbit direction
             var dir = Math.Sign(patchOrbit.h);
             // true anomalies, timewise - nu1 happens first, then nu2
@@ -213,21 +215,41 @@ namespace Orbit
             double SetNu1(double nu) => nu1 = dir == 1 ? Math.Max(nu1, nu) : Math.Min(nu1, nu);
             double SetNu2(double nu) => nu2 = dir == 1 ? Math.Min(nu2, nu) : Math.Max(nu2, nu);
 
-            if (soiEscape.HasTransition)
-            {
-                var nuCapt = patchOrbit.CalcNu(soiEscape.SOICapture?.pos);
-                SetNu1(nuCapt);
-            }
             if (HasTransition)
             {
+                // clip to SOI capture
+                if (soiEscape.HasTransition)
+                {
+                    var nuCapt = patchOrbit.CalcNu(soiEscape.SOICapture?.pos);
+                    SetNu1(nuCapt);
+                }
+                // clip to entry point of this patch
+                if (prevPatch != null)
+                {
+                    var nuEnter = patchOrbit.CalcNu(prevPatch.NextTransition.NextState.pos);
+                    SetNu1(nuEnter);
+                }
+                // this is the first patch: clip to the current position
+                if (prevPatch == null && NextTransition != soiEscape)
+                {
+                    trajectory.clipToCurrent = true;
+                }
+                // clip to exit point
                 var nuTrans = patchOrbit.CalcNu(NextTransition.State.pos);
                 SetNu2(nuTrans);
             }
 
-            if (dir == 1) { trajectory.nuMin = nu1; trajectory.nuMax = nu2; }
-            else { trajectory.nuMin = nu2; trajectory.nuMax = nu1; }
+            // normalize nu2 to be on the correct side of nu1
+            // if nu1 was never assigned, use the orbit's nu0 as a reference point
+            // (throughout the game we assume that state at epoch represents a real state on the patch
+            // and not some random point that is on a different period)
+            var nuRef = nu1;
+            if (double.IsInfinity(nuRef)) nuRef = patchOrbit.nu0;
+            if (dir * nu2 < dir * nuRef) nu2 += dir * 2 * Math.PI;
 
-            trajectory.GenerateTrajectory();
+            trajectory.nu1 = nu1; trajectory.nu2 = nu2;
+
+            trajectory.UpdateVisuals();
         }
     }
 }
