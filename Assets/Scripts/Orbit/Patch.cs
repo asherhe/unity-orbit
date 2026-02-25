@@ -217,16 +217,11 @@ namespace Orbit
             {
                 var nuCapt = patchOrbit.CalcNu(soiEscape.SOICapture?.pos);
                 SetNu1(nuCapt);
-                SetNu2(-nuCapt);
             }
             if (HasTransition)
             {
-                if (patchOrbit.Shape != OrbitShape.Ellipse)
-                {
-                    var nuTrans = patchOrbit.CalcNu(NextTransition.State.pos);
-                    SetNu2(nuTrans);
-                }
-                // currently no support for elliptical trajectories as we still gotta show the entire period anyways
+                var nuTrans = patchOrbit.CalcNu(NextTransition.State.pos);
+                SetNu2(nuTrans);
             }
 
             if (dir == 1) { trajectory.nuMin = nu1; trajectory.nuMax = nu2; }

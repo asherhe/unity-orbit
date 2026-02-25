@@ -1,9 +1,7 @@
-using MathNet.Numerics.Distributions;
 using Orbit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 
 namespace UI
@@ -13,7 +11,6 @@ namespace UI
     {
         private TrajectoryMesh _trajectoryMesh;
         private MeshRenderer _meshRenderer;
-        private MeshFilter _meshFilter;
         private FollowWorldTransform _follow;
 
         private OrbitState _orbit;
@@ -25,7 +22,6 @@ namespace UI
             {
                 if (_orbit == value) return;
                 _orbit = value;
-                _prop = new UniversalPropagator(_orbit);
                 GenerateTrajectory();
             }
         }
@@ -100,17 +96,15 @@ namespace UI
 
         private void Awake()
         {
-            _trajectoryMesh = new TrajectoryMesh();
+            _trajectoryMesh = gameObject.AddComponent<TrajectoryMesh>();
             _meshRenderer = GetComponent<MeshRenderer>();
-            _meshFilter = GetComponent<MeshFilter>();
-            _meshFilter.mesh = _trajectoryMesh.mesh;
             _follow = GetComponent<FollowWorldTransform>();
         }
 
         /// <summary>
         /// data about each vectex in the trajectory mesh
         /// </summary>
-        private struct TrajectoryPoint
+        public struct Point
         {
             public Vector2 pos;
             public double r;
@@ -121,58 +115,22 @@ namespace UI
             /// </summary>
             /// <param name="r">distance from center</param>
             /// <param name="nu">true anomaly</param>
+            /// <param name="u">animation parameter</param>
             /// <param name="o">orbit state</param>
-            public TrajectoryPoint(double r, double nu, OrbitState o)
+            public Point(double r, double nu, double u, OrbitState o)
             {
-                this.r = r; this.nu = nu;
+                this.r = r; this.nu = nu; this.u = u;
                 var theta = (float)(nu + o.omega);
                 pos = (float)r * new Vector2(Mathf.Cos(theta), Mathf.Sin(theta));
 
-                // TODO: migrate out of constructor into dedicated block in GenerateTrajectory()
-                var prop = new UniversalPropagator(o);
-                var coeff = prop.AnomCoeff;
-                var danomaly = o.CalcAnomaly(nu) - o.Anomaly0;
-                //if (o.Shape == OrbitShape.Ellipse)
-                //    danomaly = MathUtils.Mod(danomaly, 2 * Math.PI);
-                var chi = coeff * danomaly;
-
-                // time since epoch
-                u = prop.UniversalKepler(chi) / Math.Sqrt(o.GM);
-
-                // orbit time for one full cycle of the trajectory animation
-                if (o.Shape == OrbitShape.Ellipse)
-                {
-                    u /= o.period;
-                    if (o.h < 0.0 && nu == 0.0) u += 1;
-                }
-                else if (o.Shape == OrbitShape.Parabola)
-                {
-                    u /= 4 * Math.Sqrt(o.periapsis * o.periapsis * o.periapsis / o.GM) / 3;
-                    u = 1 / (1 + Math.Exp(-0.2 * u)); // sigmoid
-                }
-                else
-                {
-                    // characteristic time for hyperbolic orbits:
-                    //     t = b / v_excess
-                    // where b is the impact parameter (distance from asymptote to focus) and
-                    // v_excess is the hyperbolic excess velocity (speed at infinity).
-                    //
-                    // since the formulas for b and v_excess are
-                    //     b = -a sqrt( e^2 - 1 )
-                    //     vexcess = sqrt( GM / -a )
-                    // the expression for the characteristic time is
-                    //     t = -a sqrt( -a (e^2 - 1) / GM )
-
-                    u /= -o.a * Math.Sqrt(-o.a * (o.e * o.e - 1) / o.GM);
-                    u = 1 / (1 + Math.Exp(-0.5 * u)); // sigmoid
-                }
             }
         }
 
-        public void GenerateTrajectory()
+        /// <summary>
+        /// determine true anomaly bounds for trajectory drawing
+        /// </summary>
+        private (double, double) CalcNuBounds()
         {
-            _follow.follow = Orbit.body.transform;
-
             double nu1, nu2;
             if (Orbit.e < 1.0)
             {
@@ -198,12 +156,116 @@ namespace UI
             // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
             if (_trajectoryMesh.isLooped) { nu1 = 0; nu2 = 2 * Math.PI; }
 
-            LinkedList<TrajectoryPoint> points = new();
+            return (nu1, nu2);
+        }
+
+        // saved orbital parameters
+
+        /// <summary>
+        /// coefficient for the determination of universal anomaly
+        /// </summary>
+        double coeff;
+
+        /// <summary>
+        /// characteristic time for this orbit's animation (equivalent to one animation period in real time)
+        /// </summary>
+        double tcharacteristic;
+
+        /// <summary>
+        /// SOI escape calculator for time scaling
+        /// </summary>
+        SOIEscapeTransition _esc;
+
+        /// <summary>
+        /// initialize some orbital parameters used for driving the animation
+        /// </summary>
+        private void InitParams()
+        {
+            _prop = new UniversalPropagator(_orbit);
+            _esc = new SOIEscapeTransition(_orbit);
+
+            coeff = _prop.AnomCoeff;
+
+            switch (Orbit.Shape)
+            {
+                case OrbitShape.Ellipse:
+                    // squishes one orbital revolution to [0,1]
+                    tcharacteristic = Orbit.period;
+                    break;
+                case OrbitShape.Parabola:
+                    // characteristic time for parabolic orbits:
+                    // time-of-flight from periapsis to 90 degree true anomaly
+                    tcharacteristic = 4 * Math.Sqrt(Orbit.periapsis * Orbit.periapsis * Orbit.periapsis / Orbit.GM) / 3;
+                    break;
+                case OrbitShape.Hyperbola:
+                    // characteristic time for hyperbolic orbits:
+                    //     t = b / v_excess
+                    // where b is the impact parameter (distance from asymptote to focus) and
+                    // v_excess is the hyperbolic excess velocity (speed at infinity).
+                    //
+                    // since the formulas for b and v_excess are
+                    //     b = -a sqrt( e^2 - 1 )
+                    //     vexcess = sqrt( GM / -a )
+                    // the expression for the characteristic time is
+                    //     t = -a sqrt( -a (e^2 - 1) / GM )
+                    tcharacteristic = -Orbit.a * Math.Sqrt(-Orbit.a * (Orbit.e * Orbit.e - 1) / Orbit.GM);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// determine animation parameter at a given true anomaly.
+        /// ELLIPTICAL ORBITS - normalizes each orbital revolution to [0,1]
+        /// PARABOLIC ORBITS - 
+        /// </summary>
+        private double CalcU(double nu)
+        {
+            var danomaly = Orbit.CalcAnomaly(nu) - Orbit.Anomaly0;
+            var chi = coeff * danomaly;
+
+            // time since epoch
+            var u = _prop.UniversalKepler(chi) / Math.Sqrt(Orbit.GM);
+
+            // orbit time for one full cycle of the trajectory animation
+            u /= tcharacteristic;
+
+            // shape-specific processing
+            switch (Orbit.Shape)
+            {
+                case OrbitShape.Ellipse:
+                    // ensure correct endpoint value at periapsis when the orbit is reversed
+                    if (nu == 0.0 && Orbit.h < 0.0) u += 1;
+                    break;
+                case OrbitShape.Parabola:
+                    u = 1 / (1 + Math.Exp(-0.2 * u)); // sigmoid
+                    break;
+                case OrbitShape.Hyperbola:
+                    u = 1 / (1 + Math.Exp(-0.5 * u)); // sigmoid
+                    break;
+            }
+
+            return u;
+        }
+
+        private Point ConstructPoint(double r, double nu) => new Point(r, nu, CalcU(nu), Orbit);
+
+        public void GenerateTrajectory()
+        {
+            _follow.follow = Orbit.body.transform;
+
+            InitParams();
+
+            var (nu1, nu2) = CalcNuBounds();
+
+            LinkedList<Point> points = new();
+            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nu1), nu1));
+            points.AddLast(ConstructPoint(Orbit.GetDistanceFromNu(nu2), nu2));
 
             // error tolerance
             double tol = Orbit.p * quality;
 
-            void SubdivideMesh(LinkedListNode<TrajectoryPoint> start, LinkedListNode<TrajectoryPoint> end, double nuStart, double nuEnd, int depth)
+            // dynamic mesh resolution to match sharpness of orbit's curvature
+            void SubdivideMesh(LinkedListNode<Point> start, LinkedListNode<Point> end, double nuStart, double nuEnd, int depth)
             {
                 if (depth == 0) return;
 
@@ -217,15 +279,13 @@ namespace UI
                 // deviates too far
                 if (Math.Abs(rMid - chordMid) > tol)
                 {
-                    var mid = points.AddAfter(start, new TrajectoryPoint(rMid, nuMid, Orbit));
+                    var mid = points.AddAfter(start, ConstructPoint(rMid, nuMid));
                     SubdivideMesh(start, mid, nuStart, nuMid, depth - 1);
                     SubdivideMesh(mid, end, nuMid, nuEnd, depth - 1);
                 }
             }
 
-            points.AddLast(new TrajectoryPoint(Orbit.GetDistanceFromNu(nu1), nu1, Orbit));
-            points.AddLast(new TrajectoryPoint(Orbit.GetDistanceFromNu(nu2), nu2, Orbit));
-            SubdivideMesh(points.First, points.Last, nu1, nu2, 24);
+            SubdivideMesh(points.First, points.Last, nu1, nu2, 64);
 
             if (_trajectoryMesh.isLooped)
             {
@@ -247,116 +307,6 @@ namespace UI
 
             _trajectoryMesh.SetPointList(points);
             _trajectoryMesh.UpdateMesh();
-        }
-
-
-        class TrajectoryMesh
-        {
-            public Vector3[] verts;
-            /*
-             * uvs: progress along the trajectory at this vertex
-             * prev, next: positions of previous and next point
-             * data: [ which side are we on? (-1 or 1), is this vertex a corner/end cap? (0 or 1) ]
-             */
-            public Vector2[] uvs, prev, next, data;
-            public int[] tris;
-
-            private Bounds bounds;
-
-            public bool isLooped = false;
-
-            public Mesh mesh = new();
-
-            public void SetPointList(LinkedList<TrajectoryPoint> points)
-            {
-                int len = points.Count;
-                if (len < 2) return;
-
-                // we add a duplicate version of the first point if we have a loop so
-                // that UV doesn't interpolate between 0 and 1 for the segment that closes the loop
-                int nVerts = len + (isLooped ? 1 : 0);
-                verts = new Vector3[nVerts * 2];
-                uvs = new Vector2[nVerts * 2];
-                prev = new Vector2[nVerts * 2];
-                next = new Vector2[nVerts * 2];
-                data = new Vector2[nVerts * 2];
-                tris = new int[6 * (nVerts - 1)];
-
-                var node = points.First;
-                int i = 0;
-                Vector2 maxCoords = Vector2.zero;
-                while (node != null)
-                {
-                    var point = node.Value;
-                    var pos = point.pos;
-
-                    maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
-                    maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
-
-                    var prevNode = node == points.First ? points.Last : node.Previous;
-                    var nextNode = node == points.Last ? points.First : node.Next;
-
-                    verts[i * 2] = pos;
-                    verts[i * 2 + 1] = pos;
-                    uvs[i * 2] = new Vector2((float)point.u, 0);
-                    uvs[i * 2 + 1] = new Vector2((float)point.u, 1);
-                    prev[i * 2] = prevNode.Value.pos;
-                    prev[i * 2 + 1] = prevNode.Value.pos;
-                    next[i * 2] = nextNode.Value.pos;
-                    next[i * 2 + 1] = nextNode.Value.pos;
-                    data[i * 2] = new Vector2(1, 0);
-                    data[i * 2 + 1] = new Vector2(-1, 0);
-
-                    node = node.Next;
-                    i++;
-                }
-                // adjust render bounds for mesh so that it actually displays
-                bounds = new Bounds(Vector2.zero, 2 * maxCoords);
-
-                if (isLooped)
-                {
-                    verts[len * 2] = verts[0];
-                    verts[len * 2 + 1] = verts[1];
-                    uvs[len * 2] = uvs[0] + new Vector2(1, 0);
-                    uvs[len * 2 + 1] = uvs[1] + new Vector2(1, 0);
-                    prev[len * 2] = prev[0];
-                    prev[len * 2 + 1] = prev[1];
-                    next[len * 2] = next[0];
-                    next[len * 2 + 1] = next[1];
-                    data[len * 2] = data[0];
-                    data[len * 2 + 1] = data[1];
-                }
-                else
-                {
-                    data[0].y = 1;
-                    data[1].y = 1;
-                    data[len * 2 - 2].y = 2;
-                    data[len * 2 - 1].y = 2;
-                }
-
-                for (int j = 0; j < nVerts - 1; j++)
-                {
-                    tris[6 * j] = 2 * j;
-                    tris[6 * j + 1] = 2 * j + 1;
-                    tris[6 * j + 2] = 2 * j + 3;
-
-                    tris[6 * j + 3] = 2 * j;
-                    tris[6 * j + 4] = 2 * j + 3;
-                    tris[6 * j + 5] = 2 * j + 2;
-                }
-            }
-
-            public void UpdateMesh()
-            {
-                mesh.Clear();
-                mesh.vertices = verts;
-                mesh.uv = uvs;
-                mesh.uv2 = prev;
-                mesh.uv3 = next;
-                mesh.uv4 = data;
-                mesh.triangles = tris;
-                mesh.bounds = bounds;
-            }
         }
     }
 }
