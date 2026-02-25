@@ -55,7 +55,7 @@ public class TimewarpControls : MonoBehaviour
         if (ActiveCraftController.Instance.command.HasControlInput && TimewarpScale > maxControlWarp)
         {
             WarpIndex--;
-            AnnouncementDisplay.Instance.Announce("Cannot timewarp while throttle is open!");
+            AnnouncementDisplay.Instance.Announce($"Cannot warp past x{maxControlWarp:0.##} while throttle is on!");
         }
     }
     public void WarpDecrease()
