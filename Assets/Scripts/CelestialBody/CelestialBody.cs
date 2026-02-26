@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CelestialBody : MonoBehaviour, IOrbitingObject
+public class CelestialBody : OrbitingObject
 {
     private CelestialBodyConfig _config;
     [Serializable]
@@ -88,7 +88,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     private GameObject _surfaceObject;
     private GameObject _atmObject;
     private GameObject _soiObject;
-    
+
     private UI.CelestialBodyLabel _mapLabel;
 
     [SerializeField]
@@ -98,12 +98,6 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// name of this celestial body, used for display and referencing
     /// </summary>
     public string bodyName { get; private set; }
-
-    /// <summary>
-    /// orbit of this body
-    /// </summary>
-    public OrbitState orbit { get; private set; }
-    private IOrbitPropagator _prop;
 
     /// <summary>
     /// celestial body that this body is a satellite of
@@ -118,7 +112,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     /// <summary>
     /// radius of this celestial body's SOI
     /// </summary>
-    public double soiRadius { get; private set; }
+    public double soiRadius { get; private set; } = double.PositiveInfinity;
 
 
     /// <summary>
@@ -181,23 +175,17 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
             var a = _config.orbit.semimajorAxis * 1000.0;
             orbit = new OrbitState(
-                -Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
+                Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
                 _config.orbit.eccentricity,
                 _config.orbit.longitudePeriapsis * Math.PI / 180.0,
                 _config.orbit.epochMeanAnom * Math.PI / 180.0,
                 _config.orbit.epochTime,
                 parent
             );
-            orbit.Owner = this;
-            _prop = new UniversalPropagator(orbit);
+            orbit.owner = this;
+            prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
-
-            UI.Trajectory trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
-            trajectory.name = $"Trajectory {this}";
-            trajectory.Color = color;
-            // we can afford to do high quality for celestial trajectories because they are static
-            trajectory.quality = 1e-6;
         }
 
         if ((hasAtmosphere = _config.atmosphere != null))
@@ -319,15 +307,23 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
 
         SetDynamicMaterialProperties();
 
-        _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
-    }
+        UI.MapLabelManager.WhenInstantiated(() =>
+        {
+            _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
+        });
 
-    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
-    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
-    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
-    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
-    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
-    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
+        if (orbit != null)
+        {
+            UI.TrajectoryManager.WhenInstantiated(() =>
+            {
+                var trajectory = UI.TrajectoryManager.Instance.AddTrajectory(orbit);
+                trajectory.name = $"Trajectory {this}";
+                trajectory.Color = color;
+                // we can afford to do high quality for celestial trajectories because they are static
+                trajectory.quality = 1e-6;
+            });
+        }
+    }
 
     /// <summary>
     /// get the current position of this body, with the sun at the origin
@@ -336,7 +332,7 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
     {
         var parentPos = Vector2d.zero;
         if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
-        return parentPos + GetPosition();
+        return parentPos + Position;
     }
 
     private void FixedUpdate()
@@ -351,8 +347,5 @@ public class CelestialBody : MonoBehaviour, IOrbitingObject
         SetDynamicMaterialProperties();
     }
 
-    public override string ToString()
-    {
-        return $"[CelestialBody {bodyName}]";
-    }
+    public override string ToString() => $"[CelestialBody {bodyName}]";
 }

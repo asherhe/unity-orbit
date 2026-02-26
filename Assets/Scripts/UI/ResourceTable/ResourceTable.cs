@@ -18,8 +18,11 @@ namespace UI
 
         private void Awake()
         {
-            _craft = ActiveCraftController.Instance.craft;
-            _craft.OnLoaded += GenerateTable;
+            ActiveCraftController.WhenInstantiated(() =>
+            {
+                _craft = ActiveCraftController.Instance.craft;
+                _craft.OnLoaded += GenerateTable;
+            });
         }
 
         private void GenerateTable()

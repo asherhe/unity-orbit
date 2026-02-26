@@ -14,7 +14,9 @@ namespace UI
         private void Awake()
         {
             _rectTransform = GetComponent<RectTransform>();
-            MapViewManager.Instance.OnMapToggled += ToggleMinimap;
+            MapViewManager.WhenInstantiated(() => {
+                MapViewManager.Instance.OnMapToggled += ToggleMinimap;
+            });
         }
 
         private void ToggleMinimap()

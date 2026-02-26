@@ -9,7 +9,7 @@ namespace UI
     public class TrajectoryManager : SingletonBehaviour<TrajectoryManager>
     {
         public GameObject trajectoryPrefab;
-        private readonly HashSet<Trajectory> _trajectories = new();
+        private readonly Dictionary<OrbitState, Trajectory> _trajectories = new();
 
         /// <summary>
         /// add a new trajectory to display
@@ -17,13 +17,19 @@ namespace UI
         /// <returns>newly created trajectory component</returns>
         public Trajectory AddTrajectory(OrbitState o)
         {
+            if (_trajectories.ContainsKey(o)) throw new InvalidOperationException("A Trajectory already exists for this OrbitState");
             var trajObject = Instantiate(trajectoryPrefab, transform);
             trajObject.transform.localPosition = Vector3.zero;
             var trajectory = trajObject.GetComponent<Trajectory>();
             trajectory.Orbit = o;
-            _trajectories.Add(trajectory);
+            _trajectories.Add(o, trajectory);
             return trajectory;
         }
+
+        /// <summary>
+        /// retrieve the trajectory that displays the given OrbitState, if it exists
+        /// </summary>
+        public Trajectory GetTrajectoryOf(OrbitState o) => _trajectories[o];
 
         /// <summary>
         /// remove a trajectory from display
@@ -31,7 +37,7 @@ namespace UI
         /// <returns>true if trajectory was found and removed, false otherwise</returns>
         public bool RemoveTrajectory(Trajectory t)
         {
-            if (_trajectories.Remove(t))
+            if (_trajectories.Remove(t.Orbit))
             {
                 Destroy(t.gameObject);
                 return true;

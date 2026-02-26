@@ -10,12 +10,12 @@ namespace UI
     /// extend this to create a specific implementation of the ObjectLabel behaviours you want
     /// </summary>
     [RequireComponent(typeof(FollowWorldTransformFromScreen))]
-    public class ObjectLabel : MapLabel
+    public abstract class ObjectLabel : MapLabel
     {
         protected FollowWorldTransformFromScreen _follow;
 
-        private Orbit.IOrbitingObject _owner;
-        public Orbit.IOrbitingObject Owner
+        private Orbit.OrbitingObject _owner;
+        public Orbit.OrbitingObject Owner
         {
             get => _owner;
             set
@@ -28,6 +28,23 @@ namespace UI
 
         protected event Action OnOwnerUpdated;
 
+        public abstract string Name { get; }
+
+        private bool _isTargeted = false;
+        /// <summary>
+        /// whether this label is the active target
+        /// </summary>
+        protected bool IsTargeted
+        {
+            get => _isTargeted;
+            set
+            {
+                if (_isTargeted == value) return;
+                _isTargeted = value;
+                ShowLabel = _isTargeted;
+            }
+        }
+
         protected override void Awake()
         {
             base.Awake();
@@ -36,6 +53,28 @@ namespace UI
 
             OnOwnerUpdated += () => _follow.follow = Owner.gameObject.transform;
             OnOwnerUpdated += UpdateVisuals;
+            OnOwnerUpdated += UpdateTargeting;
+
+            icon.OnClick += ToggleTarget;
+         
+            TargetingSystem.WhenInstantiated(() =>
+            {
+                TargetingSystem.Instance.OnTargetChanged += UpdateTargeting;
+            });
+        }
+
+        private void ToggleTarget()
+        {
+            IsTargeted = !IsTargeted;
+            if (IsTargeted) TargetingSystem.Instance.Target = Owner;
+            else TargetingSystem.Instance.Target = null;
+        }
+
+        private void UpdateTargeting()
+        {
+            IsTargeted = TargetingSystem.Instance.Target == Owner;
+            if (IsTargeted) labelText.text = $">{Name}<";
+            else labelText.text = Name;
         }
     }
 }

@@ -77,13 +77,13 @@ namespace Orbit
             SOIEscape = _prop.GetStateVectors(dt2, chi2);
 
             // state of parent body at SOI escape
-            var bodyState = orbit.body.GetStateVectors(t2);
+            var bodyState = orbit.body.GetStateVectorsAt(t2);
 
             return new TransitionResult(
-                SOIEscape.Value, new OrbitState(
+                SOIEscape.Value, orbit.body.parent, new StateVectors(
+                    t2,
                     bodyState.pos + SOIEscape?.pos,
-                    bodyState.vel + SOIEscape?.vel,
-                    t2, orbit.body.parent
+                    bodyState.vel + SOIEscape?.vel
                 )
             );
         }

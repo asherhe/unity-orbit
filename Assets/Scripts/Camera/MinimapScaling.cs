@@ -24,7 +24,7 @@ public class MinimapScaling : MonoBehaviour
         }
         else
         {
-            scale = 3 * activeCraft.GetPosition().Magnitude;
+            scale = 3 * activeCraft.Position.Magnitude;
         }
         _camera.orthographicSize = (float)scale;
     }

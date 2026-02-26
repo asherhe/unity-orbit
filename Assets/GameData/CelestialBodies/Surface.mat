@@ -24,22 +24,23 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _LightTex:
-        m_Texture: {fileID: 2800000, guid: 7a2c8ea6a89124a4a8a805d948a4abd3, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 559eb836fc63ad144b00266cf32cc729, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
-        m_Texture: {fileID: 2800000, guid: 03aed97f6238c2441b14505598bfd7c9, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecularTex:
-        m_Texture: {fileID: 2800000, guid: 217f065d5dd327341b9ef42184d85e7f, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
+    m_Ints:
+    - _HasAtmosphere: 0
     m_Floats:
     - _AtmHeight: 100000
     - _AtmSeaLevelPressure: 1
@@ -48,6 +49,7 @@ Material:
     - _MieScaleHeight: 1200
     - _PlanetRad: 6371000
     - _RayleighScaleHeight: 8500
+    - _SunAmp: 1
     - _SunIntensity: 20
     - _ViewSamples: 24
     m_Colors:

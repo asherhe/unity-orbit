@@ -10,8 +10,10 @@ Shader "Planet"
         _AmbientColor ("Ambient Color", Color) = (0.08,0.1,0.1)
         // sun & atmosphere settings
         _SunDir ("Sun Direction", Vector) = (-1,0,0.2,0)
-        _SunIntensity ("Sun Intensity", Float) = 20
+        _SunIntensity ("Sun Intensity", Float) = 20 // sun intensity based on distance from sun
+        _SunAmp ("Sun Amplification", Float) = 1 // fudge factor for amplifying light because atmosphere eats up a lot
         _PlanetRad ("Planet Radius (m)", Float) = 6371000
+        _HasAtmosphere ("Has atmosphere?", Integer) = 0
         _AtmHeight ("Atmosphere Height (m)", Float) = 100000
         _AtmSeaLevelPressure ("Sea Level Pressure (atm)", Float) = 1
         _RayleighScaleHeight ("Rayleigh Scattering Scale Height (m)", Float) = 8500
@@ -58,7 +60,9 @@ Shader "Planet"
                 
                 float4 _SunDir;
                 float _SunIntensity;
+                float _SunAmp;
                 float _PlanetRad;
+                int _HasAtmosphere;
                 float _AtmHeight;
                 float _AtmSeaLevelPressure;
                 float _RayleighScaleHeight;
@@ -97,19 +101,22 @@ Shader "Planet"
                 
                 float4 baseTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
 
-                float3 sunColor = scatterAttenuation(
-                    _PlanetRad * sphereNormal,
-                    L,
-                    _PlanetRad,
-                    _AtmHeight,
-                    _RayleighScaleHeight,
-                    _MieScaleHeight,
-                    _RayleighScatteringCoeff,
-                    _MieScatteringCoeff,
-                    _MiePhaseG,
-                    _LightSamples,
-                    true
-                ) * _SunIntensity * _AtmSeaLevelPressure;
+                float3 sunColor = float3(1, 1, 1);
+                if (_HasAtmosphere)
+                    sunColor = scatterAttenuation(
+                        _PlanetRad * sphereNormal,
+                        L,
+                        _PlanetRad,
+                        _AtmHeight,
+                        _RayleighScaleHeight,
+                        _MieScaleHeight,
+                        _RayleighScatteringCoeff,
+                        _MieScatteringCoeff,
+                        _MiePhaseG,
+                        _LightSamples,
+                        true
+                    ) * _AtmSeaLevelPressure;
+                sunColor *= _SunIntensity * _SunAmp;
 
                 // ambient
                 float3 color = (_AmbientColor * baseTex).rgb;

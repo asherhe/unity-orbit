@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 32549689}
   - component: {fileID: 32549691}
   m_Layer: 5
-  m_Name: Warp Indicator
+  m_Name: Announcement Display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -180,7 +180,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Time Warp: x1'
+  m_text: Announcement
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -1489,6 +1489,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37122a0c4a5b80546b8ab2c947e423a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _apsisLabelPrefab: {fileID: 5451008072283253895, guid: 623c870661506464ab7356d3e2ef0707, type: 3}
+  _SOITransitionLabelPrefab: {fileID: 5451008072283253895, guid: d6a4a7020c3da104c9b5457ee75a407b, type: 3}
+  _encounterLabelGroupPrefab: {fileID: 5601554297001268798, guid: 46588bd696a7d064db22d1848457b3af, type: 3}
   _celestialBodyLabelPrefab: {fileID: 5451008072283253895, guid: 642ae6ba9f16e1847bc51aeda572aac3, type: 3}
   _spacecraftLabelPrefab: {fileID: 5451008072283253895, guid: 6559770a193d6ba4bbc2a1043a06140f, type: 3}
 --- !u!1 &579806096
@@ -1562,14 +1565,14 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 555601239}
+  - {fileID: 1248814215}
   - {fileID: 1666144701}
   - {fileID: 461308266}
   - {fileID: 2042889821}
   - {fileID: 1827051615}
   - {fileID: 1382134023}
   - {fileID: 32549688}
-  - {fileID: 1248814215}
-  - {fileID: 555601239}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1923,6 +1926,7 @@ GameObject:
   - component: {fileID: 673478614}
   - component: {fileID: 673478617}
   - component: {fileID: 673478616}
+  - component: {fileID: 673478618}
   m_Layer: 0
   m_Name: Game Manager
   m_TagString: Untagged
@@ -1989,15 +1993,34 @@ MonoBehaviour:
   - 2
   - 5
   - 10
+  - 20
   - 50
   - 100
-  - 500
+  - 300
   - 1000
+  - 3000
   - 10000
+  - 30000
   - 100000
+  - 300000
   - 1000000
+  - 3000000
   - 10000000
+  - 30000000
   - 100000000
+  maxControlWarp: 20
+--- !u!114 &673478618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 673478613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6d03270650e5f84a94c7cc8833e7d72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1067888754
 GameObject:
   m_ObjectHideFlags: 0

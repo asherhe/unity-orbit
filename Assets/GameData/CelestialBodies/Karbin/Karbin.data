@@ -18,7 +18,7 @@ surfaceMaterial:
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
   parent: Discus
-  semimajorAxis: 2.12e5 # km
+  semimajorAxis: 2.27e5 # km
   eccentricity: 0.007
   longitudePeriapsis: 0.0 # deg
   epochMeanAnom: 0.0 # deg

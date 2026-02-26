@@ -22,14 +22,38 @@ namespace Orbit
         /// </summary>
         private readonly List<Patch> _patches;
         /// <summary>
-        /// all patches of this orbit
+        /// the first (and current) conic patch. guarenteed to be active
         /// </summary>
-        public IList<Patch> Patches { get => _patches.AsReadOnly(); }
+        public Patch FirstPatch { get => _patches[0]; }
+        /// <summary>
+        /// all patches of this orbit, whether active or inactive
+        /// </summary>
+        public IEnumerable<Patch> AllPatches { get => _patches.AsReadOnly(); }
+        /// <summary>
+        /// all active patches of this orbit
+        /// </summary>
+        public IEnumerable<Patch> ActivePatches
+        {
+            get
+            {
+                for (int i = 0; i < numActivePatches; i++)
+                    yield return _patches[i];
+            }
+        }
 
         /// <summary>
         /// number of patches actually predicted to exist
         /// </summary>
         public int numActivePatches;
+
+        /// <summary>
+        /// invoked when the current orbit transitions from one patch to another
+        /// </summary>
+        public event Action OnTransition;
+        /// <summary>
+        /// invoked when all orbit transition states have been recalculated
+        /// </summary>
+        public event Action OnRecalculated;
 
         /// <summary>
         /// configures a PatchedConicManager linked to an object with orbit state orbit
@@ -39,15 +63,15 @@ namespace Orbit
         public PatchedConicManager(OrbitState orbit, int maxPatches = 6)
         {
             SrcOrbit = orbit;
-            
+
             // bind this before we initialize patches so that the trajectory update code within
             // Patch executes AFTER new transition points are established
             SrcOrbit.OnStateChanged += RecalculatePatches;
 
             // construct linked patches
-            _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit) };
+            _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit, this) };
             for (int i = 1; i < maxPatches; i++)
-                _patches.Add(new Patch(_patches[i - 1]));
+                _patches.Add(new Patch(_patches[i - 1], this));
         }
 
         /// <summary>
@@ -70,7 +94,7 @@ namespace Orbit
             for (; i < _patches.Count; i++)
             {
                 var patch = _patches[i];
-                _patches[i].SetActive(true);
+                _patches[i].IsActive = true;
 
                 patch.CheckTransitions(t);
                 if (!patch.HasTransition) { i++; break; }
@@ -83,12 +107,10 @@ namespace Orbit
             // disable all inactive patches
             for (; i < _patches.Count; i++)
             {
-                _patches[i].SetActive(false);
+                _patches[i].IsActive = false;
             }
 
-            // recalculate trajectory bounds now that all new patches have been generated
-            for (i = 0; i < numActivePatches; i++)
-                _patches[i].UpdateTrajectoryBounds();
+            OnRecalculated?.Invoke();
         }
 
         /// <summary>
@@ -115,6 +137,8 @@ namespace Orbit
                     // quick and dirty solution
 
                     SrcOrbit.CopyFrom(_patches[0].nextOrbit);
+
+                    OnTransition?.Invoke();
                 }
                 else break;
             }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UI;
 using UnityEngine;
 
 public class TimewarpControls : MonoBehaviour
@@ -8,13 +9,22 @@ public class TimewarpControls : MonoBehaviour
     private InputActions _inputActions;
 
     [SerializeField]
-    private double[] timeWarpFactors = { 1, 2, 5, 10, 50, 100, 500, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8 };
+    private double[] timeWarpFactors = { 1, 2, 5, 10, 20, 50, 100, 300, 1e3, 3e3, 1e4, 3e4, 1e5, 3e5, 1e6, 3e6, 1e7, 3e7, 1e8 };
+
+    /// <summary>
+    /// above this timescale, no craft control is allowed
+    /// </summary>
+    public double maxControlWarp = 20.0;
 
     private int _warpIndex = 0;
     public int WarpIndex
     {
         get => _warpIndex;
-        set => _warpIndex = Math.Clamp(value, 0, timeWarpFactors.Length - 1);
+        set
+        {
+            _warpIndex = Math.Clamp(value, 0, timeWarpFactors.Length - 1);
+            OnWarpChanged?.Invoke();
+        }
     }
 
     /// <summary>
@@ -35,9 +45,25 @@ public class TimewarpControls : MonoBehaviour
         _inputActions.Warp.WarpIncrease.performed += ctx => WarpIncrease();
         _inputActions.Warp.WarpDecrease.performed += ctx => WarpDecrease();
         _inputActions.Warp.WarpCancel.performed += ctx => WarpCancel();
+
+        OnWarpChanged += () => AnnouncementDisplay.Instance.Announce($"Time Warp: x{Universe.Instance.Timewarp.TimewarpScale}");
     }
 
-    public void WarpIncrease() { WarpIndex++; OnWarpChanged?.Invoke(); }
-    public void WarpDecrease() { WarpIndex--; OnWarpChanged?.Invoke(); }
-    public void WarpCancel() { WarpIndex = 0; OnWarpChanged?.Invoke(); }
+    public void WarpIncrease()
+    {
+        WarpIndex++;
+        if (ActiveCraftController.Instance.command.HasControlInput && TimewarpScale > maxControlWarp)
+        {
+            WarpIndex--;
+            AnnouncementDisplay.Instance.Announce($"Cannot warp past x{maxControlWarp:0.##} while throttle is on!");
+        }
+    }
+    public void WarpDecrease()
+    {
+        WarpIndex--;
+    }
+    public void WarpCancel()
+    {
+        WarpIndex = 0;
+    }
 }

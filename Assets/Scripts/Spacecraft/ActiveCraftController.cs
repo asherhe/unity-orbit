@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,32 +8,39 @@ using UnityEngine.InputSystem;
 /// provides user control to the active spacecraft
 /// </summary>
 [RequireComponent(typeof(Spacecraft))]
-public class ActiveCraftController : MonoBehaviour
+public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
 {
-    public static ActiveCraftController Instance { get; private set; }
-
     private InputActions _inputActions;
 
     /// <summary>
     /// the active spacecraft
+    /// NOTE: still hard-coded in inspector, one day we will add craft switching
     /// </summary>
+    [SerializeField]
     public Spacecraft craft { get; private set; }
 
+    private Parts.CommandPlugin _command;
     /// <summary>
     /// active command plugin on spacecraft
     /// </summary>
-    public Parts.CommandPlugin command { get; private set; }
+    public Parts.CommandPlugin command
+    {
+        get => _command; private set
+        {
+            _command = value;
+            OnCommandChange?.Invoke();
+        }
+    }
+
+    public event Action OnCommandChange;
 
     /// <summary>
     /// throttle change rate per second
     /// </summary>
     public float throttlingRate = 0.3f;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null || Instance == this) Instance = this;
-        else Destroy(this);
-
         craft = GetComponent<Spacecraft>();
 
         craft.OnLoaded += () =>
@@ -50,6 +58,7 @@ public class ActiveCraftController : MonoBehaviour
 
         _inputActions.Flight.AutoSteer.performed += ctx => command.IsAutoSteerEnabled = !command.IsAutoSteerEnabled;
 
+        base.Awake();
     }
 
     private void Update()

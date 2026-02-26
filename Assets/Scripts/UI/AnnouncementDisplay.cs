@@ -8,10 +8,10 @@ using UnityEngine;
 namespace UI
 {
     /// <summary>
-    /// indicates the time warp speed
+    /// shows announcements on-screen
     /// </summary>
     [RequireComponent(typeof(TMP_Text))]
-    public class TimewarpIndicator : MonoBehaviour
+    public class AnnouncementDisplay : SingletonBehaviour<AnnouncementDisplay>
     {
         private TMP_Text _text;
 
@@ -27,10 +27,11 @@ namespace UI
         /// </summary>
         public float fadeDuration = 1.0f;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
+
             _text = GetComponent<TMP_Text>();
-            Universe.Instance.Timewarp.OnWarpChanged += ShowWarp;
 
             _fadeTween = DOTween.To(
                  () => _text.alpha,
@@ -39,12 +40,11 @@ namespace UI
                  fadeDuration
              ).SetAutoKill(false);
             _fadeTween.Complete();
-            //_alphaTween.Pause();
         }
 
-        private void ShowWarp()
+        public void Announce(string msg)
         {
-            _text.text = $"Time Warp: x{Universe.Instance.Timewarp.TimewarpScale}";
+            _text.text = msg;
             if (_fadeCoroutine != null) StopCoroutine(_fadeCoroutine);
             _fadeCoroutine = StartCoroutine(DelayFade());
         }

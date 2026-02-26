@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Vertx.Debugging;
 
-public class Spacecraft : MonoBehaviour, IOrbitingObject
+public class Spacecraft : OrbitingObject
 {
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
@@ -57,17 +57,13 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
     /// </summary>
     private GameObject _partsGameObject;
 
-    public OrbitState orbit { get; private set; }
-    private IOrbitPropagator _prop;
-    private PatchedConicManager _patchManager;
-    private SOIEscapeTransition _soiEscape;
-    private SOIInterceptTransition _soiIntercept;
+    public PatchedConicManager patches { get; private set; }
 
     private UI.SpacecraftLabel _mapLabel;
 
     public CelestialBody body { get => orbit.body; }
 
-    public double Altitude { get => GetPosition().Magnitude - body.radius; }
+    public double Altitude { get => Position.Magnitude - body.radius; }
 
     /// <summary>
     /// provides events and values that can be used to control this spacecraft.
@@ -115,11 +111,13 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
 
         craftName = _config.name;
+        gameObject.name = craftName;
 
         // TODO: initialize fields
         Newtonian.angle = _config.rotation.angle;
         Newtonian.angularMomentum = _config.rotation.momentum;
 
+        await CelestialBodyManager.WaitForInstantiation();
         var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
         orbit = new OrbitState(
             _config.orbit.h,
@@ -129,16 +127,17 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
             _config.orbit.t0,
             parent
         );
-        orbit.Owner = this;
+        orbit.owner = this;
 
-        _prop = new UniversalPropagator(orbit);
+        prop = new UniversalPropagator(orbit);
 
-        _patchManager = new PatchedConicManager(orbit);
-        _soiEscape = _patchManager.Patches[0].soiEscape;
-        _soiIntercept = _patchManager.Patches[0].soiIntercept;
-        _patchManager.RecalculatePatches();
+        patches = new PatchedConicManager(orbit);
+        patches.RecalculatePatches();
 
-        _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
+        UI.MapLabelManager.WhenInstantiated(() =>
+        {
+            _mapLabel = UI.MapLabelManager.Instance.AddSpacecraft(this);
+        });
 
         // starts asynchronous part loading
         // we need this because we need to do operations on the part after loading is complete,
@@ -220,16 +219,9 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         }
     }
 
-    public Vector2d GetPosition() => GetPosition(Universe.Instance.UT);
-    public Vector2d GetVelocity() => GetVelocity(Universe.Instance.UT);
-    public StateVectors GetStateVectors() => GetStateVectors(Universe.Instance.UT);
-    public Vector2d GetPosition(double t) => _prop.GetPosition(t);
-    public Vector2d GetVelocity(double t) => _prop.GetVelocity(t);
-    public StateVectors GetStateVectors(double t) => _prop.GetStateVectors(t);
-
     private void FixedUpdate()
     {
-        _patchManager.Update(Universe.Instance.UT);
+        patches.Update(Universe.Instance.UT);
     }
 
     private void Update()
@@ -240,8 +232,5 @@ public class Spacecraft : MonoBehaviour, IOrbitingObject
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
     }
 
-    public override string ToString()
-    {
-        return $"[Spacecraft {craftName}]";
-    }
+    public override string ToString() => $"[Spacecraft {craftName}]";
 }

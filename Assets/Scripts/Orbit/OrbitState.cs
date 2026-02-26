@@ -23,19 +23,10 @@ namespace Orbit
         /// </summary>
         public double GM { get => body.GM; }
 
-        private IOrbitingObject _owner;
         /// <summary>
         /// the orbiting object that occupies this orbit. possibly <c>null</c>
         /// </summary>
-        public IOrbitingObject Owner
-        {
-            get
-            {
-                if (_owner == null) throw new InvalidOperationException("this orbit does not have an owner");
-                return _owner;
-            }
-            set { _owner = value; }
-        }
+        public OrbitingObject owner;
 
         public double t0 { get; private set; }
         public Vector2d p0 { get; private set; }
@@ -101,7 +92,7 @@ namespace Orbit
         /// </summary>
         public double M0 { get; private set; }
         /// <summary>
-        /// true anomaly at epoch
+        /// true anomaly at epoch. normalized to [ -PI, PI ]
         /// </summary>
         public double nu0 { get; private set; }
         /// <summary>
@@ -179,6 +170,15 @@ namespace Orbit
         public OrbitState(Vector2d pos, Vector2d vel, double t, CelestialBody body)
         {
             UpdateFromStateVectors(pos, vel, t, body);
+        }
+        /// <summary>
+        /// construct an orbit from cartesian state vectors
+        /// </summary>
+        /// <param name="state">state vectors at epoch</param>
+        /// <param name="body">parent celestial body</param>
+        public OrbitState(StateVectors state, CelestialBody body)
+        {
+            UpdateFromStateVectors(state.pos, state.vel, state.time, body);
         }
 
         public OrbitState(OrbitState other)
@@ -396,6 +396,8 @@ namespace Orbit
             if (1 < e - TOL) return OrbitShape.Hyperbola;
             else return OrbitShape.Parabola;
         }
+
+        public override string ToString() => (owner != null ? $"{owner} OrbitState" : "OrbitState");
     }
 
     /// <summary>
@@ -416,6 +418,9 @@ namespace Orbit
             this.pos = pos;
             this.vel = vel;
         }
+
+        public static StateVectors None = new StateVectors(double.NaN, null, null);
+        public static bool IsNone(StateVectors state) => double.IsNaN(state.time) && state.pos == null && state.vel == null;
 
         public override string ToString() => $"[ t={time}; p={pos}; v={vel} ]";
     }

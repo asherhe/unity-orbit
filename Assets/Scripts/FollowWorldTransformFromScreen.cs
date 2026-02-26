@@ -10,8 +10,8 @@ public class FollowWorldTransformFromScreen : MonoBehaviour
     /// </summary>
     public Transform follow;
 
-    private Canvas _canvas;
-    private RectTransform _canvasRectTransform;
+    private static Canvas _canvas;
+    private static RectTransform _canvasRectTransform;
     private RectTransform _rectTransform;
 
     public bool shouldFollowPosition = true;
@@ -19,22 +19,30 @@ public class FollowWorldTransformFromScreen : MonoBehaviour
 
     private void Awake()
     {
-        _canvas = GetComponentInParent<Canvas>();
-        _canvasRectTransform = _canvas.GetComponent<RectTransform>();
+        if (_canvas == null)
+        {
+            _canvas = GetComponentInParent<Canvas>();
+            _canvasRectTransform = _canvas.GetComponent<RectTransform>();
+        }
         _rectTransform = GetComponent<RectTransform>();
+    }
+
+    public static Vector2 WorldToCanvas(Vector3 pos)
+    {
+        var screenPos = Camera.main.WorldToScreenPoint(pos);
+        Vector2 canvasPos;
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRectTransform, screenPos, null, out canvasPos);
+        return canvasPos;
     }
 
     private void LateUpdate()
     {
         if (follow != null)
         {
-            if (shouldFollowPosition) {
-                var screenPos = Camera.main.WorldToScreenPoint(follow.position);
-                transform.position = follow.position;
-                Vector2 canvasPos;
-                RectTransformUtility.ScreenPointToLocalPointInRectangle(_canvasRectTransform, screenPos, null, out canvasPos);
-                // ensure that this RectTransform is anchored to the canvas origin
-                _rectTransform.anchoredPosition = canvasPos;
+            if (shouldFollowPosition)
+            {
+                // note: ensure that this RectTransform is anchored to the canvas origin
+                _rectTransform.anchoredPosition = WorldToCanvas(follow.position);
             }
             if (shouldFollowRotation) transform.rotation = follow.rotation;
         }

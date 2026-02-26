@@ -43,31 +43,37 @@ namespace Orbit
         /// <summary>
         /// new orbit state once transition occurs
         /// </summary>
-        public OrbitState NextOrbit { get => _result.orbit; }
+        public OrbitState NextOrbit { get => _result.nextOrbit; }
+        /// <summary>
+        /// state vectors at the other end at the start of the next orbit
+        /// </summary>
+        public StateVectors NextState { get => _result.nextState; }
 
         protected struct TransitionResult
         {
-            public StateVectors state;
-            public OrbitState orbit;
+            public StateVectors state, nextState;
+            public OrbitState nextOrbit;
             /// <summary>
             /// time at which this prediction becomes invalid and require a recalculation
             /// (i.e. we didn't bother predicting ahead of this point)
             /// </summary>
             public double expiryDate;
             public double Time { get => state.time; }
-            public TransitionResult(StateVectors state, OrbitState orbit, double expiryDate = double.PositiveInfinity)
+            public TransitionResult(StateVectors state, CelestialBody nextBody, StateVectors nextState, double expiryDate = double.PositiveInfinity)
             {
                 this.state = state;
-                this.orbit = orbit;
+                this.nextState = nextState;
+                if (nextBody == null || StateVectors.IsNone(nextState)) nextOrbit = null;
+                else nextOrbit = new OrbitState(nextState, nextBody);
                 this.expiryDate = expiryDate;
             }
 
-            public static TransitionResult None = new(new StateVectors(double.NaN, null, null), null);
+            public static TransitionResult None = new(StateVectors.None, null, StateVectors.None);
             /// <summary>
             /// no transition predicted, but this prediction expires at time UT
             /// </summary>
             /// <returns>newly constructed TransitionResult</returns>
-            public static TransitionResult ExpiresAt(double UT) => new(new StateVectors(double.NaN, null, null), null, expiryDate: UT);
+            public static TransitionResult ExpiresAt(double UT) => new(StateVectors.None, null, StateVectors.None, expiryDate: UT);
         }
 
         /// <summary>
