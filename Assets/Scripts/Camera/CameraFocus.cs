@@ -9,7 +9,7 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
     /// the object that the camera is focused on
     /// TODO: dynamically change focused object
     /// </summary>
-    public OrbitingObject Focus { get => ActiveCraftController.Instance.craft; }
+    public OrbitingObject Focus => ActiveCraftController.Instance.craft;
 
     /// <summary>
     /// get the current location of an orbit, relative to the location of the focused object.

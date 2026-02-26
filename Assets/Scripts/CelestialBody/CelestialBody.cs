@@ -175,7 +175,7 @@ public class CelestialBody : OrbitingObject
             var parent = CelestialBodyManager.Instance.celestialBodies[_config.orbit.parent];
             var a = _config.orbit.semimajorAxis * 1000.0;
             orbit = new OrbitState(
-                -Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
+                Math.Sqrt(a * parent.GM * (1 - _config.orbit.eccentricity * _config.orbit.eccentricity)),
                 _config.orbit.eccentricity,
                 _config.orbit.longitudePeriapsis * Math.PI / 180.0,
                 _config.orbit.epochMeanAnom * Math.PI / 180.0,
