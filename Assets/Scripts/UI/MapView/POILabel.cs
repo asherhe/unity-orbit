@@ -1,5 +1,6 @@
 using MathNet.Numerics;
 using Orbit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,16 @@ namespace UI
         /// orbit this POILabel is attached to
         /// </summary>
         protected abstract OrbitState LabelOrbit { get; }
+
+        /// <summary>
+        /// optional trajectory field to determine if the label is still on the trajectory
+        /// </summary>
+        public Trajectory trajectory;
+
+        /// <summary>
+        /// true anomaly of this label
+        /// </summary>
+        private double nu;
 
         /// <summary>
         /// determine the desired position of this POI in body space. called on orbit state update
@@ -65,15 +76,35 @@ namespace UI
             BodyPos = GetPosition();
             IsActive = BodyPos != null;
             if (IsActive)
+            {
+                nu = LabelOrbit.CalcNu(BodyPos);
                 labelText.text = GetLabelText();
+            }
+
+            CheckTrajVisibility();
+        }
+
+        /// <summary>
+        /// run a check to see if this label is within the bounds of the trajectory
+        /// </summary>
+        private void CheckTrajVisibility()
+        {
+            if (trajectory == null) return;
+            if (!IsActive) return;
+
+            var dir = Math.Sign(LabelOrbit.h);
+            IsActive = trajectory.IsLooped || (dir * trajectory.nuMin <= dir * nu && dir * nu <= dir * trajectory.nuMax);
         }
 
         private void Update()
         {
-            if (BodyPos != null)
+            if (IsActive)
             {
                 var worldPos = LabelOrbit.body.transform.position + BodyPos;
                 rectTransform.anchoredPosition = FollowWorldTransformFromScreen.WorldToCanvas(worldPos);
+
+                if (trajectory != null && !trajectory.AreBoundsTimeInvariant)
+                    CheckTrajVisibility();
             }
 
             if (DoZoomAlpha)

@@ -147,6 +147,8 @@ namespace Orbit
             {
                 periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
                 apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
+                periapsisLabel.trajectory = apoapsisLabel.trajectory = trajectory;
+
                 soiEnterLabel = UI.MapLabelManager.Instance.AddSOITransition(this, UI.SOITransitionLabel.DisplayMode.Enter);
                 soiExitLabel = UI.MapLabelManager.Instance.AddSOITransition(this, UI.SOITransitionLabel.DisplayMode.Exit);
 

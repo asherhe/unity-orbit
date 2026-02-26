@@ -80,6 +80,15 @@ namespace UI
         }
 
         /// <summary>
+        /// whether this trajectory is looped
+        /// </summary>
+        public bool IsLooped
+        {
+            get => _trajectoryMesh.isLooped;
+            private set => _trajectoryMesh.isLooped = value;
+        }
+
+        /// <summary>
         /// furthest distance to which we will render parabolic and hyperbolic trajectories (m)
         /// </summary>
         public double maxRenderDistance = 1e13;
@@ -94,6 +103,20 @@ namespace UI
         /// note that boundaries here occur time-wise - the orbit will reach nu1 first, then nu2
         /// </summary>
         public double nu1 = double.NegativeInfinity, nu2 = double.PositiveInfinity;
+
+        /// <summary>
+        /// cached clipping bounds for base orbit shape
+        /// </summary>
+        private double nuMin0, nuMax0;
+
+        // actual clipping bounds of the trajectory after applying nu1 and nu2
+        public double nuMin { get; private set; }
+        public double nuMax { get; private set; }
+
+        /// <summary>
+        /// whether clipping bounds are expected to change over time while keeping the orbit constant
+        /// </summary>
+        public bool AreBoundsTimeInvariant => clipToCurrent;
 
         /// <summary>
         /// whether to clip the trajectory to the current location of the orbit
@@ -172,6 +195,22 @@ namespace UI
                 nu2 -= 2 * Math.PI * Math.Floor(nu2 / (2 * Math.PI) + 0.5);
             }
 
+            // determine nu bounds of base orbit shape
+            var dir = Math.Sign(Orbit.h);
+            if (Orbit.Shape == OrbitShape.Ellipse)
+            {
+                nuMin0 = double.NegativeInfinity;
+                nuMax0 = double.PositiveInfinity;
+            }
+            else
+            {
+                // true anomaly to maxRenderDistance
+                double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
+                nuMin0 = -asymptote;
+                nuMax0 = asymptote;
+            }
+            // ensure the two are in the right order chronologically
+            nuMin0 *= dir; nuMax0 *= dir;
 
             // cache value so we don't have to recompute it
             coeff = _prop.AnomCoeff;
@@ -212,21 +251,7 @@ namespace UI
         {
             var dir = Math.Sign(Orbit.h);
 
-            double nuMin, nuMax;
-            if (Orbit.Shape == OrbitShape.Ellipse)
-            {
-                nuMin = double.NegativeInfinity;
-                nuMax = double.PositiveInfinity;
-            }
-            else
-            {
-                // true anomaly to maxRenderDistance
-                double asymptote = Math.Acos((Math.Abs(Orbit.p) - maxRenderDistance) / (maxRenderDistance * Orbit.e));
-                nuMin = -asymptote;
-                nuMax = asymptote;
-            }
-            // ensure the two are in the right order chronologically
-            nuMin *= dir; nuMax *= dir;
+            nuMin = nuMin0; nuMax = nuMax0;
 
             // proper setters for chonological ordering
             void SetNuMin(double nu) => nuMin = dir == 1 ? Math.Max(nuMin, nu) : Math.Min(nuMin, nu);
@@ -264,10 +289,10 @@ namespace UI
             if (double.IsFinite(nu2)) SetNuMax(nu2);
 
             // check if looped
-            _trajectoryMesh.isLooped = Math.Abs(nuMax - nuMin) >= 2 * Math.PI;
+            IsLooped = Math.Abs(nuMax - nuMin) >= 2 * Math.PI;
 
             // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
-            if (_trajectoryMesh.isLooped) { nuMin = 0; nuMax = 2 * Math.PI; }
+            if (IsLooped) { nuMin = 0; nuMax = 2 * Math.PI; }
 
             // swap to correct order
             if (nuMin > nuMax) (nuMin, nuMax) = (nuMax, nuMin);
@@ -343,7 +368,7 @@ namespace UI
 
             SubdivideMesh(points.First, points.Last, nuMin, nuMax, 64);
 
-            if (_trajectoryMesh.isLooped)
+            if (IsLooped)
             {
                 // remove duplicate point that closes the loop
                 points.RemoveLast();
