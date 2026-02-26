@@ -337,7 +337,7 @@ public class CelestialBody : OrbitingObject
 
     private void FixedUpdate()
     {
-        _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(-360.0 * Universe.Instance.fixedDeltaTime / dayLength));
+        _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(360.0 * Universe.Instance.fixedDeltaTime / dayLength));
     }
 
     private void Update()
