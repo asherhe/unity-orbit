@@ -66,13 +66,31 @@ namespace Orbit
         /// map view labels for patch apses
         /// </summary>
         private UI.ApsisLabel periapsisLabel, apoapsisLabel;
-        private UI.SOITransitionLabel soiLabel;
+        private UI.SOITransitionLabel soiEnterLabel, soiExitLabel;
 
         /// <summary>
         /// how far removed this Patch is from the original, current OrbitState.
         /// equal to zero if this Patch represents the current orbit.
         /// </summary>
         private readonly int _patchStep;
+
+        private bool _isActive = false;
+        /// <summary>
+        /// the active/inactive state of this patch
+        /// </summary>
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                _isActive = value;
+                trajectory.gameObject.SetActive(_isActive);
+                periapsisLabel.IsActive = _isActive;
+                apoapsisLabel.IsActive = _isActive;
+                soiEnterLabel.IsActive = _isActive;
+                soiExitLabel.IsActive = _isActive;
+            }
+        }
 
         /// <summary>
         /// construct a patch based on the orbit state of an orbiting body.
@@ -123,35 +141,26 @@ namespace Orbit
             ExpiryDate = double.PositiveInfinity;
 
             trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
-            trajectory.name = $"Trajectory {rootOrbit.Owner} (Patch {_patchStep})";
+            trajectory.name = $"Trajectory {rootOrbit.owner} (Patch {_patchStep})";
 
             UI.MapLabelManager.WhenInstantiated(() =>
             {
                 periapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Periapsis);
                 apoapsisLabel = UI.MapLabelManager.Instance.AddApsis(patchOrbit, UI.ApsisLabel.DisplayMode.Apoapsis);
-                soiLabel = UI.MapLabelManager.Instance.AddSOITransition(this);
+                soiEnterLabel = UI.MapLabelManager.Instance.AddSOITransition(this, UI.SOITransitionLabel.DisplayMode.Enter);
+                soiExitLabel = UI.MapLabelManager.Instance.AddSOITransition(this, UI.SOITransitionLabel.DisplayMode.Exit);
 
                 manager.OnTransition += () =>
                 {
                     bool hasNext = nextPatch != null;
-                    periapsisLabel.IsLabelActive = hasNext && nextPatch.periapsisLabel.IsLabelActive;
-                    apoapsisLabel.IsLabelActive = hasNext && nextPatch.apoapsisLabel.IsLabelActive;
-                    soiLabel.IsLabelActive = hasNext && nextPatch.soiLabel.IsLabelActive;
+                    periapsisLabel.IsTextActive = hasNext && nextPatch.periapsisLabel.IsTextActive;
+                    apoapsisLabel.IsTextActive = hasNext && nextPatch.apoapsisLabel.IsTextActive;
+                    soiEnterLabel.IsTextActive = hasNext && nextPatch.soiEnterLabel.IsTextActive;
+                    soiExitLabel.IsTextActive = hasNext && nextPatch.soiExitLabel.IsTextActive;
                 };
             });
 
             OnTransitionUpdate += UpdateTrajectoryPrefs;
-        }
-
-        /// <summary>
-        /// designate the active/inactive state of this patch
-        /// </summary>
-        public void SetActive(bool isActive)
-        {
-            trajectory.gameObject.SetActive(isActive);
-            periapsisLabel.gameObject.SetActive(isActive);
-            apoapsisLabel.gameObject.SetActive(isActive);
-            soiLabel.gameObject.SetActive(isActive);
         }
 
         public void CheckTransitions() => CheckTransitions(Universe.Instance.UT);
@@ -250,6 +259,11 @@ namespace Orbit
             trajectory.nu1 = nu1; trajectory.nu2 = nu2;
 
             trajectory.UpdateVisuals();
+        }
+
+        public override string ToString()
+        {
+            return $"[{rootOrbit}: Patch {_patchStep + 1}]";
         }
     }
 }

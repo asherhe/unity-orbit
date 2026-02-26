@@ -17,7 +17,11 @@ namespace UI
             set
             {
                 if (_patch == value) return;
-                if (_patch != null) _patch.OnTransitionUpdate -= RefreshLabel;
+                if (_patch != null)
+                {
+                    _patch.OnTransitionUpdate -= RefreshLabel;
+                    _patch.manager.OnTransition -= RefreshLabel;
+                }
                 _patch = value;
                 _patch.OnTransitionUpdate += RefreshLabel;
                 _patch.manager.OnTransition += OnPatchTransition;
@@ -28,7 +32,9 @@ namespace UI
 
         protected virtual void OnPatchTransition()
         {
-            IsLabelActive = false;
+            IsTextActive = false;
+            RefreshLabel();
+            if (IsActive) IsActive = Patch.IsActive;
         }
     }
 }

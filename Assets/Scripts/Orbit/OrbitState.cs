@@ -23,19 +23,10 @@ namespace Orbit
         /// </summary>
         public double GM { get => body.GM; }
 
-        private OrbitingObject _owner;
         /// <summary>
         /// the orbiting object that occupies this orbit. possibly <c>null</c>
         /// </summary>
-        public OrbitingObject Owner
-        {
-            get
-            {
-                if (_owner == null) throw new InvalidOperationException("this orbit does not have an owner");
-                return _owner;
-            }
-            set { _owner = value; }
-        }
+        public OrbitingObject owner;
 
         public double t0 { get; private set; }
         public Vector2d p0 { get; private set; }
@@ -405,6 +396,8 @@ namespace Orbit
             if (1 < e - TOL) return OrbitShape.Hyperbola;
             else return OrbitShape.Parabola;
         }
+
+        public override string ToString() => (owner != null ? $"{owner} OrbitState" : "OrbitState");
     }
 
     /// <summary>

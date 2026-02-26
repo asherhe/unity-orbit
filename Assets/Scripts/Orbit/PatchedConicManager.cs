@@ -94,7 +94,7 @@ namespace Orbit
             for (; i < _patches.Count; i++)
             {
                 var patch = _patches[i];
-                _patches[i].SetActive(true);
+                _patches[i].IsActive = true;
 
                 patch.CheckTransitions(t);
                 if (!patch.HasTransition) { i++; break; }
@@ -107,7 +107,7 @@ namespace Orbit
             // disable all inactive patches
             for (; i < _patches.Count; i++)
             {
-                _patches[i].SetActive(false);
+                _patches[i].IsActive = false;
             }
 
             OnRecalculated?.Invoke();

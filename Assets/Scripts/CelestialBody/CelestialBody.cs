@@ -182,7 +182,7 @@ public class CelestialBody : OrbitingObject
                 _config.orbit.epochTime,
                 parent
             );
-            orbit.Owner = this;
+            orbit.owner = this;
             prop = new UniversalPropagator(orbit);
             parent.satellites.Add(this);
             soiRadius = a * Math.Pow(mass / parent.mass, 0.4);
@@ -347,8 +347,5 @@ public class CelestialBody : OrbitingObject
         SetDynamicMaterialProperties();
     }
 
-    public override string ToString()
-    {
-        return $"[CelestialBody {bodyName}]";
-    }
+    public override string ToString() => $"[CelestialBody {bodyName}]";
 }

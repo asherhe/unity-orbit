@@ -127,7 +127,7 @@ public class Spacecraft : OrbitingObject
             _config.orbit.t0,
             parent
         );
-        orbit.Owner = this;
+        orbit.owner = this;
 
         prop = new UniversalPropagator(orbit);
 
@@ -232,8 +232,5 @@ public class Spacecraft : OrbitingObject
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
     }
 
-    public override string ToString()
-    {
-        return $"[Spacecraft {craftName}]";
-    }
+    public override string ToString() => $"[Spacecraft {craftName}]";
 }

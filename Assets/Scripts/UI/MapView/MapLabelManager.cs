@@ -69,16 +69,19 @@ namespace UI
         public ApsisLabel AddApsis(OrbitState orbit, ApsisLabel.DisplayMode mode)
         {
             var labelObject = Instantiate(_apsisLabelPrefab, _apsisContainer);
+            labelObject.name = $"{orbit} {(mode == ApsisLabel.DisplayMode.Periapsis ? "Periapsis" : "Apoapsis")}";
             var apsisLabel = labelObject.GetComponent<ApsisLabel>();
             apsisLabel.Orbit = orbit;
             apsisLabel.Mode = mode;
             return apsisLabel;
         }
-        public SOITransitionLabel AddSOITransition(Patch patch)
+        public SOITransitionLabel AddSOITransition(Patch patch, SOITransitionLabel.DisplayMode mode)
         {
             var labelObject = Instantiate(_SOITransitionLabelPrefab, _SOITransitionContainer);
+            labelObject.name = $"{patch} SOI {(mode == SOITransitionLabel.DisplayMode.Enter ? "Entrance" : "Exit")}";
             var soiLabel = labelObject.GetComponent<SOITransitionLabel>();
             soiLabel.Patch = patch;
+            soiLabel.Mode = mode;
             return soiLabel;
         }
         public EncounterLabelGroup AddEncounterLabelGroup()

@@ -32,6 +32,7 @@ namespace UI
         {
             base.Awake();
             _iconImage = icon.iconGraphic as Image;
+            UpdateIcon();
         }
 
         protected override Vector2d GetPosition()
@@ -46,7 +47,7 @@ namespace UI
             // hide label if it's not supposed to be shown
             var isEscaped = Mode == DisplayMode.Apoapsis && Orbit.apoapsis > Orbit.body.soiRadius;
             var isUnderground = Mode == DisplayMode.Periapsis && Orbit.periapsis < Orbit.body.radius;
-            gameObject.SetActive(!(isEscaped || isUnderground));
+            if (isEscaped || isUnderground) return null;
 
             return Orbit.PerifocalToBody(perifocal);
         }

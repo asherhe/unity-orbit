@@ -18,7 +18,10 @@ public class Vector2d
 
     /* operations on vectors */
 
-    public static bool operator ==(Vector2d v, Vector2d w) => v.x == w.x && v.y == w.y;
+    public static bool operator ==(Vector2d v, Vector2d w) {
+        if (v is null || w is null) return v is null && w is null;
+        return v.x == w.x && v.y == w.y;
+    }
     public static bool operator !=(Vector2d v, Vector2d w) => !(v == w);
     public override bool Equals(object obj) => Equals(obj as Vector2d);
     public override int GetHashCode() => HashCode.Combine(x, y);
@@ -76,7 +79,7 @@ public class Vector2d
     public static Vector2d left => new(-1.0, 0.0);
     public static Vector2d right => new(1.0, 0.0);
 
-    public override string ToString() => "(" + x + ", " + y + ")";
+    public override string ToString() => $"({x}, {y})";
     public static implicit operator Vector2(Vector2d v) { return new Vector2((float)v.x, (float)v.y); }
     public static implicit operator Vector3(Vector2d v) { return new Vector3((float)v.x, (float)v.y, 0.0f); }
     public static implicit operator Vector4(Vector2d v) { return new Vector4((float)v.x, (float)v.y, 0.0f, 0.0f); }

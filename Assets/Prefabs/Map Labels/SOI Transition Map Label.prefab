@@ -52,6 +52,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 1196769106614374800}
   labelText: {fileID: 7430548474943000832}
+  _enterIcon: {fileID: -1284389915, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+  _exitIcon: {fileID: 831127747, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
 --- !u!1 &6274093736713104357
 GameObject:
   m_ObjectHideFlags: 0

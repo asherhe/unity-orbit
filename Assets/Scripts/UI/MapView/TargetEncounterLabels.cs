@@ -43,6 +43,7 @@ namespace UI
         private EncounterLabelGroup CreatePooledItem()
         {
             var label = MapLabelManager.Instance.AddEncounterLabelGroup();
+            label.name = $"Encounter {_labelPool.Count}";
             label.gameObject.SetActive(false);
             return label;
         }

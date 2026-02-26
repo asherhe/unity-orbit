@@ -64,7 +64,7 @@ namespace Orbit
             if (!earliestEnc.HasValue) return TransitionResult.ExpiresAt(expiry);
             var captureEncounter = earliestEnc.Value;
 
-            nextCaptureBody = (CelestialBody)captureEncounter.other.Owner;
+            nextCaptureBody = (CelestialBody)captureEncounter.other.owner;
             var t = captureEncounter.state.time;
 
             // estimated time to traverse the SOI radius, doubled for extra wiggle room
