@@ -3,7 +3,10 @@ guid: 93810ed55e77d744f947547c7424c79b
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - craft: {instanceID: 0}
+  - part: {instanceID: 0}
+  - _lightPrefab: {fileID: 5722078137225193987, guid: 8ad34734d04ce5242a339fdee12cb834, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

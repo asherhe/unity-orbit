@@ -26,13 +26,18 @@ namespace Parts
 
         private SpriteRenderer _spriteRenderer;
 
+        protected override void OnAwake()
+        {
+            base.OnAwake();
+
+            _spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
+        }
+
         public override void OnLoad(DataNode config)
         {
             base.OnLoad(config);
 
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
-
-            _spriteRenderer = gameObject.AddComponent<SpriteRenderer>();
 
             _config.material.LoadMaterial(m =>
             {
@@ -43,6 +48,8 @@ namespace Parts
 
         public override async Task OnLoadAsync(DataNode config)
         {
+            await base.OnLoadAsync(config);
+
             var sprite = Addressables.LoadAssetAsync<Sprite>(_config.sprite);
             await sprite.Task;
             _spriteRenderer.sprite = sprite.Result;
