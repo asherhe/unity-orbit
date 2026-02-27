@@ -6,6 +6,8 @@ using UnityEngine;
 
 public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
 {
+    private CameraView ActiveView => MapViewManager.Instance.activeView;
+
     private InputActions _inputActions;
 
     public float zoomSpeed = 0.1f;
@@ -20,6 +22,8 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         { CameraView.MapView, 5e6f }
     };
 
+    private float _tweenTime = 0.25f;
+
     private Camera _camera;
 
     /// <summary>
@@ -31,10 +35,15 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
     /// note that this is not the actual world space position, just a screen space mouse position scaled to world space
     /// </summary>
     private Vector3 panStartWorld;
+
     /// <summary>
-    /// location of camera in world space at the start of panning
+    /// saved pan positions for different camera views
     /// </summary>
-    private Vector3 panStartCam;
+    public Dictionary<CameraView, Vector3> panPositions = new()
+    {
+        { CameraView.FlightView, new(0f, 0f, -10f) },
+        { CameraView.MapView, new(0f, 0f, -10f) },
+    };
 
     // block input when camera is tweening
     private bool isTweening = false;
@@ -49,12 +58,17 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         MapViewManager.Instance.OnMapToggled += () =>
         {
             isTweening = true;
-            Camera.main.DOOrthoSize(zoomLevels[MapViewManager.Instance.activeView], 0.25f)
+            _camera.DOOrthoSize(zoomLevels[ActiveView], _tweenTime)
                 .OnComplete(() =>
                 {
                     // for large map view zoom levels orthographic size might end up as 0 at the end because of floating point errors
-                    Camera.main.orthographicSize = zoomLevels[MapViewManager.Instance.activeView];
+                    _camera.orthographicSize = zoomLevels[ActiveView];
                     isTweening = false;
+                });
+            _camera.transform.DOMove(panPositions[ActiveView], _tweenTime)
+                .OnComplete(() =>
+                {
+                    _camera.transform.position = panPositions[ActiveView];
                 });
         };
     }
@@ -67,15 +81,15 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
 
             if (zoomInput != 0.0f)
             {
-                float zoomLevel = zoomLevels[MapViewManager.Instance.activeView];
+                float zoomLevel = zoomLevels[ActiveView];
                 zoomLevel *= Mathf.Exp(zoomInput * zoomSpeed * Time.deltaTime);
-                Vector2 currentBounds = zoomBounds[MapViewManager.Instance.activeView];
+                Vector2 currentBounds = zoomBounds[ActiveView];
                 zoomLevel = Mathf.Clamp(
                     zoomLevel,
                     currentBounds.x,
                     currentBounds.y
                 );
-                zoomLevels[MapViewManager.Instance.activeView] = zoomLevel;
+                zoomLevels[ActiveView] = zoomLevel;
                 _camera.DOOrthoSize(zoomLevel, 0.2f).SetEase(Ease.OutCubic);
             }
 
@@ -83,7 +97,6 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
             {
                 isPanning = true;
                 panStartWorld = GetMouseWorldPos();
-                panStartCam = _camera.transform.position;
             }
             if (_inputActions.Camera.Pan.WasReleasedThisFrame())
             {
@@ -93,7 +106,8 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
             if (isPanning)
             {
                 var displacement = panStartWorld - GetMouseWorldPos();
-                _camera.transform.position += displacement;
+                panPositions[ActiveView] += displacement;
+                _camera.transform.position = panPositions[ActiveView];
             }
         }
     }
@@ -103,7 +117,6 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         var screen2world = 2.0f * _camera.orthographicSize / Math.Min(Screen.width, Screen.height);
         Vector2 screenPos = _inputActions.Camera.MousePosition.ReadValue<Vector2>();
         return _camera.ScreenToWorldPoint(screenPos);
-        //return screenPos * screen2world;
     }
 
     [Serializable]
