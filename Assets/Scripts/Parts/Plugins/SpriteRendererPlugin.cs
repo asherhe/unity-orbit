@@ -60,7 +60,7 @@ namespace Parts
             base.OnUpdate();
 
             // assume position within craft has negligible effect
-            var heliocentric = craft.body.GetHeliocentricPosition() + craft.Position;
+            var heliocentric = craft.GetHeliocentricPosition();
             var sunIntensity = (float)(1.7e22 / heliocentric.Magnitude2); // slightly over 2 at earth orbit
             var sunDirection = -heliocentric.Normalized;
             // set z to 0.3 so that parts are better illuminated

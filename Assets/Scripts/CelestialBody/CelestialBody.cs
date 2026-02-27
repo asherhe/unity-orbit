@@ -325,16 +325,6 @@ public class CelestialBody : OrbitingObject
         }
     }
 
-    /// <summary>
-    /// get the current position of this body, with the sun at the origin
-    /// </summary>
-    public Vector2d GetHeliocentricPosition()
-    {
-        var parentPos = Vector2d.zero;
-        if (parent != null) parentPos = parent.GetHeliocentricPosition();
-        return parentPos + Position;
-    }
-
     private void FixedUpdate()
     {
         _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(360.0 * Universe.Instance.fixedDeltaTime / dayLength));
