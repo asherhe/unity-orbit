@@ -347,5 +347,5 @@ public class CelestialBody : OrbitingObject
         SetDynamicMaterialProperties();
     }
 
-    public override string ToString() => $"[CelestialBody {bodyName}]";
+    public override string ToString() => $"CelestialBody {bodyName}";
 }

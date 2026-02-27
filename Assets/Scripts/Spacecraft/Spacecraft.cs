@@ -232,5 +232,5 @@ public class Spacecraft : OrbitingObject
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
     }
 
-    public override string ToString() => $"[Spacecraft {craftName}]";
+    public override string ToString() => $"Spacecraft {craftName}";
 }
