@@ -20,13 +20,32 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         { CameraView.MapView, 5e6f }
     };
 
+    private Camera _camera;
+
+    /// <summary>
+    /// whether or not a pan operation is cative
+    /// </summary>
+    private bool isPanning = false;
+    /// <summary>
+    /// location of pointer, scaled to world size, at the start of panning.
+    /// note that this is not the actual world space position, just a screen space mouse position scaled to world space
+    /// </summary>
+    private Vector3 panStartWorld;
+    /// <summary>
+    /// location of camera in world space at the start of panning
+    /// </summary>
+    private Vector3 panStartCam;
+
     // block input when camera is tweening
     private bool isTweening = false;
 
-    private void Start()
+    private void Awake()
     {
+        _camera = Camera.main;
+
         _inputActions = new InputActions();
         _inputActions.Camera.Enable();
+
         MapViewManager.Instance.OnMapToggled += () =>
         {
             isTweening = true;
@@ -57,9 +76,34 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
                     currentBounds.y
                 );
                 zoomLevels[MapViewManager.Instance.activeView] = zoomLevel;
-                Camera.main.DOOrthoSize(zoomLevel, 0.2f).SetEase(Ease.OutCubic);
+                _camera.DOOrthoSize(zoomLevel, 0.2f).SetEase(Ease.OutCubic);
+            }
+
+            if (_inputActions.Camera.Pan.WasPressedThisFrame() && _inputActions.Camera.Pan.IsPressed())
+            {
+                isPanning = true;
+                panStartWorld = GetMouseWorldPos();
+                panStartCam = _camera.transform.position;
+            }
+            if (_inputActions.Camera.Pan.WasReleasedThisFrame())
+            {
+                isPanning = false;
+            }
+
+            if (isPanning)
+            {
+                var displacement = panStartWorld - GetMouseWorldPos();
+                _camera.transform.position += displacement;
             }
         }
+    }
+
+    private Vector3 GetMouseWorldPos()
+    {
+        var screen2world = 2.0f * _camera.orthographicSize / Math.Min(Screen.width, Screen.height);
+        Vector2 screenPos = _inputActions.Camera.MousePosition.ReadValue<Vector2>();
+        return _camera.ScreenToWorldPoint(screenPos);
+        //return screenPos * screen2world;
     }
 
     [Serializable]
