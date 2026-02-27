@@ -265,7 +265,7 @@ public class CelestialBody : OrbitingObject
 
         _surfaceObject = new GameObject("Surface");
         _surfaceObject.transform.parent = displayObject.transform;
-        _surfaceObject.transform.localPosition = Vector3.forward * 550.0f;
+        _surfaceObject.transform.localPosition = Vector3.forward * 10.0f;
         _surfaceObject.transform.localScale = Vector3.one * (float)radius;
         MeshFilter surfaceMeshFilter = _surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
@@ -284,7 +284,7 @@ public class CelestialBody : OrbitingObject
         {
             _atmObject = new GameObject("Atmosphere");
             _atmObject.transform.parent = displayObject.transform;
-            _atmObject.transform.localPosition = Vector3.forward * 500.0f;
+            _atmObject.transform.localPosition = Vector3.forward * 9.0f;
             _atmObject.transform.localScale = Vector3.one * (float)(radius + atmHeight);
             MeshFilter atmMeshFilter = _atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
@@ -301,6 +301,7 @@ public class CelestialBody : OrbitingObject
         if (orbit != null)
         {
             _soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
+            _soiObject.transform.localPosition = Vector3.forward * 50.0f;
             _soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 

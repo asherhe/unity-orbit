@@ -38,6 +38,15 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 3073181807
+    locked: 0
+  - name: Trajectories
+    uniqueID: 893118475
+    locked: 0
+  - name: Celestial Bodies
+    uniqueID: 3789082143
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
