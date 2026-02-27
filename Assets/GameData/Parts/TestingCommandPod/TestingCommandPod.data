@@ -13,6 +13,12 @@ attachmentNodes:
 plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod.png
+    material:
+      path: Assets/GameData/Parts/Part.mat
+      properties:
+        _NormalMap:
+          type: Texture2D
+          value: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod-Normal.png
   CommandPlugin:
     autoSteerable: true
   ReactionWheelPlugin:

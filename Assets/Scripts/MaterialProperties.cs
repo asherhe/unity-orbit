@@ -40,20 +40,16 @@ public class MaterialProperties
     /// the material referenced by this MaterialProperties object
     /// </summary>
     public Material Material { get; private set; }
-    /// <summary>
-    /// invoked when LoadMaterial() finishes loading. comes with the loaded material as an argument
-    /// </summary>
-    public event Action<Material> OnMaterialLoaded;
-
+    
     /// <summary>
     /// load the material at the addressable path <c>path</c>
     /// </summary>
-    public void LoadMaterial()
+    public void LoadMaterial(Action<Material> onComplete)
     {
         Addressables.LoadAssetAsync<Material>(path).Completed += m =>
         {
             Material = m.Result;
-            OnMaterialLoaded?.Invoke(Material);
+            onComplete(Material);
         };
     }
 

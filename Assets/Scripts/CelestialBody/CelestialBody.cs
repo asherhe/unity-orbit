@@ -151,8 +151,7 @@ public class CelestialBody : OrbitingObject
 
     /* rendering parameters */
     public Color color { get; private set; }
-    public Material surfaceMaterial { get; private set; }
-    public Material atmMaterial { get; private set; }
+
     private List<Material> _dynamicMaterials;
 
     public void LoadConfig(DataNode config)
@@ -271,15 +270,15 @@ public class CelestialBody : OrbitingObject
         MeshFilter surfaceMeshFilter = _surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = _surfaceObject.AddComponent<MeshRenderer>();
-        _config.surfaceMaterial.LoadMaterial(); _config.surfaceMaterial.OnMaterialLoaded += m =>
+        _config.surfaceMaterial.LoadMaterial(m =>
         {
-            surfaceMeshRenderer.material = surfaceMaterial = m;
+            surfaceMeshRenderer.material = m;
             _config.surfaceMaterial.SetMaterialProperties(surfaceMeshRenderer.material);
             if (hasAtmosphere)
                 _config.atmosphere.material.SetMaterialProperties(surfaceMeshRenderer.material);
             SetMaterialProperties(surfaceMeshRenderer.material);
             _dynamicMaterials.Add(surfaceMeshRenderer.material);
-        };
+        });
 
         if (hasAtmosphere)
         {
@@ -290,13 +289,13 @@ public class CelestialBody : OrbitingObject
             MeshFilter atmMeshFilter = _atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = _atmObject.AddComponent<MeshRenderer>();
-            _config.atmosphere.material.LoadMaterial(); _config.atmosphere.material.OnMaterialLoaded += m =>
+            _config.atmosphere.material.LoadMaterial(m =>
             {
-                atmMeshRenderer.material = atmMaterial = m;
+                atmMeshRenderer.material = m;
                 _config.atmosphere.material.SetMaterialProperties(atmMeshRenderer.material);
                 SetMaterialProperties(atmMeshRenderer.material);
                 _dynamicMaterials.Add(atmMeshRenderer.material);
-            };
+            });
         }
 
         if (orbit != null)

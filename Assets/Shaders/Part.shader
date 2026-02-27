@@ -2,8 +2,8 @@ Shader "Part"
 {
     Properties
     {
-        _MainTex ("Diffuse", 2D) = "white" {}
-        [Normal] _NormalMap ("Texture", 2D) = "bump" {}
+        _MainTex ("Main Texture", 2D) = "white" {}
+        [Normal] _NormalMap ("Normal Map", 2D) = "bump" {}
 
         _SunDir ("Sun Direction", Vector) = (-1,0,0.2,0)
         _SunColor ("Sun Color", Color) = (1,1,1,1)
