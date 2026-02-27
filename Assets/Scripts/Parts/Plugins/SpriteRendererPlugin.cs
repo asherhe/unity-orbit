@@ -54,5 +54,18 @@ namespace Parts
             await sprite.Task;
             _spriteRenderer.sprite = sprite.Result;
         }
+
+        protected override void OnUpdate()
+        {
+            base.OnUpdate();
+
+            // assume position within craft has negligible effect
+            var heliocentric = craft.orbit.body.GetHeliocentricPosition() + craft.Position;
+            var sunIntensity = (float)(1.7e22 / heliocentric.Magnitude2); // slightly over 2 at earth orbit
+            Vector4 sunDirection = -heliocentric.Normalized;
+            sunDirection.z = 0.3f; sunDirection.w = 0.0f;
+            _spriteRenderer.material.SetFloat("_SunIntensity", sunIntensity);
+            _spriteRenderer.material.SetVector("_SunDir", sunDirection);
+        }
     }
 }

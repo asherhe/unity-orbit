@@ -23,7 +23,9 @@ namespace Orbit
         /// </summary>
         private void RenewCachedState()
         {
-            if (Universe.Instance.UT != cachedState.time)
+            if (orbit == null)
+                cachedState = new(Universe.Instance.UT, Vector2d.zero, Vector2d.zero);
+            else if (Universe.Instance.UT != cachedState.time)
                 cachedState = prop.GetStateVectors(Universe.Instance.UT);
         }
 
@@ -53,8 +55,11 @@ namespace Orbit
             }
         }
 
-        public Vector2d GetPositionAt(double t) => prop.GetPosition(t);
-        public Vector2d GetVelocityAt(double t) => prop.GetVelocity(t);
-        public StateVectors GetStateVectorsAt(double t) => prop.GetStateVectors(t);
+        public Vector2d GetPositionAt(double t) =>
+            orbit != null ? prop.GetPosition(t) : Vector2d.zero;
+        public Vector2d GetVelocityAt(double t) =>
+            orbit != null ? prop.GetVelocity(t) : Vector2d.zero;
+        public StateVectors GetStateVectorsAt(double t) =>
+            orbit != null ? prop.GetStateVectors(t) : new(t, Vector2d.zero, Vector2d.zero);
     }
 }

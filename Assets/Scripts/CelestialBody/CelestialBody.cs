@@ -102,7 +102,7 @@ public class CelestialBody : OrbitingObject
     /// <summary>
     /// celestial body that this body is a satellite of
     /// </summary>
-    public CelestialBody parent { get => orbit.body; }
+    public CelestialBody parent { get => orbit != null ? orbit.body : null; }
 
     /// <summary>
     /// natural satellites of this body
@@ -331,7 +331,7 @@ public class CelestialBody : OrbitingObject
     public Vector2d GetHeliocentricPosition()
     {
         var parentPos = Vector2d.zero;
-        if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
+        if (parent != null) parentPos = parent.GetHeliocentricPosition();
         return parentPos + Position;
     }
 
