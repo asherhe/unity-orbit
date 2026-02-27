@@ -91,6 +91,16 @@ namespace Parts
                 /// adjust the shape of the intensity-distance curve. 0 is softer, 1 is sharper
                 /// </summary>
                 public float falloff;
+
+                /// <summary>
+                /// frequency at which light intensity flickers
+                /// </summary>
+                public float flickerFrequency;
+
+                /// <summary>
+                /// minimum and maximum light flicker intensity, as a multiplier of intensity
+                /// </summary>
+                public float flickerMin, flickerMax;
             }
         }
 
@@ -101,9 +111,8 @@ namespace Parts
         private GameObject _lightObject;
         private Light2D _light2D;
         private float _maxLightIntensity;
-        [SerializeField]
-        private float _flickerFreq = 12.8f;
-        private float _flickerMin = 0.7f, _flickerMax = 1.9f;
+        private float _flickerFrequency;
+        private float _flickerMin, _flickerMax;
 
         /// <summary>
         /// specific impulse, in seconds
@@ -177,6 +186,11 @@ namespace Parts
             var sizeOverLifetime = _particleSystem.sizeOverLifetime;
             sizeOverLifetime.enabled = true;
             sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1.0f, _config.plume.life.size);
+
+            _maxLightIntensity = _config.light.intensity;
+            _flickerFrequency = _config.light.flickerFrequency;
+            _flickerMin = _config.light.flickerMin;
+            _flickerMax = _config.light.flickerMax;
         }
 
         public override async Task OnLoadAsync(DataNode config)
@@ -202,7 +216,6 @@ namespace Parts
                 _light2D = _lightObject.GetComponent<Light2D>();
                 _light2D.color = _config.light.color;
                 _light2D.intensity = 0.0f;
-                _maxLightIntensity = _config.light.intensity;
                 _light2D.pointLightInnerRadius = 0.0f;
                 _light2D.pointLightOuterRadius = _config.light.radius;
                 _light2D.falloffIntensity = _config.light.falloff;
@@ -258,7 +271,7 @@ namespace Parts
             if (_light2D != null)
             {
                 var baseIntensity = craft.Control.Throttle * _maxLightIntensity;
-                var flicker = Mathf.Lerp(_flickerMin, _flickerMax, Mathf.PerlinNoise1D(_flickerFreq* (float)Universe.Instance.UT));
+                var flicker = Mathf.Lerp(_flickerMin, _flickerMax, Mathf.PerlinNoise1D(_flickerFrequency * (float)Universe.Instance.UT));
                 _light2D.intensity = baseIntensity * flicker;
             }
         }
@@ -266,10 +279,12 @@ namespace Parts
         protected override void OnPluginEnable()
         {
             _psEmission.enabled = true;
+            _light2D.enabled = true;
         }
         protected override void OnPluginDisable()
         {
             _psEmission.enabled = false;
+            _light2D.enabled = false;
         }
     }
 }

@@ -73,3 +73,7 @@ plugins:
       intensity: 3.83
       radius: 4.50
       falloff: 0.73
+
+      flickerFrequency: 12.8
+      flickerMin: 0.7
+      flickerMax: 1.9
