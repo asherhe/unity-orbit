@@ -205,7 +205,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Shift/Ctrl"",
+                    ""name"": ""Throttle Up/Down"",
                     ""id"": ""e5fe924f-73f9-4647-8201-1c3ee0942b1a"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -218,7 +218,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""positive"",
                     ""id"": ""06fdbc93-fcc5-454a-9681-ccadeffa2397"",
-                    ""path"": ""<Keyboard>/leftShift"",
+                    ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
@@ -229,7 +229,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""negative"",
                     ""id"": ""0ec2ca0e-c338-428e-b755-401f72cf1d55"",
-                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
