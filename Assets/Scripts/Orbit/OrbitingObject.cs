@@ -72,6 +72,12 @@ namespace Orbit
             return parentPos + Position;
         }
 
+        /// <summary>
+        /// determine position of obj2 relative to obj1
+        /// </summary>
+        /// <param name="obj1">object to compare against</param>
+        /// <param name="obj2">object being compared</param>
+        /// <returns>displacement from obj1 to obj2</returns>
         public static Vector2d GetRelativePosition(OrbitingObject obj1, OrbitingObject obj2)
         {
             if (obj1 == obj2) return Vector2d.zero;

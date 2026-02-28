@@ -226,7 +226,7 @@ public class Spacecraft : OrbitingObject
 
     private void Update()
     {
-        transform.position = CameraFocus.Instance.GetRelativePosition(this);
+        transform.position = CameraFocus.Instance.TransformObject(this);
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;

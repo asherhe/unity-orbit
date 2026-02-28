@@ -332,7 +332,7 @@ public class CelestialBody : OrbitingObject
 
     private void Update()
     {
-        transform.position = CameraFocus.Instance.GetRelativePosition(this);
+        transform.position = CameraFocus.Instance.TransformObject(this);
 
         SetDynamicMaterialProperties();
     }

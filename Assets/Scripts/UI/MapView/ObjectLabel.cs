@@ -63,6 +63,7 @@ namespace UI
             OnOwnerUpdated += UpdateTargeting;
 
             _inputActions.Ctx_ObjectLabel.Target.performed += ctx => ToggleTarget();
+            _inputActions.Ctx_ObjectLabel.Focus.performed += ctx => CameraFocus.Instance.Focus = Owner;
 
             TargetingSystem.WhenInstantiated(() =>
             {
