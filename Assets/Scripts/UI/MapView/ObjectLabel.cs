@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -63,8 +64,9 @@ namespace UI
             });
         }
 
-        private void ToggleTarget()
+        private void ToggleTarget(PointerEventData data)
         {
+            if (data.button != PointerEventData.InputButton.Left) return;
             IsTargeted = !IsTargeted;
             if (IsTargeted) TargetingSystem.Instance.Target = Owner;
             else TargetingSystem.Instance.Target = null;
