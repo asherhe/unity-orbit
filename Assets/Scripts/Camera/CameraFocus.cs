@@ -8,14 +8,17 @@ using UnityEngine;
 public class CameraFocus : SingletonBehaviour<CameraFocus>
 {
     [SerializeField]
-    private OrbitingObject _focus;
+    private OrbitingObject _defaultFocus;
 
+    private OrbitingObject _focus;
     /// <summary>
     /// the object that the camera is focused on
     /// </summary>
-    public OrbitingObject Focus {
+    public OrbitingObject Focus
+    {
         get => _focus;
-        set {
+        set
+        {
             _focus = value;
             OnFocusChanged?.Invoke();
         }
@@ -23,11 +26,29 @@ public class CameraFocus : SingletonBehaviour<CameraFocus>
 
     public event Action OnFocusChanged;
 
+    /// <summary>
+    /// focused objects for different camera views
+    /// </summary>
+    private Dictionary<CameraView, OrbitingObject> viewFocuses;
+
     protected override void Awake()
     {
-        base.Awake();
+        _focus = _defaultFocus;
+        viewFocuses = new Dictionary<CameraView, OrbitingObject>()
+        {
+            { CameraView.FlightView, _defaultFocus },
+            { CameraView.MapView, _defaultFocus },
+        };
 
         OnFocusChanged += () => AnnouncementDisplay.Instance.Announce($"Focusing {Focus.name}");
+
+        MapViewManager.WhenInstantiated(() =>
+        {
+            OnFocusChanged += () => viewFocuses[MapViewManager.Instance.activeView] = Focus;
+            MapViewManager.Instance.OnMapToggled += () => Focus = viewFocuses[MapViewManager.Instance.activeView];
+        });
+
+        base.Awake();
     }
 
     /// <summary>

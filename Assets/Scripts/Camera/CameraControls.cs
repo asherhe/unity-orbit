@@ -123,15 +123,17 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
                 var disp = CameraFocus.Instance.TransformObject(_prevFocus) + Pan;
                 _prevFocus = focus;
 
-                if (focus is CelestialBody body) Zoom = 3.0f * (float)body.radius;
-                else Zoom = 2.0f * (float)focus.Position.Magnitude;
-                _camera.DOOrthoSize(Zoom, _tweenTime)
-                    .SetEase(Ease.OutQuad)
-                    .OnComplete(() =>
-                    {
-                        Zoom = Zoom;
-                        isTweening = false;
-                    });
+                if (ActiveView == CameraView.MapView)
+                {
+                    if (focus is CelestialBody body) Zoom = 3.0f * (float)body.radius;
+                    else Zoom = 2.0f * (float)focus.Position.Magnitude;
+                    _camera.DOOrthoSize(Zoom, _tweenTime)
+                        .SetEase(Ease.OutQuad)
+                        .OnComplete(() =>
+                        {
+                            Zoom = Zoom;
+                        });
+                }
 
                 Pan = disp;
                 _camera.transform.DOMove(new Vector3(0f, 0f, _camera.transform.position.z), _tweenTime)
@@ -139,6 +141,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
                     .OnComplete(() =>
                     {
                         Pan = Vector2.zero;
+                        isTweening = false;
                     });
             };
         });
