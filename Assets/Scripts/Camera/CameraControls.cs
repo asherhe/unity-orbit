@@ -21,6 +21,15 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         { CameraView.FlightView, 10f },
         { CameraView.MapView, 5e6f }
     };
+    private float Zoom
+    {
+        get => zoomLevels[ActiveView];
+        set
+        {
+            zoomLevels[ActiveView] = value;
+            _camera.DOOrthoSize(zoomLevels[ActiveView], 0.1f).SetEase(Ease.OutCubic);
+        }
+    }
 
     private float _tweenTime = 0.25f;
 
@@ -44,6 +53,15 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         { CameraView.FlightView, new(0f, 0f, -10f) },
         { CameraView.MapView, new(0f, 0f, -10f) },
     };
+    private Vector3 Pan
+    {
+        get => panPositions[ActiveView];
+        set
+        {
+            panPositions[ActiveView] = value;
+            _camera.transform.position = panPositions[ActiveView];
+        }
+    }
 
     // block input when camera is tweening
     private bool isTweening = false;
@@ -58,17 +76,17 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
         MapViewManager.Instance.OnMapToggled += () =>
         {
             isTweening = true;
-            _camera.DOOrthoSize(zoomLevels[ActiveView], _tweenTime)
+            _camera.DOOrthoSize(Zoom, _tweenTime)
                 .OnComplete(() =>
                 {
                     // for large map view zoom levels orthographic size might end up as 0 at the end because of floating point errors
-                    _camera.orthographicSize = zoomLevels[ActiveView];
+                    _camera.orthographicSize = Zoom;
                     isTweening = false;
                 });
-            _camera.transform.DOMove(panPositions[ActiveView], _tweenTime)
+            _camera.transform.DOMove(Pan, _tweenTime)
                 .OnComplete(() =>
                 {
-                    _camera.transform.position = panPositions[ActiveView];
+                    _camera.transform.position = Pan;
                 });
         };
     }
@@ -81,7 +99,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
 
             if (zoomInput != 0.0f)
             {
-                float zoomLevel = zoomLevels[ActiveView];
+                float zoomLevel = Zoom;
                 zoomLevel *= Mathf.Exp(zoomInput * zoomSpeed * Time.deltaTime);
                 Vector2 currentBounds = zoomBounds[ActiveView];
                 zoomLevel = Mathf.Clamp(
@@ -89,8 +107,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
                     currentBounds.x,
                     currentBounds.y
                 );
-                zoomLevels[ActiveView] = zoomLevel;
-                _camera.DOOrthoSize(zoomLevel, 0.2f).SetEase(Ease.OutCubic);
+                Zoom = zoomLevel;
             }
 
             if (_inputActions.Camera.Pan.WasPressedThisFrame() && _inputActions.Camera.Pan.IsPressed())
@@ -106,8 +123,7 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
             if (isPanning)
             {
                 var displacement = panStartWorld - GetMouseWorldPos();
-                panPositions[ActiveView] += displacement;
-                _camera.transform.position = panPositions[ActiveView];
+                Pan += displacement;
             }
         }
     }
