@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class CelestialBody : OrbitingObject
 {
@@ -82,6 +83,8 @@ public class CelestialBody : OrbitingObject
             /// </summary>
             public MaterialProperties material;
         }
+
+        public List<string> customDisplayPrefabs = new();
     }
 
     private GameObject _displayObject;
@@ -305,6 +308,14 @@ public class CelestialBody : OrbitingObject
             _soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 
+        foreach (var path in _config.customDisplayPrefabs)
+        {
+            Addressables.LoadAssetAsync<GameObject>(path).Completed += prefab =>
+            {
+                Instantiate(prefab.Result, transform);
+            };
+        }
+
         SetDynamicMaterialProperties();
 
         UI.MapLabelManager.WhenInstantiated(() =>
@@ -327,7 +338,7 @@ public class CelestialBody : OrbitingObject
 
     private void FixedUpdate()
     {
-        _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(360.0 * Universe.Instance.fixedDeltaTime / dayLength));
+        _surfaceObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(360.0 * Universe.Instance.fixedDeltaTime / dayLength));
     }
 
     private void Update()
