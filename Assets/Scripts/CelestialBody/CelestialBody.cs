@@ -217,21 +217,21 @@ public class CelestialBody : OrbitingObject
     {
         // some placeholder values for these or else we get CS0165
         float sunIntensity = 20.0f;
-        Vector4 sunDirection = Vector4.zero;
+        Vector4 sunDirection = new(0f, 0f, -1f, 0f);
         if (orbit != null)
         {
             var heliocentric = GetHeliocentricPosition();
             sunIntensity = (float)(1.7e23 / heliocentric.Magnitude2);
-            sunDirection = -heliocentric.Normalized;
-            sunDirection.z = 0.2f; sunDirection.w = 0.0f;
+            if (heliocentric.Magnitude2 > 0)
+            {
+                sunDirection = -heliocentric.Normalized;
+                sunDirection.z = 0.2f; sunDirection.w = 0.0f;
+            }
         }
         foreach (var m in _dynamicMaterials)
         {
-            if (orbit != null)
-            {
-                m.SetFloat("_SunIntensity", sunIntensity);
-                m.SetVector("_SunDir", sunDirection);
-            }
+            m.SetFloat("_SunIntensity", sunIntensity);
+            m.SetVector("_SunDir", sunDirection);
         }
     }
 
