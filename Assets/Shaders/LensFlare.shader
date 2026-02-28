@@ -64,6 +64,10 @@ Shader "LensFlare"
 
                 float3 objectCS = TransformObjectToHClip(float3(0, 0, 0)).xyz; // object origin in clip space
                 
+                float scale = 1;
+                if (_RadialDistortion > 0.0)
+                    scale = length(objectCS.xy) * _AxisDistance * _RadialDistortion;
+
                 if (_AutoRotate) {
                     float2 radial = -normalize(objectCS.xy);
                     float2x2 rotate = float2x2(radial, -radial.y, radial.x);
@@ -72,10 +76,6 @@ Shader "LensFlare"
                 
                 objectCS.xy *= 1.0 - _AxisDistance;
                 vertCS *= float3(1, -1 / aspect, 1);
-                
-                float scale = 1;
-                if (_RadialDistortion > 0.0)
-                    scale = length(objectCS.xy) * _RadialDistortion;
 
                 OUT.positionCS = float4(objectCS + scale * vertCS, 1);
                 OUT.positionCS.w = 1;

@@ -22,4 +22,4 @@ orbit: false
 atmosphere: false # TODO, figure out how sun's atmosphere works
 
 customDisplayPrefabs:
-  - Assets/GameData/CelestialBodies/Sun/Lens Flare.prefab
+  - Assets/GameData/CelestialBodies/Sun/SunLensFlare.prefab

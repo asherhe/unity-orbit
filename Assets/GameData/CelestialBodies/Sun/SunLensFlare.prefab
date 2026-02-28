@@ -112,7 +112,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5856778752011243596}
   m_Layer: 0
-  m_Name: Lens Flare
+  m_Name: SunLensFlare
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -547,7 +547,7 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 1}
   intensity: 0.12
   axisDistance: 0.12
-  radialDistortion: 0.39
+  radialDistortion: 2.99
   autoRotate: 1
 --- !u!1 &5617717709649799365
 GameObject:
@@ -649,7 +649,7 @@ MonoBehaviour:
   color: {r: 1, g: 1, b: 1, a: 1}
   intensity: 0.13
   axisDistance: 0.15
-  radialDistortion: 1.58
+  radialDistortion: 10.05
   autoRotate: 0
 --- !u!1 &5946598386949660359
 GameObject:
