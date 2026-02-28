@@ -22,6 +22,7 @@ namespace UI
         /// <summary>
         /// optional trajectory field to determine if the label is still on the trajectory
         /// </summary>
+        [HideInInspector]
         public Trajectory trajectory;
 
         /// <summary>
@@ -43,6 +44,9 @@ namespace UI
             return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - LabelOrbit.body.radius) + "m";
         }
 
+        /// <summary>
+        /// expose protected ShowLabel property
+        /// </summary>
         public bool IsTextActive { get => ShowLabel; set => ShowLabel = value; }
 
         /// <summary>
@@ -59,12 +63,6 @@ namespace UI
         /// true by default, override if you don't want this behaviour
         /// </summary>
         protected virtual bool DoZoomAlpha => true;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            icon.OnClick += () => IsTextActive = !IsTextActive;
-        }
 
         private void Start()
         {

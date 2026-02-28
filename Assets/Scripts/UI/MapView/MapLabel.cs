@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -17,6 +17,9 @@ namespace UI
         protected MapIcon icon;
         [SerializeField]
         protected TMP_Text labelText;
+
+        [SerializeField]
+        protected LabelContextMenu contextMenu;
 
         private float _alpha = 1.0f;
         public float Alpha
@@ -68,6 +71,7 @@ namespace UI
 
             icon.OnHoverEnter += OnHoverEnter;
             icon.OnHoverLeave += OnHoverLeave;
+            icon.OnClick += OnClick;
 
             iconColor = icon.color;
             textColor = labelText.color;
@@ -95,15 +99,28 @@ namespace UI
                 if (alpha == 0.0f) _textAlphaTween.OnComplete(() => labelText.gameObject.SetActive(false));
             }
         }
-        private void OnHoverEnter()
+        private void OnHoverEnter(PointerEventData data)
         {
             IsHovered = true;
             rectTransform.DOScale(1.25f, 0.25f).SetEase(Ease.OutCubic);
         }
-        private void OnHoverLeave()
+        private void OnHoverLeave(PointerEventData data)
         {
             IsHovered = false;
             rectTransform.DOScale(1.0f, 0.25f).SetEase(Ease.OutCubic);
+        }
+        private void OnClick(PointerEventData data)
+        {
+            // left click: toggle label visibility
+            if (data.button == PointerEventData.InputButton.Left)
+            {
+                ShowLabel = !ShowLabel;
+            }
+            // right click: show context menu
+            if (data.button == PointerEventData.InputButton.Right)
+            {
+                // TODO:
+            }
         }
     }
 }

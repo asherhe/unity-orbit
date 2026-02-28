@@ -102,7 +102,7 @@ public class CelestialBody : OrbitingObject
     /// <summary>
     /// celestial body that this body is a satellite of
     /// </summary>
-    public CelestialBody parent { get => orbit.body; }
+    public CelestialBody parent { get => orbit != null ? orbit.body : null; }
 
     /// <summary>
     /// natural satellites of this body
@@ -151,8 +151,7 @@ public class CelestialBody : OrbitingObject
 
     /* rendering parameters */
     public Color color { get; private set; }
-    public Material surfaceMaterial { get; private set; }
-    public Material atmMaterial { get; private set; }
+
     private List<Material> _dynamicMaterials;
 
     public void LoadConfig(DataNode config)
@@ -266,42 +265,43 @@ public class CelestialBody : OrbitingObject
 
         _surfaceObject = new GameObject("Surface");
         _surfaceObject.transform.parent = displayObject.transform;
-        _surfaceObject.transform.localPosition = Vector3.forward * 550.0f;
+        _surfaceObject.transform.localPosition = Vector3.forward * 10.0f;
         _surfaceObject.transform.localScale = Vector3.one * (float)radius;
         MeshFilter surfaceMeshFilter = _surfaceObject.AddComponent<MeshFilter>();
         surfaceMeshFilter.mesh = quadMesh;
         MeshRenderer surfaceMeshRenderer = _surfaceObject.AddComponent<MeshRenderer>();
-        _config.surfaceMaterial.LoadMaterial(); _config.surfaceMaterial.OnMaterialLoaded += m =>
+        _config.surfaceMaterial.LoadMaterial(m =>
         {
-            surfaceMeshRenderer.material = surfaceMaterial = m;
+            surfaceMeshRenderer.material = m;
             _config.surfaceMaterial.SetMaterialProperties(surfaceMeshRenderer.material);
             if (hasAtmosphere)
                 _config.atmosphere.material.SetMaterialProperties(surfaceMeshRenderer.material);
             SetMaterialProperties(surfaceMeshRenderer.material);
             _dynamicMaterials.Add(surfaceMeshRenderer.material);
-        };
+        });
 
         if (hasAtmosphere)
         {
             _atmObject = new GameObject("Atmosphere");
             _atmObject.transform.parent = displayObject.transform;
-            _atmObject.transform.localPosition = Vector3.forward * 500.0f;
+            _atmObject.transform.localPosition = Vector3.forward * 9.0f;
             _atmObject.transform.localScale = Vector3.one * (float)(radius + atmHeight);
             MeshFilter atmMeshFilter = _atmObject.AddComponent<MeshFilter>();
             atmMeshFilter.mesh = quadMesh;
             MeshRenderer atmMeshRenderer = _atmObject.AddComponent<MeshRenderer>();
-            _config.atmosphere.material.LoadMaterial(); _config.atmosphere.material.OnMaterialLoaded += m =>
+            _config.atmosphere.material.LoadMaterial(m =>
             {
-                atmMeshRenderer.material = atmMaterial = m;
+                atmMeshRenderer.material = m;
                 _config.atmosphere.material.SetMaterialProperties(atmMeshRenderer.material);
                 SetMaterialProperties(atmMeshRenderer.material);
                 _dynamicMaterials.Add(atmMeshRenderer.material);
-            };
+            });
         }
 
         if (orbit != null)
         {
             _soiObject = Instantiate(_SOIPrefab, _displayObject.transform);
+            _soiObject.transform.localPosition = Vector3.forward * 50.0f;
             _soiObject.transform.localScale = (2.0f * (float)soiRadius) * Vector3.one;
         }
 
@@ -325,27 +325,17 @@ public class CelestialBody : OrbitingObject
         }
     }
 
-    /// <summary>
-    /// get the current position of this body, with the sun at the origin
-    /// </summary>
-    public Vector2d GetHeliocentricPosition()
-    {
-        var parentPos = Vector2d.zero;
-        if (parent.orbit != null) parentPos = parent.GetHeliocentricPosition();
-        return parentPos + Position;
-    }
-
     private void FixedUpdate()
     {
-        _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(-360.0 * Universe.Instance.fixedDeltaTime / dayLength));
+        _displayObject.transform.rotation *= Quaternion.Euler(0.0f, 0.0f, (float)(360.0 * Universe.Instance.fixedDeltaTime / dayLength));
     }
 
     private void Update()
     {
-        transform.position = CameraFocus.Instance.GetRelativePosition(this);
+        transform.position = CameraFocus.Instance.TransformObject(this);
 
         SetDynamicMaterialProperties();
     }
 
-    public override string ToString() => $"[CelestialBody {bodyName}]";
+    public override string ToString() => $"CelestialBody {bodyName}";
 }

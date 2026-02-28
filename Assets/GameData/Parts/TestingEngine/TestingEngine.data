@@ -13,11 +13,18 @@ attachmentNodes:
 plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingEngine/TestingEngine.png
+    material:
+      path: Assets/GameData/Parts/Part.mat
+      properties:
+        _NormalMap:
+          type: Texture2D
+          value: Assets/GameData/Parts/TestingEngine/TestingEngine-Normal.png
   EnginePlugin:
     # isp: 316 # s
     isp: 1000 # ridiculously good isp for testing
     # thrust: 26.7 # kN
     thrust: 100 # better thrust for faster testing
+    thrustDir: { x: 0.0, y: 1.0 }
     propellantRatio:
       NTO: 1.5
       Hydrazine: 1.0
@@ -60,3 +67,13 @@ plugins:
           0.33: 0.96
           0.76: 0.66
           1.00: 0.00
+
+    light:
+      color: "#FFA43B"
+      intensity: 3.83
+      radius: 4.50
+      falloff: 0.73
+
+      flickerFrequency: 12.8
+      flickerMin: 0.7
+      flickerMax: 1.9

@@ -13,6 +13,12 @@ attachmentNodes:
 plugins:
   SpriteRendererPlugin:
     sprite: Assets/GameData/Parts/TestingTank/TestingTank.png
+    material:
+      path: Assets/GameData/Parts/Part.mat
+      properties:
+        _NormalMap:
+          type: Texture2D
+          value: Assets/GameData/Parts/TestingTank/TestingTank-Normal.png
   ResourceContainerPlugin:
     maxAmount:
       NTO: 3600

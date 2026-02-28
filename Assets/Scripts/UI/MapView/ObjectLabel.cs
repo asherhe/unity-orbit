@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace UI
 {
@@ -12,6 +13,8 @@ namespace UI
     [RequireComponent(typeof(FollowWorldTransformFromScreen))]
     public abstract class ObjectLabel : MapLabel
     {
+        private InputActions _inputActions;
+
         protected FollowWorldTransformFromScreen _follow;
 
         private Orbit.OrbitingObject _owner;
@@ -49,14 +52,19 @@ namespace UI
         {
             base.Awake();
 
+            _inputActions = new InputActions();
+            icon.OnHoverEnter += data => _inputActions.Ctx_ObjectLabel.Enable();
+            icon.OnHoverLeave += data => _inputActions.Ctx_ObjectLabel.Disable();
+
             _follow = GetComponent<FollowWorldTransformFromScreen>();
 
             OnOwnerUpdated += () => _follow.follow = Owner.gameObject.transform;
             OnOwnerUpdated += UpdateVisuals;
             OnOwnerUpdated += UpdateTargeting;
 
-            icon.OnClick += ToggleTarget;
-         
+            _inputActions.Ctx_ObjectLabel.Target.performed += ctx => ToggleTarget();
+            _inputActions.Ctx_ObjectLabel.Focus.performed += ctx => CameraFocus.Instance.Focus = Owner;
+
             TargetingSystem.WhenInstantiated(() =>
             {
                 TargetingSystem.Instance.OnTargetChanged += UpdateTargeting;

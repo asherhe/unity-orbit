@@ -205,7 +205,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Shift/Ctrl"",
+                    ""name"": ""Throttle Up/Down"",
                     ""id"": ""e5fe924f-73f9-4647-8201-1c3ee0942b1a"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -218,7 +218,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""positive"",
                     ""id"": ""06fdbc93-fcc5-454a-9681-ccadeffa2397"",
-                    ""path"": ""<Keyboard>/leftShift"",
+                    ""path"": ""<Keyboard>/w"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
@@ -229,7 +229,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": ""negative"",
                     ""id"": ""0ec2ca0e-c338-428e-b755-401f72cf1d55"",
-                    ""path"": ""<Keyboard>/leftCtrl"",
+                    ""path"": ""<Keyboard>/s"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
@@ -262,7 +262,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""40a451ee-7d24-464d-b7d7-9ff884331ba4"",
-                    ""path"": ""<Keyboard>/t"",
+                    ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard + Mouse"",
@@ -361,6 +361,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pan"",
+                    ""type"": ""Button"",
+                    ""id"": ""a64a9c9d-b35f-422e-8930-afb7ebe5b2ec"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Mouse Position"",
+                    ""type"": ""Value"",
+                    ""id"": ""23708581-80f7-4b63-8d31-bd3bc629c3f9"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -383,6 +401,76 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
                     ""action"": ""ToggleMap"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b62fde50-d92b-42be-a9ac-b2aa9c9bfd9b"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""Pan"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""079364ce-4280-4448-8434-be9c7e2d26b6"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""Mouse Position"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Ctx_ObjectLabel"",
+            ""id"": ""e01003a7-98ec-4d52-b3c9-924f86f53efb"",
+            ""actions"": [
+                {
+                    ""name"": ""Target"",
+                    ""type"": ""Button"",
+                    ""id"": ""e4ad1af9-a158-4ce9-a19a-b55f146680a3"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Focus"",
+                    ""type"": ""Button"",
+                    ""id"": ""57fefd37-0845-4579-9f9f-b4e0ad4b4995"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""29f4babc-1f2d-4afe-b925-1609bd31a1f7"",
+                    ""path"": ""<Keyboard>/t"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard + Mouse"",
+                    ""action"": ""Target"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ab589225-3831-4ad7-8e56-992cc1da2682"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Focus"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -424,6 +512,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
         m_Camera_ToggleMap = m_Camera.FindAction("ToggleMap", throwIfNotFound: true);
+        m_Camera_Pan = m_Camera.FindAction("Pan", throwIfNotFound: true);
+        m_Camera_MousePosition = m_Camera.FindAction("Mouse Position", throwIfNotFound: true);
+        // Ctx_ObjectLabel
+        m_Ctx_ObjectLabel = asset.FindActionMap("Ctx_ObjectLabel", throwIfNotFound: true);
+        m_Ctx_ObjectLabel_Target = m_Ctx_ObjectLabel.FindAction("Target", throwIfNotFound: true);
+        m_Ctx_ObjectLabel_Focus = m_Ctx_ObjectLabel.FindAction("Focus", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -431,6 +525,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         UnityEngine.Debug.Assert(!m_Flight.enabled, "This will cause a leak and performance issues, InputActions.Flight.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Warp.enabled, "This will cause a leak and performance issues, InputActions.Warp.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, InputActions.Camera.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_Ctx_ObjectLabel.enabled, "This will cause a leak and performance issues, InputActions.Ctx_ObjectLabel.Disable() has not been called.");
     }
 
     /// <summary>
@@ -766,6 +861,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private List<ICameraActions> m_CameraActionsCallbackInterfaces = new List<ICameraActions>();
     private readonly InputAction m_Camera_Zoom;
     private readonly InputAction m_Camera_ToggleMap;
+    private readonly InputAction m_Camera_Pan;
+    private readonly InputAction m_Camera_MousePosition;
     /// <summary>
     /// Provides access to input actions defined in input action map "Camera".
     /// </summary>
@@ -785,6 +882,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Camera/ToggleMap".
         /// </summary>
         public InputAction @ToggleMap => m_Wrapper.m_Camera_ToggleMap;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/Pan".
+        /// </summary>
+        public InputAction @Pan => m_Wrapper.m_Camera_Pan;
+        /// <summary>
+        /// Provides access to the underlying input action "Camera/MousePosition".
+        /// </summary>
+        public InputAction @MousePosition => m_Wrapper.m_Camera_MousePosition;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -817,6 +922,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ToggleMap.started += instance.OnToggleMap;
             @ToggleMap.performed += instance.OnToggleMap;
             @ToggleMap.canceled += instance.OnToggleMap;
+            @Pan.started += instance.OnPan;
+            @Pan.performed += instance.OnPan;
+            @Pan.canceled += instance.OnPan;
+            @MousePosition.started += instance.OnMousePosition;
+            @MousePosition.performed += instance.OnMousePosition;
+            @MousePosition.canceled += instance.OnMousePosition;
         }
 
         /// <summary>
@@ -834,6 +945,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @ToggleMap.started -= instance.OnToggleMap;
             @ToggleMap.performed -= instance.OnToggleMap;
             @ToggleMap.canceled -= instance.OnToggleMap;
+            @Pan.started -= instance.OnPan;
+            @Pan.performed -= instance.OnPan;
+            @Pan.canceled -= instance.OnPan;
+            @MousePosition.started -= instance.OnMousePosition;
+            @MousePosition.performed -= instance.OnMousePosition;
+            @MousePosition.canceled -= instance.OnMousePosition;
         }
 
         /// <summary>
@@ -867,6 +984,113 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
     /// </summary>
     public CameraActions @Camera => new CameraActions(this);
+
+    // Ctx_ObjectLabel
+    private readonly InputActionMap m_Ctx_ObjectLabel;
+    private List<ICtx_ObjectLabelActions> m_Ctx_ObjectLabelActionsCallbackInterfaces = new List<ICtx_ObjectLabelActions>();
+    private readonly InputAction m_Ctx_ObjectLabel_Target;
+    private readonly InputAction m_Ctx_ObjectLabel_Focus;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Ctx_ObjectLabel".
+    /// </summary>
+    public struct Ctx_ObjectLabelActions
+    {
+        private @InputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public Ctx_ObjectLabelActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "Ctx_ObjectLabel/Target".
+        /// </summary>
+        public InputAction @Target => m_Wrapper.m_Ctx_ObjectLabel_Target;
+        /// <summary>
+        /// Provides access to the underlying input action "Ctx_ObjectLabel/Focus".
+        /// </summary>
+        public InputAction @Focus => m_Wrapper.m_Ctx_ObjectLabel_Focus;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_Ctx_ObjectLabel; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="Ctx_ObjectLabelActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(Ctx_ObjectLabelActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="Ctx_ObjectLabelActions" />
+        public void AddCallbacks(ICtx_ObjectLabelActions instance)
+        {
+            if (instance == null || m_Wrapper.m_Ctx_ObjectLabelActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_Ctx_ObjectLabelActionsCallbackInterfaces.Add(instance);
+            @Target.started += instance.OnTarget;
+            @Target.performed += instance.OnTarget;
+            @Target.canceled += instance.OnTarget;
+            @Focus.started += instance.OnFocus;
+            @Focus.performed += instance.OnFocus;
+            @Focus.canceled += instance.OnFocus;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="Ctx_ObjectLabelActions" />
+        private void UnregisterCallbacks(ICtx_ObjectLabelActions instance)
+        {
+            @Target.started -= instance.OnTarget;
+            @Target.performed -= instance.OnTarget;
+            @Target.canceled -= instance.OnTarget;
+            @Focus.started -= instance.OnFocus;
+            @Focus.performed -= instance.OnFocus;
+            @Focus.canceled -= instance.OnFocus;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="Ctx_ObjectLabelActions.UnregisterCallbacks(ICtx_ObjectLabelActions)" />.
+        /// </summary>
+        /// <seealso cref="Ctx_ObjectLabelActions.UnregisterCallbacks(ICtx_ObjectLabelActions)" />
+        public void RemoveCallbacks(ICtx_ObjectLabelActions instance)
+        {
+            if (m_Wrapper.m_Ctx_ObjectLabelActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="Ctx_ObjectLabelActions.AddCallbacks(ICtx_ObjectLabelActions)" />
+        /// <seealso cref="Ctx_ObjectLabelActions.RemoveCallbacks(ICtx_ObjectLabelActions)" />
+        /// <seealso cref="Ctx_ObjectLabelActions.UnregisterCallbacks(ICtx_ObjectLabelActions)" />
+        public void SetCallbacks(ICtx_ObjectLabelActions instance)
+        {
+            foreach (var item in m_Wrapper.m_Ctx_ObjectLabelActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_Ctx_ObjectLabelActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="Ctx_ObjectLabelActions" /> instance referencing this action map.
+    /// </summary>
+    public Ctx_ObjectLabelActions @Ctx_ObjectLabel => new Ctx_ObjectLabelActions(this);
     private int m_KeyboardMouseSchemeIndex = -1;
     /// <summary>
     /// Provides access to the input control scheme.
@@ -973,5 +1197,41 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnToggleMap(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Pan" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnPan(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Mouse Position" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMousePosition(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Ctx_ObjectLabel" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="Ctx_ObjectLabelActions.AddCallbacks(ICtx_ObjectLabelActions)" />
+    /// <seealso cref="Ctx_ObjectLabelActions.RemoveCallbacks(ICtx_ObjectLabelActions)" />
+    public interface ICtx_ObjectLabelActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Target" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnTarget(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Focus" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnFocus(InputAction.CallbackContext context);
     }
 }

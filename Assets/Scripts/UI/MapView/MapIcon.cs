@@ -27,17 +27,17 @@ namespace UI
             }
         }
 
-        public event Action OnHoverEnter;
-        public event Action OnHoverLeave;
-        public event Action OnClick;
+        public event Action<PointerEventData> OnHoverEnter;
+        public event Action<PointerEventData> OnHoverLeave;
+        public event Action<PointerEventData> OnClick;
 
         protected virtual void Awake()
         {
             rectTransform = transform as RectTransform;
         }
 
-        public void OnPointerEnter(PointerEventData data) { OnHoverEnter?.Invoke(); }
-        public void OnPointerExit(PointerEventData data) { OnHoverLeave?.Invoke(); }
-        public void OnPointerClick(PointerEventData data) { OnClick?.Invoke(); }
+        public void OnPointerEnter(PointerEventData data) => OnHoverEnter?.Invoke(data);
+        public void OnPointerExit(PointerEventData data) => OnHoverLeave?.Invoke(data);
+        public void OnPointerClick(PointerEventData data) => OnClick?.Invoke(data);
     }
 }

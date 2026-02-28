@@ -119,7 +119,7 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Shift/Ctrl",
+                    "name": "Throttle Up/Down",
                     "id": "e5fe924f-73f9-4647-8201-1c3ee0942b1a",
                     "path": "1DAxis",
                     "interactions": "",
@@ -132,7 +132,7 @@
                 {
                     "name": "positive",
                     "id": "06fdbc93-fcc5-454a-9681-ccadeffa2397",
-                    "path": "<Keyboard>/leftShift",
+                    "path": "<Keyboard>/w",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
@@ -143,7 +143,7 @@
                 {
                     "name": "negative",
                     "id": "0ec2ca0e-c338-428e-b755-401f72cf1d55",
-                    "path": "<Keyboard>/leftCtrl",
+                    "path": "<Keyboard>/s",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
@@ -176,7 +176,7 @@
                 {
                     "name": "",
                     "id": "40a451ee-7d24-464d-b7d7-9ff884331ba4",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard + Mouse",
@@ -275,6 +275,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Pan",
+                    "type": "Button",
+                    "id": "a64a9c9d-b35f-422e-8930-afb7ebe5b2ec",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Mouse Position",
+                    "type": "Value",
+                    "id": "23708581-80f7-4b63-8d31-bd3bc629c3f9",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -297,6 +315,76 @@
                     "processors": "",
                     "groups": "Keyboard + Mouse",
                     "action": "ToggleMap",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b62fde50-d92b-42be-a9ac-b2aa9c9bfd9b",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard + Mouse",
+                    "action": "Pan",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "079364ce-4280-4448-8434-be9c7e2d26b6",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard + Mouse",
+                    "action": "Mouse Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Ctx_ObjectLabel",
+            "id": "e01003a7-98ec-4d52-b3c9-924f86f53efb",
+            "actions": [
+                {
+                    "name": "Target",
+                    "type": "Button",
+                    "id": "e4ad1af9-a158-4ce9-a19a-b55f146680a3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Focus",
+                    "type": "Button",
+                    "id": "57fefd37-0845-4579-9f9f-b4e0ad4b4995",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "29f4babc-1f2d-4afe-b925-1609bd31a1f7",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard + Mouse",
+                    "action": "Target",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab589225-3831-4ad7-8e56-992cc1da2682",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Focus",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

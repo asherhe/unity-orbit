@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.Rendering.Universal;
 
 namespace Parts
 {
@@ -22,11 +23,18 @@ namespace Parts
             /// </summary>
             public double thrust;
             /// <summary>
+            /// thrust direction in part space
+            /// </summary>
+            public Vector2d thrustDir;
+            /// <summary>
             /// relative ratio of propellants used in the engine.
             /// scaled so that the total propellant mass matches the expected propellant consumption from the engine.
             /// </summary>
             public Dictionary<string, double> propellantRatio;
 
+            /// <summary>
+            /// engine plume particle system configuration
+            /// </summary>
             public PlumeConfig plume;
             [Serializable]
             public class PlumeConfig
@@ -56,11 +64,55 @@ namespace Parts
                     public AnimationCurve size;
                 }
             }
+
+            /// <summary>
+            /// engine scene light configuration
+            /// </summary>
+            public LightConfig light;
+            [Serializable]
+            public class LightConfig
+            {
+                /// <summary>
+                /// engine light color, should roughly correspond to plume color
+                /// </summary>
+                public Color color;
+
+                /// <summary>
+                /// intensity of engine light at max throttle
+                /// </summary>
+                public float intensity;
+
+                /// <summary>
+                /// how far this light should shine (m)
+                /// </summary>
+                public float radius;
+
+                /// <summary>
+                /// adjust the shape of the intensity-distance curve. 0 is softer, 1 is sharper
+                /// </summary>
+                public float falloff;
+
+                /// <summary>
+                /// frequency at which light intensity flickers
+                /// </summary>
+                public float flickerFrequency;
+
+                /// <summary>
+                /// minimum and maximum light flicker intensity, as a multiplier of intensity
+                /// </summary>
+                public float flickerMin, flickerMax;
+            }
         }
 
-        private GameObject _particleGameObject;
+        private GameObject _particleObject;
         private ParticleSystem _particleSystem;
         private ParticleSystem.EmissionModule _psEmission;
+
+        private GameObject _lightObject;
+        private Light2D _light2D;
+        private float _maxLightIntensity;
+        private float _flickerFrequency;
+        private float _flickerMin, _flickerMax;
 
         /// <summary>
         /// specific impulse, in seconds
@@ -71,7 +123,7 @@ namespace Parts
         /// </summary>
         private double _thrust;
         /// <summary>
-        /// direction for engine thrust in craft space, which is the local up vector of this part
+        /// direction for engine thrust in craft space
         /// </summary>
         private Vector2d _thrustDir;
         /// <summary>
@@ -86,9 +138,11 @@ namespace Parts
 
         protected override void OnAwake()
         {
-            _particleGameObject = new GameObject("Engine Plume");
-            _particleGameObject.transform.parent = transform;
-            _particleSystem = _particleGameObject.AddComponent<ParticleSystem>();
+            base.OnAwake();
+
+            _particleObject = new GameObject("Engine Plume");
+            _particleObject.transform.parent = transform;
+            _particleSystem = _particleObject.AddComponent<ParticleSystem>();
             _psEmission = _particleSystem.emission; _psEmission.enabled = false;
         }
 
@@ -100,15 +154,15 @@ namespace Parts
 
             _isp = _config.isp;
             _thrust = _config.thrust * 1000.0; // kN -> N
-            _thrustDir = Vector2d.up.Rotate(part.craftRot * 180.0 / Math.PI);
+            _thrustDir = _config.thrustDir.Rotate(part.craftRot * 180.0 / Math.PI);
 
             _propRatio = new Dictionary<string, double>(_config.propellantRatio);
             _propRatioMass = 0.0;
             foreach (var kvp in _propRatio)
                 _propRatioMass += kvp.Value * ResourceManager.GetDensity(kvp.Key);
 
-            _particleGameObject.transform.localPosition = _config.plume.nozzlePos;
-            _particleGameObject.transform.localRotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
+            _particleObject.transform.localPosition = _config.plume.nozzlePos;
+            _particleObject.transform.localRotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
 
             var main = _particleSystem.main;
             main.simulationSpace = ParticleSystemSimulationSpace.World;
@@ -132,14 +186,40 @@ namespace Parts
             var sizeOverLifetime = _particleSystem.sizeOverLifetime;
             sizeOverLifetime.enabled = true;
             sizeOverLifetime.size = new ParticleSystem.MinMaxCurve(1.0f, _config.plume.life.size);
+
+            _maxLightIntensity = _config.light.intensity;
+            _flickerFrequency = _config.light.flickerFrequency;
+            _flickerMin = _config.light.flickerMin;
+            _flickerMax = _config.light.flickerMax;
         }
 
         public override async Task OnLoadAsync(DataNode config)
         {
-            var plumeMat = Addressables.LoadAssetAsync<Material>("Assets/GameData/PartPlugins/EnginePlugin/PlumeMaterial.mat");
-            await plumeMat.Task;
-            var renderer = _particleGameObject.GetComponent<ParticleSystemRenderer>();
-            renderer.material = plumeMat.Result;
+            await base.OnLoadAsync(config);
+
+            await Task.WhenAll(LoadPlumeMatAsync(), LoadLightAsync());
+
+            async Task LoadPlumeMatAsync()
+            {
+                var plumeMat = Addressables.LoadAssetAsync<Material>("Assets/GameData/PartPlugins/EnginePlugin/PlumeMaterial.mat");
+                await plumeMat.Task;
+                var renderer = _particleObject.GetComponent<ParticleSystemRenderer>();
+                renderer.material = plumeMat.Result;
+            }
+
+            async Task LoadLightAsync()
+            {
+                var lightPrefab = Addressables.LoadAssetAsync<GameObject>("Assets/GameData/PartPlugins/EnginePlugin/Engine Light Source.prefab");
+                await lightPrefab.Task;
+                _lightObject = Instantiate(lightPrefab.Result, transform);
+                _lightObject.transform.localPosition = _config.plume.nozzlePos;
+                _light2D = _lightObject.GetComponent<Light2D>();
+                _light2D.color = _config.light.color;
+                _light2D.intensity = 0.0f;
+                _light2D.pointLightInnerRadius = 0.0f;
+                _light2D.pointLightOuterRadius = _config.light.radius;
+                _light2D.falloffIntensity = _config.light.falloff;
+            }
         }
 
         protected override void OnFixedUpdate()
@@ -168,7 +248,8 @@ namespace Parts
 
                     // apply thrust
                     craft.Newtonian.ApplyForce(thrust * _thrustDir, part.craftPos);
-                } else
+                }
+                else
                 {
                     // shut down engine
                     IsEnabled = false;
@@ -186,15 +267,24 @@ namespace Parts
                     craft.Control.Throttle * _config.plume.rate.constantMax
                 );
             }
+
+            if (_light2D != null)
+            {
+                var baseIntensity = craft.Control.Throttle * _maxLightIntensity;
+                var flicker = Mathf.Lerp(_flickerMin, _flickerMax, Mathf.PerlinNoise1D(_flickerFrequency * (float)Universe.Instance.UT));
+                _light2D.intensity = baseIntensity * flicker;
+            }
         }
 
         protected override void OnPluginEnable()
         {
             _psEmission.enabled = true;
+            _light2D.enabled = true;
         }
         protected override void OnPluginDisable()
         {
             _psEmission.enabled = false;
+            _light2D.enabled = false;
         }
     }
 }

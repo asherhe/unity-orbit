@@ -143,6 +143,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   icon: {fileID: 5905547726822950036}
   labelText: {fileID: 7430548474943000832}
+  contextMenu: {fileID: 0}
+  trajectory: {fileID: 0}
   _periapsisIcon: {fileID: -1783579856, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
   _apoapsisIcon: {fileID: 1224050610, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
 --- !u!1 &6274093736713104357
