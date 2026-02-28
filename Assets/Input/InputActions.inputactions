@@ -176,7 +176,7 @@
                 {
                     "name": "",
                     "id": "40a451ee-7d24-464d-b7d7-9ff884331ba4",
-                    "path": "<Keyboard>/t",
+                    "path": "<Keyboard>/e",
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard + Mouse",
@@ -337,6 +337,54 @@
                     "processors": "",
                     "groups": ";Keyboard + Mouse",
                     "action": "Mouse Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Ctx_ObjectLabel",
+            "id": "e01003a7-98ec-4d52-b3c9-924f86f53efb",
+            "actions": [
+                {
+                    "name": "Target",
+                    "type": "Button",
+                    "id": "e4ad1af9-a158-4ce9-a19a-b55f146680a3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Focus",
+                    "type": "Button",
+                    "id": "57fefd37-0845-4579-9f9f-b4e0ad4b4995",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "29f4babc-1f2d-4afe-b925-1609bd31a1f7",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard + Mouse",
+                    "action": "Target",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab589225-3831-4ad7-8e56-992cc1da2682",
+                    "path": "<Keyboard>/f",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Focus",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
