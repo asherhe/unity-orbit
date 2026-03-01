@@ -81,8 +81,6 @@ namespace UI
 
         protected void UpdateActivity()
         {
-            if (name == "OrbitState Periapsis" && LabelOrbit.body.bodyName == "Mozza")
-                Debug.Log($"should {ShouldShowLabel} && _isActive {_isActive}");
             gameObject.SetActive(IsActive);
         }
 
@@ -120,8 +118,6 @@ namespace UI
 
             var dir = Math.Sign(LabelOrbit.h);
             nu = LabelOrbit.CalcNu(BodyPos);
-            if (LabelOrbit.body.bodyName == "Mozza")
-                Debug.Log($"{trajectory.nuMin} -> {nu} -> {trajectory.nuMax}");
             ShouldShowLabel = trajectory.IsLooped || (dir * trajectory.nuMin <= dir * nu && dir * nu <= dir * trajectory.nuMax);
         }
 
