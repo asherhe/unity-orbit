@@ -110,74 +110,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: dv
-      rect:
-        serializedVersion: 2
-        x: 0
-        y: 242
-        width: 16
-        height: 12
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 961c21b7b66aa7440a5a72ff26d6e152
-      internalID: 1368228396
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: mps
-      rect:
-        serializedVersion: 2
-        x: 16
-        y: 242
-        width: 16
-        height: 12
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ae6b3f77a8dba7b409df1bfad7020eb4
-      internalID: -1802136435
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: mps2
-      rect:
-        serializedVersion: 2
-        x: 32
-        y: 242
-        width: 16
-        height: 12
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eee0ea88abf46444d88d1010bb66c007
-      internalID: -2046230124
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: craft_ship
       rect:
         serializedVersion: 2
         x: 0
-        y: 208
+        y: 224
         width: 16
         height: 16
       alignment: 0
@@ -198,7 +135,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 208
+        y: 224
         width: 16
         height: 16
       alignment: 0
@@ -219,7 +156,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 208
+        y: 224
         width: 16
         height: 16
       alignment: 0
@@ -240,7 +177,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 208
+        y: 224
         width: 16
         height: 16
       alignment: 0
@@ -261,7 +198,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 208
+        y: 224
         width: 16
         height: 16
       alignment: 0
@@ -282,7 +219,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 224
+        y: 240
         width: 16
         height: 16
       alignment: 0
@@ -303,7 +240,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 224
+        y: 240
         width: 16
         height: 16
       alignment: 0
@@ -324,7 +261,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 80
-        y: 208
+        y: 224
         width: 32
         height: 32
       alignment: 0
@@ -345,7 +282,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 192
+        y: 208
         width: 16
         height: 16
       alignment: 7
@@ -366,7 +303,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 192
+        y: 208
         width: 16
         height: 16
       alignment: 7
@@ -387,7 +324,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 48
-        y: 192
+        y: 208
         width: 16
         height: 16
       alignment: 0
@@ -408,7 +345,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 64
-        y: 192
+        y: 208
         width: 16
         height: 16
       alignment: 0
@@ -429,6 +366,27 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
+        y: 208
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fa781e5daa730445ab69ab588981494
+      internalID: -1548797983
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: btn_16px
+      rect:
+        serializedVersion: 2
+        x: 0
         y: 192
         width: 16
         height: 16
@@ -439,8 +397,92 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9fa781e5daa730445ab69ab588981494
-      internalID: -1548797983
+      spriteID: a4fb65750c521c54286d40f0ffa5b9cc
+      internalID: -1874926009
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: btn_+
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 192
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 388ca9e0f377a3b46ad94f46ebaef050
+      internalID: -1750367304
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: btn_-
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 192
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fa7ba84399cab44da2c289b53875f80
+      internalID: 1528964062
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: btn_orbit+
+      rect:
+        serializedVersion: 2
+        x: 48
+        y: 192
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15830d4fe07e83043a704f63c4cf3c0d
+      internalID: -1809737720
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: btn_orbit-
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 192
+        width: 16
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 22468b22df4f41848bd21bdb232e3084
+      internalID: -957184523
       vertices: []
       indices: 
       edges: []
@@ -456,6 +498,11 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      btn_+: -1750367304
+      btn_-: 1528964062
+      btn_16px: -1874926009
+      btn_orbit+: -1809737720
+      btn_orbit-: -957184523
       celestial_body: 1659343972
       craft_lander: -200999148
       craft_probe: 61874634

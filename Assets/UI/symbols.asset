@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 84a92b25f83d49b9bc132d206b370281, type: 3}
-  m_Name: icons
+  m_Name: symbols
   m_EditorClassIdentifier: 
   hashCode: 128033944
   material: {fileID: 2404458994748067878}
@@ -38,7 +38,7 @@ MonoBehaviour:
     m_StrikethroughOffset: 0
     m_StrikethroughThickness: 0
     m_TabWidth: 0
-  spriteSheet: {fileID: 2800000, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+  spriteSheet: {fileID: 2800000, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
   m_SpriteCharacterTable:
   - m_ElementType: 2
     m_Unicode: 65534
@@ -58,6 +58,12 @@ MonoBehaviour:
     m_Scale: 1
     m_Name: mps2
     m_HashCode: 4041756
+  - m_ElementType: 2
+    m_Unicode: 65534
+    m_GlyphIndex: 3
+    m_Scale: 1
+    m_Name: pm
+    m_HashCode: 3613
   m_SpriteGlyphTable:
   - m_Index: 0
     m_Metrics:
@@ -68,13 +74,13 @@ MonoBehaviour:
       m_HorizontalAdvance: 16
     m_GlyphRect:
       m_X: 16
-      m_Y: 242
+      m_Y: 50
       m_Width: 16
       m_Height: 12
     m_Scale: 1
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
-    sprite: {fileID: -1802136435, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+    sprite: {fileID: 18382063, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
   - m_Index: 1
     m_Metrics:
       m_Width: 16
@@ -84,13 +90,13 @@ MonoBehaviour:
       m_HorizontalAdvance: 16
     m_GlyphRect:
       m_X: 0
-      m_Y: 242
+      m_Y: 50
       m_Width: 16
       m_Height: 12
     m_Scale: 1
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
-    sprite: {fileID: 1368228396, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+    sprite: {fileID: 1401605815, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
   - m_Index: 2
     m_Metrics:
       m_Width: 16
@@ -100,13 +106,29 @@ MonoBehaviour:
       m_HorizontalAdvance: 16
     m_GlyphRect:
       m_X: 32
-      m_Y: 242
+      m_Y: 50
       m_Width: 16
       m_Height: 12
     m_Scale: 1
     m_AtlasIndex: 0
     m_ClassDefinitionType: 0
-    sprite: {fileID: -2046230124, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+    sprite: {fileID: 1010678424, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
+  - m_Index: 3
+    m_Metrics:
+      m_Width: 8
+      m_Height: 12
+      m_HorizontalBearingX: 0
+      m_HorizontalBearingY: 10
+      m_HorizontalAdvance: 8
+    m_GlyphRect:
+      m_X: 0
+      m_Y: 114
+      m_Width: 8
+      m_Height: 12
+    m_Scale: 1
+    m_AtlasIndex: 0
+    m_ClassDefinitionType: 0
+    sprite: {fileID: 1010678424, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
   spriteInfoList: []
   fallbackSpriteAssets: []
 --- !u!21 &2404458994748067878
@@ -133,7 +155,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 850fcd4fd616ac842a6dfb3ba01839ce, type: 3}
+        m_Texture: {fileID: 2800000, guid: 77e3a52794c54584f97672fcd585bfd7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
