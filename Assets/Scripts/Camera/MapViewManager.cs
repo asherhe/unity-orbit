@@ -41,10 +41,7 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
 
     protected override void Awake()
     {
-        base.Awake();
-
         activeMapCamera = minimapCamera;
-
 
         InputReader.WhenInstantiated(() =>
         {
@@ -52,6 +49,8 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
             _inputActions.Camera.Enable();
             _inputActions.Camera.ToggleMap.performed += (context) => ToggleMapView();
         });
+
+        base.Awake();
     }
 
     public void ToggleMapView()
@@ -67,6 +66,7 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
 
         activeMapCamera = Camera.main;
         Camera.main.cullingMask = mapCullingMask;
+        _inputActions.MapView.Enable();
 
         OnMapToggled.Invoke();
     }
@@ -78,6 +78,7 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
 
         activeMapCamera = minimapCamera;
         Camera.main.cullingMask = flightCullingMask;
+        _inputActions.MapView.Disable();
 
         OnMapToggled.Invoke();
     }
