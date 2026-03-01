@@ -54,8 +54,8 @@ namespace UI
                 var point = node.Value;
                 var pos = point.pos;
 
-                maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
-                maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
+                if (double.IsFinite(pos.x)) maxCoords.x = Mathf.Max(maxCoords.x, Mathf.Abs(pos.x));
+                if (double.IsFinite(pos.y)) maxCoords.y = Mathf.Max(maxCoords.y, Mathf.Abs(pos.y));
 
                 var prevNode = node == points.First ? points.Last : node.Previous;
                 var nextNode = node == points.Last ? points.First : node.Next;
