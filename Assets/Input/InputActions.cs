@@ -110,7 +110,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""ThrottleCut"",
+                    ""name"": ""Throttle Cut"",
                     ""type"": ""Button"",
                     ""id"": ""73107268-d24c-4d71-b41d-e43719b05884"",
                     ""expectedControlType"": """",
@@ -119,7 +119,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ThrottleFull"",
+                    ""name"": ""Throttle Full"",
                     ""type"": ""Button"",
                     ""id"": ""d99893bb-0542-413e-bca3-36a480414858"",
                     ""expectedControlType"": """",
@@ -128,7 +128,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""AutoSteer"",
+                    ""name"": ""Auto Steer"",
                     ""type"": ""Button"",
                     ""id"": ""ebd5ddf5-57e4-4fc7-bc23-e4548d750449"",
                     ""expectedControlType"": """",
@@ -172,7 +172,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Arrow Keys"",
+                    ""name"": ""Left/Right Arrow"",
                     ""id"": ""e6bd098e-3e82-4628-a6da-65e93a00bd1e"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -205,7 +205,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Throttle Up/Down"",
+                    ""name"": ""W/S"",
                     ""id"": ""e5fe924f-73f9-4647-8201-1c3ee0942b1a"",
                     ""path"": ""1DAxis"",
                     ""interactions"": """",
@@ -238,13 +238,46 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
+                    ""name"": ""Up/Down Arrow"",
+                    ""id"": ""995c00ac-8001-4317-87fb-9d13138b8651"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Throttle"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""positive"",
+                    ""id"": ""59ec7bc8-245c-48a6-be0c-49f7e9ff12a2"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard + Mouse"",
+                    ""action"": ""Throttle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""negative"",
+                    ""id"": ""e4d2fbde-fa85-47df-9d85-abe5c4d943c1"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard + Mouse"",
+                    ""action"": ""Throttle"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
                     ""name"": """",
                     ""id"": ""4a7b834a-819b-4bed-bd47-a28a0e4a4737"",
                     ""path"": ""<Keyboard>/x"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""ThrottleCut"",
+                    ""action"": ""Throttle Cut"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -255,7 +288,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""ThrottleFull"",
+                    ""action"": ""Throttle Full"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -266,7 +299,35 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Keyboard + Mouse"",
-                    ""action"": ""AutoSteer"",
+                    ""action"": ""Auto Steer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Map View"",
+            ""id"": ""5009d8a3-9cd3-4f39-a848-b1ede7f0387b"",
+            ""actions"": [
+                {
+                    ""name"": ""Maneuver"",
+                    ""type"": ""Button"",
+                    ""id"": ""7122a58d-686b-49a0-9356-7a5d8fe6b608"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""5bf047f4-6ea4-4e8a-9a12-0865dc341864"",
+                    ""path"": ""<Keyboard>/n"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Maneuver"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -277,7 +338,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             ""id"": ""4683bbdc-2d1f-4768-a92d-cf76851c3f07"",
             ""actions"": [
                 {
-                    ""name"": ""WarpIncrease"",
+                    ""name"": ""Warp Increase"",
                     ""type"": ""Button"",
                     ""id"": ""ac70b837-97c3-4a77-926f-ab1127e708ab"",
                     ""expectedControlType"": """",
@@ -286,19 +347,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""WarpDecrease"",
+                    ""name"": ""Warp Decrease"",
                     ""type"": ""Button"",
                     ""id"": ""13603a46-c9f2-4472-97ed-079fdaf23020"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""WarpCancel"",
+                    ""name"": ""Warp Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""d94eace0-84f5-41f4-9bd6-da7bc298b952"",
-                    ""expectedControlType"": ""Button"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -312,7 +373,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""WarpIncrease"",
+                    ""action"": ""Warp Increase"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -323,7 +384,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""WarpDecrease"",
+                    ""action"": ""Warp Decrease"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -334,7 +395,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""WarpCancel"",
+                    ""action"": ""Warp Cancel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -354,7 +415,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
-                    ""name"": ""ToggleMap"",
+                    ""name"": ""Toggle Map"",
                     ""type"": ""Button"",
                     ""id"": ""6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73"",
                     ""expectedControlType"": """",
@@ -400,7 +461,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""Keyboard + Mouse"",
-                    ""action"": ""ToggleMap"",
+                    ""action"": ""Toggle Map"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -500,18 +561,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_Flight = asset.FindActionMap("Flight", throwIfNotFound: true);
         m_Flight_Steering = m_Flight.FindAction("Steering", throwIfNotFound: true);
         m_Flight_Throttle = m_Flight.FindAction("Throttle", throwIfNotFound: true);
-        m_Flight_ThrottleCut = m_Flight.FindAction("ThrottleCut", throwIfNotFound: true);
-        m_Flight_ThrottleFull = m_Flight.FindAction("ThrottleFull", throwIfNotFound: true);
-        m_Flight_AutoSteer = m_Flight.FindAction("AutoSteer", throwIfNotFound: true);
+        m_Flight_ThrottleCut = m_Flight.FindAction("Throttle Cut", throwIfNotFound: true);
+        m_Flight_ThrottleFull = m_Flight.FindAction("Throttle Full", throwIfNotFound: true);
+        m_Flight_AutoSteer = m_Flight.FindAction("Auto Steer", throwIfNotFound: true);
+        // Map View
+        m_MapView = asset.FindActionMap("Map View", throwIfNotFound: true);
+        m_MapView_Maneuver = m_MapView.FindAction("Maneuver", throwIfNotFound: true);
         // Warp
         m_Warp = asset.FindActionMap("Warp", throwIfNotFound: true);
-        m_Warp_WarpIncrease = m_Warp.FindAction("WarpIncrease", throwIfNotFound: true);
-        m_Warp_WarpDecrease = m_Warp.FindAction("WarpDecrease", throwIfNotFound: true);
-        m_Warp_WarpCancel = m_Warp.FindAction("WarpCancel", throwIfNotFound: true);
+        m_Warp_WarpIncrease = m_Warp.FindAction("Warp Increase", throwIfNotFound: true);
+        m_Warp_WarpDecrease = m_Warp.FindAction("Warp Decrease", throwIfNotFound: true);
+        m_Warp_WarpCancel = m_Warp.FindAction("Warp Cancel", throwIfNotFound: true);
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_Zoom = m_Camera.FindAction("Zoom", throwIfNotFound: true);
-        m_Camera_ToggleMap = m_Camera.FindAction("ToggleMap", throwIfNotFound: true);
+        m_Camera_ToggleMap = m_Camera.FindAction("Toggle Map", throwIfNotFound: true);
         m_Camera_Pan = m_Camera.FindAction("Pan", throwIfNotFound: true);
         m_Camera_MousePosition = m_Camera.FindAction("Mouse Position", throwIfNotFound: true);
         // Ctx_ObjectLabel
@@ -523,6 +587,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     ~@InputActions()
     {
         UnityEngine.Debug.Assert(!m_Flight.enabled, "This will cause a leak and performance issues, InputActions.Flight.Disable() has not been called.");
+        UnityEngine.Debug.Assert(!m_MapView.enabled, "This will cause a leak and performance issues, InputActions.MapView.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Warp.enabled, "This will cause a leak and performance issues, InputActions.Warp.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, InputActions.Camera.Disable() has not been called.");
         UnityEngine.Debug.Assert(!m_Ctx_ObjectLabel.enabled, "This will cause a leak and performance issues, InputActions.Ctx_ObjectLabel.Disable() has not been called.");
@@ -737,6 +802,102 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     /// Provides a new <see cref="FlightActions" /> instance referencing this action map.
     /// </summary>
     public FlightActions @Flight => new FlightActions(this);
+
+    // Map View
+    private readonly InputActionMap m_MapView;
+    private List<IMapViewActions> m_MapViewActionsCallbackInterfaces = new List<IMapViewActions>();
+    private readonly InputAction m_MapView_Maneuver;
+    /// <summary>
+    /// Provides access to input actions defined in input action map "Map View".
+    /// </summary>
+    public struct MapViewActions
+    {
+        private @InputActions m_Wrapper;
+
+        /// <summary>
+        /// Construct a new instance of the input action map wrapper class.
+        /// </summary>
+        public MapViewActions(@InputActions wrapper) { m_Wrapper = wrapper; }
+        /// <summary>
+        /// Provides access to the underlying input action "MapView/Maneuver".
+        /// </summary>
+        public InputAction @Maneuver => m_Wrapper.m_MapView_Maneuver;
+        /// <summary>
+        /// Provides access to the underlying input action map instance.
+        /// </summary>
+        public InputActionMap Get() { return m_Wrapper.m_MapView; }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+        public void Enable() { Get().Enable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+        public void Disable() { Get().Disable(); }
+        /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+        public bool enabled => Get().enabled;
+        /// <summary>
+        /// Implicitly converts an <see ref="MapViewActions" /> to an <see ref="InputActionMap" /> instance.
+        /// </summary>
+        public static implicit operator InputActionMap(MapViewActions set) { return set.Get(); }
+        /// <summary>
+        /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <param name="instance">Callback instance.</param>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+        /// </remarks>
+        /// <seealso cref="MapViewActions" />
+        public void AddCallbacks(IMapViewActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MapViewActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MapViewActionsCallbackInterfaces.Add(instance);
+            @Maneuver.started += instance.OnManeuver;
+            @Maneuver.performed += instance.OnManeuver;
+            @Maneuver.canceled += instance.OnManeuver;
+        }
+
+        /// <summary>
+        /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+        /// </summary>
+        /// <remarks>
+        /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+        /// </remarks>
+        /// <seealso cref="MapViewActions" />
+        private void UnregisterCallbacks(IMapViewActions instance)
+        {
+            @Maneuver.started -= instance.OnManeuver;
+            @Maneuver.performed -= instance.OnManeuver;
+            @Maneuver.canceled -= instance.OnManeuver;
+        }
+
+        /// <summary>
+        /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="MapViewActions.UnregisterCallbacks(IMapViewActions)" />.
+        /// </summary>
+        /// <seealso cref="MapViewActions.UnregisterCallbacks(IMapViewActions)" />
+        public void RemoveCallbacks(IMapViewActions instance)
+        {
+            if (m_Wrapper.m_MapViewActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        /// <summary>
+        /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+        /// </summary>
+        /// <remarks>
+        /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+        /// </remarks>
+        /// <seealso cref="MapViewActions.AddCallbacks(IMapViewActions)" />
+        /// <seealso cref="MapViewActions.RemoveCallbacks(IMapViewActions)" />
+        /// <seealso cref="MapViewActions.UnregisterCallbacks(IMapViewActions)" />
+        public void SetCallbacks(IMapViewActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MapViewActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MapViewActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    /// <summary>
+    /// Provides a new <see cref="MapViewActions" /> instance referencing this action map.
+    /// </summary>
+    public MapViewActions @MapView => new MapViewActions(this);
 
     // Warp
     private readonly InputActionMap m_Warp;
@@ -1126,26 +1287,41 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottle(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ThrottleCut" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Throttle Cut" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottleCut(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ThrottleFull" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Throttle Full" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnThrottleFull(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "AutoSteer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Auto Steer" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnAutoSteer(InputAction.CallbackContext context);
+    }
+    /// <summary>
+    /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Map View" which allows adding and removing callbacks.
+    /// </summary>
+    /// <seealso cref="MapViewActions.AddCallbacks(IMapViewActions)" />
+    /// <seealso cref="MapViewActions.RemoveCallbacks(IMapViewActions)" />
+    public interface IMapViewActions
+    {
+        /// <summary>
+        /// Method invoked when associated input action "Maneuver" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnManeuver(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Warp" which allows adding and removing callbacks.
@@ -1155,21 +1331,21 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     public interface IWarpActions
     {
         /// <summary>
-        /// Method invoked when associated input action "WarpIncrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Warp Increase" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWarpIncrease(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "WarpDecrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Warp Decrease" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnWarpDecrease(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "WarpCancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Warp Cancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
@@ -1191,7 +1367,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnZoom(InputAction.CallbackContext context);
         /// <summary>
-        /// Method invoked when associated input action "ToggleMap" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// Method invoked when associated input action "Toggle Map" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>
         /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />

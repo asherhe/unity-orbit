@@ -24,7 +24,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "ThrottleCut",
+                    "name": "Throttle Cut",
                     "type": "Button",
                     "id": "73107268-d24c-4d71-b41d-e43719b05884",
                     "expectedControlType": "",
@@ -33,7 +33,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ThrottleFull",
+                    "name": "Throttle Full",
                     "type": "Button",
                     "id": "d99893bb-0542-413e-bca3-36a480414858",
                     "expectedControlType": "",
@@ -42,7 +42,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "AutoSteer",
+                    "name": "Auto Steer",
                     "type": "Button",
                     "id": "ebd5ddf5-57e4-4fc7-bc23-e4548d750449",
                     "expectedControlType": "",
@@ -86,7 +86,7 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Arrow Keys",
+                    "name": "Left/Right Arrow",
                     "id": "e6bd098e-3e82-4628-a6da-65e93a00bd1e",
                     "path": "1DAxis",
                     "interactions": "",
@@ -119,7 +119,7 @@
                     "isPartOfComposite": true
                 },
                 {
-                    "name": "Throttle Up/Down",
+                    "name": "W/S",
                     "id": "e5fe924f-73f9-4647-8201-1c3ee0942b1a",
                     "path": "1DAxis",
                     "interactions": "",
@@ -152,13 +152,46 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "Up/Down Arrow",
+                    "id": "995c00ac-8001-4317-87fb-9d13138b8651",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Throttle",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "positive",
+                    "id": "59ec7bc8-245c-48a6-be0c-49f7e9ff12a2",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard + Mouse",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "negative",
+                    "id": "e4d2fbde-fa85-47df-9d85-abe5c4d943c1",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard + Mouse",
+                    "action": "Throttle",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "4a7b834a-819b-4bed-bd47-a28a0e4a4737",
                     "path": "<Keyboard>/x",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "ThrottleCut",
+                    "action": "Throttle Cut",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -169,7 +202,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "ThrottleFull",
+                    "action": "Throttle Full",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -180,7 +213,35 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard + Mouse",
-                    "action": "AutoSteer",
+                    "action": "Auto Steer",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Map View",
+            "id": "5009d8a3-9cd3-4f39-a848-b1ede7f0387b",
+            "actions": [
+                {
+                    "name": "Maneuver",
+                    "type": "Button",
+                    "id": "7122a58d-686b-49a0-9356-7a5d8fe6b608",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "5bf047f4-6ea4-4e8a-9a12-0865dc341864",
+                    "path": "<Keyboard>/n",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Maneuver",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -191,7 +252,7 @@
             "id": "4683bbdc-2d1f-4768-a92d-cf76851c3f07",
             "actions": [
                 {
-                    "name": "WarpIncrease",
+                    "name": "Warp Increase",
                     "type": "Button",
                     "id": "ac70b837-97c3-4a77-926f-ab1127e708ab",
                     "expectedControlType": "",
@@ -200,19 +261,19 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "WarpDecrease",
+                    "name": "Warp Decrease",
                     "type": "Button",
                     "id": "13603a46-c9f2-4472-97ed-079fdaf23020",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 },
                 {
-                    "name": "WarpCancel",
+                    "name": "Warp Cancel",
                     "type": "Button",
                     "id": "d94eace0-84f5-41f4-9bd6-da7bc298b952",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
@@ -226,7 +287,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "WarpIncrease",
+                    "action": "Warp Increase",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -237,7 +298,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "WarpDecrease",
+                    "action": "Warp Decrease",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -248,7 +309,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "WarpCancel",
+                    "action": "Warp Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -268,7 +329,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "ToggleMap",
+                    "name": "Toggle Map",
                     "type": "Button",
                     "id": "6193ea7c-b2e1-4e97-a6ed-cb1ae748ef73",
                     "expectedControlType": "",
@@ -314,7 +375,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard + Mouse",
-                    "action": "ToggleMap",
+                    "action": "Toggle Map",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
