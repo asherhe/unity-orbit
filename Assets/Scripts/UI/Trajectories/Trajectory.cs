@@ -110,6 +110,7 @@ namespace UI
         private double nuMin0, nuMax0;
 
         // actual clipping bounds of the trajectory after applying nu1 and nu2
+        // still in chronological order
         public double nuMin { get; private set; }
         public double nuMax { get; private set; }
 
@@ -294,10 +295,9 @@ namespace UI
             // if we are drawing a looped mesh: shift the seam to periapsis so that vertex UV interpolation is sharp
             if (IsLooped) { nuMin = 0; nuMax = 2 * Math.PI; }
 
-            // swap to correct order
-            if (nuMin > nuMax) (nuMin, nuMax) = (nuMax, nuMin);
-
-            return (nuMin, nuMax);
+            // return in numerical order
+            if (nuMin < nuMax) return (nuMin, nuMax);
+            else return (nuMax, nuMin);
         }
 
         /// <summary>

@@ -132,7 +132,6 @@ public class Spacecraft : OrbitingObject
         prop = new UniversalPropagator(orbit);
 
         patches = new PatchedConicManager(orbit);
-        patches.RecalculatePatches();
 
         UI.MapLabelManager.WhenInstantiated(() =>
         {

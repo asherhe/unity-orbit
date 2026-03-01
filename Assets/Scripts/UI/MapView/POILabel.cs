@@ -49,13 +49,41 @@ namespace UI
         /// </summary>
         public bool IsTextActive { get => ShowLabel; set => ShowLabel = value; }
 
+        private bool _shouldShowLabel;
         /// <summary>
-        /// whether this POI label should be shown. basically a wrapper for this gameobject's active/inactive state
+        /// whether or not this label should be shown. this is the internal state for whether or not something can be shown at all
+        /// even if this is true, it is still possible for this label to not be shownd
+        /// </summary>
+        protected bool ShouldShowLabel
+        {
+            get => _shouldShowLabel;
+            set
+            {
+                _shouldShowLabel = value;
+                UpdateActivity();
+            }
+        }
+
+        private bool _isActive = true;
+        /// <summary>
+        /// whether this POI label will be shown. will have no effect if this POILabel internally decides not to show itself
+        /// getter yields whether or not this label is ACTUALLY active, setter TRIES to enable/disable this label
         /// </summary>
         public bool IsActive
         {
-            get => isActiveAndEnabled;
-            set => gameObject.SetActive(value);
+            get => _isActive && ShouldShowLabel;
+            set
+            {
+                _isActive = value;
+                UpdateActivity();
+            }
+        }
+
+        protected void UpdateActivity()
+        {
+            if (name == "OrbitState Periapsis" && LabelOrbit.body.bodyName == "Mozza")
+                Debug.Log($"should {ShouldShowLabel} && _isActive {_isActive}");
+            gameObject.SetActive(IsActive);
         }
 
         /// <summary>
@@ -72,12 +100,12 @@ namespace UI
         protected void RefreshLabel()
         {
             BodyPos = GetPosition();
-            IsActive = BodyPos != null;
-            if (IsActive)
+            ShouldShowLabel = BodyPos != null;
+            if (ShouldShowLabel)
             {
-                nu = LabelOrbit.CalcNu(BodyPos);
                 labelText.text = GetLabelText();
             }
+            IsActive = true;
 
             CheckTrajVisibility();
         }
@@ -88,10 +116,13 @@ namespace UI
         private void CheckTrajVisibility()
         {
             if (trajectory == null) return;
-            if (!IsActive) return;
+            if (!ShouldShowLabel) return;
 
             var dir = Math.Sign(LabelOrbit.h);
-            IsActive = trajectory.IsLooped || (dir * trajectory.nuMin <= dir * nu && dir * nu <= dir * trajectory.nuMax);
+            nu = LabelOrbit.CalcNu(BodyPos);
+            if (LabelOrbit.body.bodyName == "Mozza")
+                Debug.Log($"{trajectory.nuMin} -> {nu} -> {trajectory.nuMax}");
+            ShouldShowLabel = trajectory.IsLooped || (dir * trajectory.nuMin <= dir * nu && dir * nu <= dir * trajectory.nuMax);
         }
 
         private void Update()

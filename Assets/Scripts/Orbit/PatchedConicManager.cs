@@ -72,6 +72,8 @@ namespace Orbit
             _patches = new List<Patch>(maxPatches) { new Patch(SrcOrbit, this) };
             for (int i = 1; i < maxPatches; i++)
                 _patches.Add(new Patch(_patches[i - 1], this));
+
+            RecalculatePatches();
         }
 
         /// <summary>

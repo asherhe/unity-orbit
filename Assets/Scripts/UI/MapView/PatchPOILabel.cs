@@ -25,6 +25,7 @@ namespace UI
                 _patch = value;
                 _patch.OnTransitionUpdate += RefreshLabel;
                 _patch.manager.OnTransition += OnPatchTransition;
+                RefreshLabel();
             }
         }
 
@@ -34,7 +35,7 @@ namespace UI
         {
             IsTextActive = false;
             RefreshLabel();
-            if (IsActive) IsActive = Patch.IsActive;
+            IsActive = Patch.IsActive;
         }
     }
 }

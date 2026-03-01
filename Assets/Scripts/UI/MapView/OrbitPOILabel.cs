@@ -20,6 +20,7 @@ namespace UI
                 if (_orbit != null) _orbit.OnStateChanged -= RefreshLabel;
                 _orbit = value;
                 _orbit.OnStateChanged += RefreshLabel;
+                RefreshLabel();
             }
         }
 
