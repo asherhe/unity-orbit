@@ -25,9 +25,9 @@ plugins:
   LightPlugin:
     lightPosition: { x: 0, y: -0.125 }
     color: "#FFECB1"
-    intensity: 0.23
-    innerRadius: 0.73
-    outerRadius: 3.81
+    intensity: 0.13
+    innerRadius: 0.25
+    outerRadius: 1.68
     falloff: 0.89
   CommandPlugin:
     autoSteerable: true
