@@ -545,7 +545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   texture: {fileID: 21300000, guid: af6996adb0460bf4b91f9e77c52adb69, type: 3}
   color: {r: 1, g: 1, b: 1, a: 1}
-  intensity: 0.12
+  intensity: 0.06
   axisDistance: 0.12
   radialDistortion: 2.99
   autoRotate: 1
@@ -647,7 +647,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   texture: {fileID: 21300000, guid: 89bd36e6313aeb54dbe3bfc32a06d043, type: 3}
   color: {r: 1, g: 1, b: 1, a: 1}
-  intensity: 0.13
+  intensity: 0.14
   axisDistance: 0.15
   radialDistortion: 10.05
   autoRotate: 0
