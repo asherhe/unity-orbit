@@ -209,7 +209,8 @@ namespace Parts
 
             async Task LoadLightAsync()
             {
-                var lightPrefab = Addressables.LoadAssetAsync<GameObject>("Assets/GameData/PartPlugins/EnginePlugin/Engine Light Source.prefab");
+                // TODO: use LightPlugin for this
+                var lightPrefab = Addressables.LoadAssetAsync<GameObject>("Assets/GameData/PartPlugins/LightPlugin/LightSource.prefab");
                 await lightPrefab.Task;
                 _lightObject = Instantiate(lightPrefab.Result, transform);
                 _lightObject.transform.localPosition = _config.plume.nozzlePos;

@@ -4,6 +4,7 @@ Shader "Part"
     {
         _MainTex ("Main Texture", 2D) = "white" {}
         [Normal] _NormalMap ("Normal Map", 2D) = "bump" {}
+        _EmissionTex ("Emission Texture", 2D) = "black" {}
 
         _SunDir ("Sun Direction", Vector) = (-1,0,0.2,0)
         _SunColor ("Sun Color", Color) = (1,1,1,1)
@@ -41,6 +42,8 @@ Shader "Part"
                 SAMPLER(sampler_MainTex);
                 TEXTURE2D(_NormalMap);
                 SAMPLER(sampler_NormalMap);
+                TEXTURE2D(_EmissionTex);
+                SAMPLER(sampler_EmissionTex);
                 float4 _MainTex_ST;
                 
                 float4 _SunDir;
@@ -108,7 +111,15 @@ Shader "Part"
                 InitializeInputData(IN.uv, IN.lightingUV, inputData);
                 color += CombinedShapeLightShared(surfaceData, inputData).rgb;
 
-                return float4(color, main.a);
+                float4 shaded = float4(color, main.a);
+
+                float4 emission = SAMPLE_TEXTURE2D(_EmissionTex, sampler_EmissionTex, IN.uv);
+                // overlay rgba of emission onto shaded
+                float aout = emission.a + shaded.a * (1 - emission.a);
+                shaded.rgb = (emission.rgb * emission.a + shaded.rgb * shaded.a * (1 - emission.a)) / aout;
+                shaded.a = aout;
+
+                return shaded;
             }
 
             ENDHLSL

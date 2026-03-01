@@ -19,6 +19,16 @@ plugins:
         _NormalMap:
           type: Texture2D
           value: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod-Normal.png
+        _EmissionTex:
+          type: Texture2D
+          value: Assets/GameData/Parts/TestingCommandPod/TestingCommandPod-Light.png
+  LightPlugin:
+    lightPosition: { x: 0, y: -0.125 }
+    color: "#FFECB1"
+    intensity: 0.23
+    innerRadius: 0.73
+    outerRadius: 3.81
+    falloff: 0.89
   CommandPlugin:
     autoSteerable: true
   ReactionWheelPlugin:

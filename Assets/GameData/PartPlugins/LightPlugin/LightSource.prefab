@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2783842848315922200}
   - component: {fileID: 4376543588619761810}
   m_Layer: 0
-  m_Name: Engine Light Source
+  m_Name: LightSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
