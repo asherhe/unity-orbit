@@ -1,7 +1,9 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace UI
 {
@@ -10,6 +12,12 @@ namespace UI
     {
         public RectTransform rectTransform { get; private set; }
         private InputActions _inputActions;
+
+        [SerializeField]
+        private ManeuverField _timeField, _progradeField, _radialField, _incrementField;
+
+        [SerializeField]
+        private TMP_Text _dvDisplay, _burnTimeDisplay, _burnCountdownDisplay;
 
         public bool IsPlannerActive { get; private set; } = false;
 
@@ -31,6 +39,8 @@ namespace UI
                 _inputActions = InputReader.Instance.Actions;
                 _inputActions.MapView.Maneuver.performed += ctx => TogglePlanner();
             });
+
+            
         }
 
         private void OnRectTransformDimensionsChange()

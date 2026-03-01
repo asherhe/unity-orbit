@@ -1701,6 +1701,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 459623356}
+  - component: {fileID: 459623358}
   - component: {fileID: 459623357}
   m_Layer: 5
   m_Name: Increment
@@ -1757,6 +1758,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &459623358
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459623355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3767e5cbe05828e4eb6e53a2613450d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayText: {fileID: 1035460416}
+  _buttonIncrease: {fileID: 1290057892}
+  _buttonDecrease: {fileID: 757313406}
+  value: 0
+  increment: 1
 --- !u!1 &461308265
 GameObject:
   m_ObjectHideFlags: 0
@@ -3403,6 +3421,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 679671566}
+  - component: {fileID: 679671568}
   - component: {fileID: 679671567}
   m_Layer: 5
   m_Name: Radial dv
@@ -3459,6 +3478,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &679671568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 679671565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3767e5cbe05828e4eb6e53a2613450d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayText: {fileID: 1996554591}
+  _buttonIncrease: {fileID: 255400548}
+  _buttonDecrease: {fileID: 523771015}
+  value: 0
+  increment: 1
 --- !u!1 &757313404
 GameObject:
   m_ObjectHideFlags: 0
@@ -3589,6 +3625,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 821344119}
+  - component: {fileID: 821344121}
   - component: {fileID: 821344120}
   m_Layer: 5
   m_Name: Prograde dv
@@ -3645,6 +3682,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &821344121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 821344118}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3767e5cbe05828e4eb6e53a2613450d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayText: {fileID: 183337673}
+  _buttonIncrease: {fileID: 418187069}
+  _buttonDecrease: {fileID: 1486641132}
+  value: 0
+  increment: 1
 --- !u!1 &974707547
 GameObject:
   m_ObjectHideFlags: 0
@@ -3754,6 +3808,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86f17d6f5ee093843a6400248d31120f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _timeField: {fileID: 1837679384}
+  _progradeField: {fileID: 821344121}
+  _radialField: {fileID: 679671568}
+  _incrementField: {fileID: 459623358}
+  _dvDisplay: {fileID: 1518523602}
+  _burnTimeDisplay: {fileID: 9635382}
+  _burnCountdownDisplay: {fileID: 1925692442}
 --- !u!1 &1035460414
 GameObject:
   m_ObjectHideFlags: 0
@@ -6378,6 +6439,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1837679382}
+  - component: {fileID: 1837679384}
   - component: {fileID: 1837679383}
   m_Layer: 5
   m_Name: Time
@@ -6436,6 +6498,23 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &1837679384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1837679381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3767e5cbe05828e4eb6e53a2613450d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _displayText: {fileID: 1565764634}
+  _buttonIncrease: {fileID: 30816169}
+  _buttonDecrease: {fileID: 0}
+  value: 0
+  increment: 1
 --- !u!1 &1893096480
 GameObject:
   m_ObjectHideFlags: 0
@@ -6687,7 +6766,7 @@ GameObject:
   - component: {fileID: 1925692443}
   - component: {fileID: 1925692442}
   m_Layer: 5
-  m_Name: Time remaining
+  m_Name: Burn countdown
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
