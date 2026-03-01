@@ -272,7 +272,7 @@ namespace Parts
             if (_light2D != null)
             {
                 var baseIntensity = craft.Control.Throttle * _maxLightIntensity;
-                var flicker = Mathf.Lerp(_flickerMin, _flickerMax, Mathf.PerlinNoise1D(_flickerFrequency * (float)Universe.Instance.UT));
+                var flicker = Mathf.Lerp(_flickerMin, _flickerMax, Mathf.PerlinNoise1D(_flickerFrequency * (float)MathUtils.Mod(Universe.Instance.UT, 1e4)));
                 _light2D.intensity = baseIntensity * flicker;
             }
         }
