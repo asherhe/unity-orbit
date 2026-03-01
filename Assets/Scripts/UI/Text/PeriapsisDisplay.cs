@@ -10,7 +10,7 @@ namespace UI
         {
             var craft = ActiveCraftController.Instance.craft;
             double periapsis = craft.orbit.periapsis - craft.body.radius;
-            return $"Pe:{AddMetricPrefix(periapsis)}m";
+            return $"Pe:{FormatDistance(periapsis)}";
         }
     }
 }

@@ -10,7 +10,7 @@ namespace UI
         protected override string GetText()
         {
             double speed = ActiveCraftController.Instance.craft.Velocity.Magnitude;
-            return String.Format("VEL:{0:F1}<sprite name=\"mps\">", speed);
+            return $"VEL:{FormatSpeed(speed)}";
         }
     }
 }

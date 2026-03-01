@@ -9,7 +9,7 @@ namespace UI
         protected override string GetText()
         {
             double altitude = ActiveCraftController.Instance.craft.Altitude;
-            return $"ALT:{AddMetricPrefix(altitude)}m";
+            return $"ALT:{FormatDistance(altitude)}";
         }
     }
 }

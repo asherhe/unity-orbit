@@ -10,7 +10,7 @@ namespace UI
         {
             var craft = ActiveCraftController.Instance.craft;
             double apoapsis = craft.orbit.apoapsis - craft.body.radius;
-            return $"Ap:{AddMetricPrefix(apoapsis)}m";
+            return $"Ap:{FormatDistance(apoapsis)}";
         }
     }
 }

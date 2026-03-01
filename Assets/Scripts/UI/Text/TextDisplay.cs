@@ -51,5 +51,31 @@ namespace UI
             }
             return String.Format("{0:F2}{1}", x, prefix);
         }
+
+        public static string FormatDistance(double d)
+        {
+            return AddMetricPrefix(d) + "m";
+        }
+
+        public static string FormatSpeed(double v)
+        {
+            return string.Format("{0:F1}<sprite name=\"mps\">", v);
+        }
+
+        public static string FormatTime(double t, bool showSign = false)
+        {
+            string sign = "";
+            if (t < 0) sign = "-";
+            else if (showSign) sign = "+";
+
+            double absT = Math.Abs(t);
+            int days = (int)(absT / 86400);
+            int hours = (int)((absT % 86400) / 3600);
+            int mins = (int)((absT % 3600) / 60);
+            int secs = (int)(absT % 60);
+
+            string daysFormat = days > 0 ? $"{days}d " : "";
+            return $"{sign}{daysFormat}{hours:D2}:{mins:D2}:{secs:D2}s";
+        }
     }
 }

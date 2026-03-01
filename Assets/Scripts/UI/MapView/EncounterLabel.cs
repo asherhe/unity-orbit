@@ -53,7 +53,7 @@ namespace UI
             SetColors(encColor, encColor);
             
             var name = $"Approach {enc.number + 1}";
-            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}: {TextDisplay.AddMetricPrefix(enc.encounter.Distance)}m";
+            if (mode == TargetingSystem.EncounterObject.Active) return $"{name}: {TextDisplay.FormatDistance(enc.encounter.Distance)}";
             else return $"{name}:Target";
         }
     }

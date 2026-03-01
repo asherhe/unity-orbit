@@ -39,10 +39,7 @@ namespace UI
         /// determine the text to show in the label. called on orbit state update.
         /// will not be called if GetPosition returns null
         /// </summary>
-        protected virtual string GetLabelText()
-        {
-            return TextDisplay.AddMetricPrefix(BodyPos.Magnitude - LabelOrbit.body.radius) + "m";
-        }
+        protected virtual string GetLabelText() => TextDisplay.FormatDistance(BodyPos.Magnitude - LabelOrbit.body.radius);
 
         /// <summary>
         /// expose protected ShowLabel property
