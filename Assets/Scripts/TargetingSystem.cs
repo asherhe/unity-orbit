@@ -154,22 +154,19 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
         {
             // this is an elliptical, noninturrupted orbit for the forseeable future
             var tStart = UT;
-            var tEnd = UT + 1.5 * currPatch.patchOrbit.period; // often times the next approach is just over one period past the previous one, the 1.5 accounts for this
+            var tEnd = UT + currPatch.patchOrbit.period; // often times the next approach is just over one period past the previous one, the 1.5 accounts for this
 
             // we can't be certain that there are no transitions between now and the ending time bound
-            if (currPatch.ExpiryDate < tEnd)
-            {
-                // advance transition preduction until it is safe
-                while (currPatch.ExpiryDate < tEnd)
-                    currPatch.CheckTransitions(currPatch.ExpiryDate);
+            // advance transition prediction until it is safe
+            while (currPatch.ExpiryDate < tEnd)
+                currPatch.CheckTransitions(currPatch.ExpiryDate);
 
-                if (currPatch.HasTransition)
-                {
-                    // recalculate transitions if we detect one to
-                    // this automatically triggers a recalculation of target encounters so we don't need to invoke OnEncounterUpdate
-                    patchManager.RecalculatePatches(currPatch.ExpiryDate);
-                    return;
-                }
+            if (currPatch.HasTransition)
+            {
+                // recalculate transitions if we detect one to
+                // this automatically triggers a recalculation of target encounters so we don't need to invoke OnEncounterUpdate
+                patchManager.RecalculatePatches(currPatch.NextTransition.Time);
+                return;
             }
 
             // encounter time bound is guarenteed to be transition-free
@@ -179,10 +176,11 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
             foreach (var enc in encs) _encounters.AddLast(new TargetEncounter(currPatch, i++, enc));
 
             approachExpiryTime = tEnd;
-            if (_encounters.Count > 0) approachExpiryTime = _encounters.First.Value.encounter.state.time;
 
             OnEncounterUpdate?.Invoke();
         }
+
+        if (_encounters.Count > 0) approachExpiryTime = _encounters.First.Value.encounter.state.time;
     }
 
     private void FixedUpdate()
