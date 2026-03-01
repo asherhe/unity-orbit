@@ -87,8 +87,11 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
     {
         _camera = Camera.main;
 
-        _inputActions = new InputActions();
-        _inputActions.Camera.Enable();
+        InputReader.WhenInstantiated(() =>
+        {
+            _inputActions = InputReader.Instance.Actions;
+            _inputActions.Camera.Enable();
+        });
 
         MapViewManager.WhenInstantiated(() =>
         {

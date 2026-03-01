@@ -52,7 +52,13 @@ namespace UI
         {
             base.Awake();
 
+            // we don't use InputReader here because each ObjectLabel we want Ctx_ObjectLabel actions
+            // to be triggered only for the currently hovered label, not globally.
             _inputActions = new InputActions();
+
+            _inputActions.Ctx_ObjectLabel.Target.performed += ctx => ToggleTarget();
+            _inputActions.Ctx_ObjectLabel.Focus.performed += ctx => CameraFocus.Instance.Focus = Owner;
+
             icon.OnHoverEnter += data => _inputActions.Ctx_ObjectLabel.Enable();
             icon.OnHoverLeave += data => _inputActions.Ctx_ObjectLabel.Disable();
 
@@ -61,9 +67,6 @@ namespace UI
             OnOwnerUpdated += () => _follow.follow = Owner.gameObject.transform;
             OnOwnerUpdated += UpdateVisuals;
             OnOwnerUpdated += UpdateTargeting;
-
-            _inputActions.Ctx_ObjectLabel.Target.performed += ctx => ToggleTarget();
-            _inputActions.Ctx_ObjectLabel.Focus.performed += ctx => CameraFocus.Instance.Focus = Owner;
 
             TargetingSystem.WhenInstantiated(() =>
             {

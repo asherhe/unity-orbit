@@ -45,9 +45,13 @@ public class MapViewManager : SingletonBehaviour<MapViewManager>
 
         activeMapCamera = minimapCamera;
 
-        _inputActions = new InputActions();
-        _inputActions.Camera.Enable();
-        _inputActions.Camera.ToggleMap.performed += (context) => ToggleMapView();
+
+        InputReader.WhenInstantiated(() =>
+        {
+            _inputActions = InputReader.Instance.Actions;
+            _inputActions.Camera.Enable();
+            _inputActions.Camera.ToggleMap.performed += (context) => ToggleMapView();
+        });
     }
 
     public void ToggleMapView()

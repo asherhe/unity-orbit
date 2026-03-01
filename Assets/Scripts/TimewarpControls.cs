@@ -39,12 +39,15 @@ public class TimewarpControls : MonoBehaviour
 
     private void Awake()
     {
-        _inputActions = new InputActions();
-        _inputActions.Warp.Enable();
+        InputReader.WhenInstantiated(() =>
+        {
+            _inputActions = InputReader.Instance.Actions;
+            _inputActions.Warp.Enable();
 
-        _inputActions.Warp.WarpIncrease.performed += ctx => WarpIncrease();
-        _inputActions.Warp.WarpDecrease.performed += ctx => WarpDecrease();
-        _inputActions.Warp.WarpCancel.performed += ctx => WarpCancel();
+            _inputActions.Warp.WarpIncrease.performed += ctx => WarpIncrease();
+            _inputActions.Warp.WarpDecrease.performed += ctx => WarpDecrease();
+            _inputActions.Warp.WarpCancel.performed += ctx => WarpCancel();
+        });
 
         OnWarpChanged += () => AnnouncementDisplay.Instance.Announce($"Time Warp: x{Universe.Instance.Timewarp.TimewarpScale}");
     }

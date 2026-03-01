@@ -50,13 +50,17 @@ public class ActiveCraftController : SingletonBehaviour<ActiveCraftController>
                 if ((command = part.GetPlugin<Parts.CommandPlugin>()) != null) break;
         };
 
-        _inputActions = new InputActions();
-        _inputActions.Flight.Enable();
 
-        _inputActions.Flight.ThrottleCut.performed += ctx => command.CutThrottle();
-        _inputActions.Flight.ThrottleFull.performed += ctx => command.FullThrottle();
+        InputReader.WhenInstantiated(() =>
+        {
+            _inputActions = InputReader.Instance.Actions;
+            _inputActions.Flight.Enable();
 
-        _inputActions.Flight.AutoSteer.performed += ctx => command.IsAutoSteerEnabled = !command.IsAutoSteerEnabled;
+            _inputActions.Flight.ThrottleCut.performed += ctx => command.CutThrottle();
+            _inputActions.Flight.ThrottleFull.performed += ctx => command.FullThrottle();
+
+            _inputActions.Flight.AutoSteer.performed += ctx => command.IsAutoSteerEnabled = !command.IsAutoSteerEnabled;
+        });
 
         base.Awake();
     }
