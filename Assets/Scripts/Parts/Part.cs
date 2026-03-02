@@ -8,7 +8,7 @@ using UnityEngine.AddressableAssets;
 
 namespace Parts
 {
-    public class Part : MonoBehaviour, IMassive
+    public class Part : MonoBehaviour, IMassive, IActuator
     {
         /// <summary>
         /// configuration data read from the CRAFT configuration (not part definition!)
@@ -142,6 +142,7 @@ namespace Parts
         public bool hasCrossfeed { get; private set; }
 
         public MassProperty MassProperty { get; private set; } = new();
+        public ActuatorProperties ActuatorProperties { get; private set; } = new();
 
         [Serializable]
         public class AttachmentNode
@@ -348,6 +349,8 @@ namespace Parts
                 // register plugin msas property before loading
                 if (plugin is IMassive massive)
                     MassProperty.AddMassProperty(massive.MassProperty);
+                if (plugin is IActuator actuator)
+                    ActuatorProperties.AddActuator(actuator.ActuatorProperties);
 
                 plugin.OnLoad(pluginConfig);
                 pluginTasks.Add(plugin.OnLoadAsync(pluginConfig));

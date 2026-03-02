@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -8,7 +9,7 @@ using UnityEngine.Rendering.Universal;
 
 namespace Parts
 {
-    public class EnginePlugin : PartPlugin
+    public class EnginePlugin : PartPlugin, IActuator
     {
         private Config _config;
         [Serializable]
@@ -136,6 +137,8 @@ namespace Parts
         /// </summary>
         private double _propRatioMass;
 
+        public ActuatorProperties ActuatorProperties { get; private set; } = new();
+
         protected override void OnAwake()
         {
             base.OnAwake();
@@ -155,6 +158,10 @@ namespace Parts
             _isp = _config.isp;
             _thrust = _config.thrust * 1000.0; // kN -> N
             _thrustDir = _config.thrustDir.Rotate(part.craftRot * 180.0 / Math.PI);
+
+            ActuatorProperties.maxThrust = _thrust * _thrustDir;
+            ActuatorProperties.isp = _isp;
+            ActuatorProperties.UpdateState();
 
             _propRatio = new Dictionary<string, double>(_config.propellantRatio);
             _propRatioMass = 0.0;

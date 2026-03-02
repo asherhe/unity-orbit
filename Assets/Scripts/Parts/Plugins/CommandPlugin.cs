@@ -110,7 +110,7 @@ namespace Parts
 
                 // adjust steering output to moment of inertia so that the same parameters work regardless of craft properties
                 // TODO: adjust for spacecraft's usable torque too
-                craft.Control.SteeringControl = (float)(craft.Newtonian.momentOfInertia / craft.Control.maxTorque) * output;
+                craft.Control.SteeringControl = (float)(craft.Newtonian.momentOfInertia / craft.ActuatorProperties.maxTorque) * output;
 
                 // reset integral if we've reached target
                 if (error * _prevError < 0.0f) _integralError = 0.0f;

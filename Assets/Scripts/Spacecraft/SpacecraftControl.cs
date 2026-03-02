@@ -26,9 +26,4 @@ public class SpacecraftControl : MonoBehaviour
         get => _steeringControl;
         set { _steeringControl = Mathf.Clamp(value, -1.0f, 1.0f); }
     }
-
-    /// <summary>
-    /// maximum torque the spacecraft is able to generate
-    /// </summary>
-    public double maxTorque;
 }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Parts
 {
-    public class ReactionWheelPlugin : PartPlugin
+    public class ReactionWheelPlugin : PartPlugin, IActuator
     {
         private Config _config;
         [Serializable]
@@ -19,6 +19,8 @@ namespace Parts
 
         private double _torque;
 
+        public ActuatorProperties ActuatorProperties { get; private set; } = new();
+
         public override void OnLoad(DataNode config)
         {
             base.OnLoad(config);
@@ -26,8 +28,8 @@ namespace Parts
             _config = Serialization.DataNodeSerialization.Deserialize<Config>(config);
             _torque = _config.torque * 1000.0;
 
-            // TODO: this is a bit of a hack, implement a more complete system for tallying mass, torque, thrust, etc.
-            craft.Control.maxTorque += _torque;
+            ActuatorProperties.maxTorque = _torque;
+            ActuatorProperties.UpdateState();
         }
 
         protected override void OnFixedUpdate()

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using UnityEngine;
 using Vertx.Debugging;
 
-public class Spacecraft : OrbitingObject
+public class Spacecraft : OrbitingObject, IActuator
 {
     public DataObject craftConfig; // TODO: we use this until automatic vessel loading
     private Config _config;
@@ -46,6 +46,9 @@ public class Spacecraft : OrbitingObject
     /// also deals with torque, forces, etc.
     /// </summary>
     public SpacecraftNewtonian Newtonian { get; private set; }
+
+    // TODO: bind part actuators to this actuator
+    public ActuatorProperties ActuatorProperties { get; private set; } = new();
 
     /// <summary>
     /// list of parts that make up this spacecraft
@@ -162,6 +165,7 @@ public class Spacecraft : OrbitingObject
             // register part mass in newtonian system
             // do this before LoadPartAsync so that newtonian mass is updated in real time
             part.MassProperty.OnMassChanged += massChange => Newtonian.AddPointMass(part.craftPos, massChange);
+            ActuatorProperties.AddActuator(part.ActuatorProperties);
 
             tasks.Add(LoadPartAsync(part, partConfig));
         }
@@ -217,8 +221,6 @@ public class Spacecraft : OrbitingObject
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
-
-        Debug.Log(Newtonian.Mass);
     }
 
     public override string ToString() => $"Spacecraft {craftName}";
