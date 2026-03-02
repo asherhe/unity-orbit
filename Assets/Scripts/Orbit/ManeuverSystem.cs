@@ -1,4 +1,5 @@
 using Orbit;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,11 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     public bool HasManeuver => NextManeuver != null;
 
     /// <summary>
+    /// invoked when we get a new maneuver or if the manevuer is cleared
+    /// </summary>
+    public event Action OnManeuverChanged;
+
+    /// <summary>
     /// get the next pending maneuver, initializing a new one if none exists
     /// </summary>
     public Maneuver GetManeuver()
@@ -23,6 +29,7 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
         if (!HasManeuver) { 
             NextManeuver = new Maneuver(ActiveCraftController.Instance.craft);
             label = UI.MapLabelManager.Instance.AddManeuverLabel(NextManeuver);
+            OnManeuverChanged?.Invoke();
         }
         return NextManeuver;
     }
@@ -35,5 +42,6 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
         // TODO: maneuver is a dummy parameter in anticipation for maneuver list
         NextManeuver = null;
         Destroy(label.gameObject);
+        OnManeuverChanged?.Invoke();
     }
 }

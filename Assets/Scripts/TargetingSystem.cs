@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UI;
 using UnityEngine;
-using static Orbit.EncounterCalculator;
 
 public class TargetingSystem : SingletonBehaviour<TargetingSystem>
 {
@@ -28,7 +27,10 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     /// </summary>
     public event Action OnTargetChanged;
 
-    private PatchedConicManager patchManager;
+    /// <summary>
+    /// PatchedConicManager instance to check encounters with the target for
+    /// </summary>
+    private PatchedConicManager SourcePatches;
 
     public struct TargetEncounter
     {
@@ -80,8 +82,20 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
             var activeCraft = ActiveCraftController.Instance.craft;
             activeCraft.OnLoaded += () =>
             {
-                patchManager = activeCraft.patches;
-                patchManager.OnRecalculated += RecalculateEncounters;
+                SourcePatches = activeCraft.patches;
+                SourcePatches.OnRecalculated += RecalculateEncounters;
+            };
+        });
+        ManeuverSystem.WhenInstantiated(() =>
+        {
+            ManeuverSystem.Instance.OnManeuverChanged += () =>
+            {
+                SourcePatches.OnRecalculated -= RecalculateEncounters;
+                SourcePatches = ManeuverSystem.Instance.HasManeuver ?
+                    ManeuverSystem.Instance.GetManeuver().resultPatches :
+                    ActiveCraftController.Instance.craft.patches;
+                SourcePatches.OnRecalculated += RecalculateEncounters;
+                RecalculateEncounters();
             };
         });
 
@@ -99,7 +113,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
         if (Target != null)
         {
             int i = 0;
-            foreach (var patch in patchManager.ActivePatches)
+            foreach (var patch in SourcePatches.ActivePatches)
             {
                 if (patch.patchOrbit.body != Target.orbit.body) continue;
 
@@ -126,7 +140,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
     /// </summary>
     private void UpdateEncounters(double UT)
     {
-        if (patchManager == null) return;
+        if (SourcePatches == null) return;
         if (UT < approachExpiryTime) return;
 
         // eliminate patches we've already passed
@@ -144,7 +158,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
             node = node.Next;
         }
 
-        var currPatch = patchManager.FirstPatch;
+        var currPatch = SourcePatches.FirstPatch;
         if (currPatch.HasTransition || currPatch.patchOrbit.Shape != OrbitShape.Ellipse)
         {
             // the current patch is not stable, we know that all approaches have been accounted for
@@ -165,7 +179,7 @@ public class TargetingSystem : SingletonBehaviour<TargetingSystem>
             {
                 // recalculate transitions if we detect one to
                 // this automatically triggers a recalculation of target encounters so we don't need to invoke OnEncounterUpdate
-                patchManager.RecalculatePatches(currPatch.NextTransition.Time);
+                SourcePatches.RecalculatePatches(currPatch.NextTransition.Time);
                 return;
             }
 
