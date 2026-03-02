@@ -18,9 +18,21 @@ namespace UI
         private ManeuverField _timeField, _progradeField, _radialField, _incrementField;
 
         [SerializeField]
+        private Button _closeButton;
+
+        [SerializeField]
         private TMP_Text _dvDisplay, _burnTimeDisplay, _burnCountdownDisplay;
 
-        public bool IsPlannerActive { get; private set; } = false;
+        private bool _isPlannerActive = false;
+        public bool IsPlannerActive { 
+            get => _isPlannerActive;
+            private set
+            {
+                if (value == _isPlannerActive) return;
+                _isPlannerActive = value;
+                OnActivityChanged();
+            }
+        }
 
         private Vector2 activePos, inactivePos;
         private Vector2 TargetPos => IsPlannerActive ? activePos : inactivePos;
@@ -47,7 +59,13 @@ namespace UI
             InputReader.WhenInstantiated(() =>
             {
                 _inputActions = InputReader.Instance.Actions;
-                _inputActions.MapView.Maneuver.performed += ctx => TogglePlanner();
+                _inputActions.MapView.Maneuver.performed += ctx => IsPlannerActive = !IsPlannerActive;
+            });
+
+            _closeButton.onClick.AddListener(() =>
+            {
+                ManeuverSystem.Instance.RemoveManeuver(_maneuver);
+                IsPlannerActive = false;
             });
 
             _timeField.formatter = t => "T" + TextDisplay.FormatTime(t - Universe.Instance.UT, showSign: true);
@@ -74,12 +92,15 @@ namespace UI
             _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.value];
         }
 
-        private void TogglePlanner()
+        private void OnActivityChanged()
         {
-            IsPlannerActive = !IsPlannerActive;
-            
             rectTransform.DOAnchorPos(TargetPos, 0.25f)
                 .SetEase(IsPlannerActive ? Ease.OutCubic : Ease.InCubic);
+
+            if (IsPlannerActive)
+            {
+                _maneuver = ManeuverSystem.Instance.GetManeuver();
+            }
         }
     }
 }
