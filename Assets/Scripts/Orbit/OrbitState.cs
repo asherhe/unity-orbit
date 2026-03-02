@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Cinemachine.CinemachineFreeLook;
 
 namespace Orbit
 {
@@ -396,6 +397,31 @@ namespace Orbit
             else return OrbitShape.Parabola;
         }
 
+        /// <summary>
+        /// get the vector that points to a direction in prograde-radial space
+        /// </summary>
+        /// <param name="vel">current velocity</param>
+        /// <param name="h">angular momentum of orbit</param>
+        /// <param name="dir">which PR direction to get</param>
+        /// <returns></returns>
+        public static Vector2d GetPRDirection(Vector2d vel, double h, PRDirection dir)
+        {
+            var prograde = vel.Normalized;
+            var d = h > 0 ? 1.0f : -1.0f;
+            switch (dir)
+            {
+                case PRDirection.Prograde:
+                    return prograde;
+                case PRDirection.Retrograde:
+                    return -prograde;
+                case PRDirection.RadialOut:
+                    return new(d * prograde.y, -d * prograde.x);
+                case PRDirection.RadialIn:
+                    return new(-d * prograde.y, d * prograde.x);
+                default:
+                    return Vector2d.zero;
+            }
+        }
         public override string ToString() => (owner != null ? $"{owner} OrbitState" : "OrbitState");
     }
 
