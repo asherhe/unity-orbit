@@ -73,25 +73,28 @@ namespace UI
             _radialField.formatter = v => "RADL " + TextDisplay.FormatSpeed(v, showSign: true);
             _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
 
-            _incrementField.OnValueChanged += OnIncrementChanged;
-            OnIncrementChanged();
+            _incrementField.OnValueChanged += UpdateFieldIncrements;
+            UpdateFieldIncrements();
         }
 
         private void OnRectTransformDimensionsChange()
         {
             if (rectTransform == null) return;
             // wait until ContentSizeFitter does its job
-            inactivePos = activePos + Vector2.up * (rectTransform.rect.height + 40f);
+            inactivePos = activePos + Vector2.left * (rectTransform.rect.width + 40f);
             rectTransform.anchoredPosition = TargetPos;
         }
 
-        private void OnIncrementChanged()
+        private void UpdateFieldIncrements()
         {
             _incrementField.value = Math.Clamp(_incrementField.value, 0, Math.Min(speedIncrements.Count, timeIncrements.Count) - 1);
             _timeField.increment = timeIncrements[(int)_incrementField.value];
             _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.value];
         }
 
+        /// <summary>
+        /// called when the maneuver planner changes from enabled to disabled and vice versa
+        /// </summary>
         private void OnActivityChanged()
         {
             rectTransform.DOAnchorPos(TargetPos, 0.25f)
@@ -100,7 +103,16 @@ namespace UI
             if (IsPlannerActive)
             {
                 _maneuver = ManeuverSystem.Instance.GetManeuver();
+                OnActiveManeuverChanged();
             }
+        }
+
+        /// <summary>
+        /// called when the maneuver that is currently being planned is changed to a different one
+        /// </summary>
+        private void OnActiveManeuverChanged()
+        {
+            _timeField.value = (float)_maneuver.UT;
         }
     }
 }

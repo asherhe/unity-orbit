@@ -18,7 +18,7 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     /// </summary>
     public Maneuver GetManeuver()
     {
-        if (!HasManeuver) NextManeuver = new Maneuver();
+        if (!HasManeuver) NextManeuver = new Maneuver(ActiveCraftController.Instance.craft.patches);
         return NextManeuver;
     }
 
