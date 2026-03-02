@@ -53,9 +53,9 @@ namespace Orbit
         public Vector2d SourceRadialOut { get; private set; }
 
         /// <summary>
-        /// patch manager that this Maneuver is operating on
+        /// craft that is intended to execute this maneuver
         /// </summary>
-        public readonly PatchedConicManager sourcePatchManager;
+        public readonly Spacecraft craft;
 
         /// <summary>
         /// patch that this maneuver lies on
@@ -80,23 +80,22 @@ namespace Orbit
         /// <param name="source">original PatchedConicManager this maneuver is based on</param>
         /// <param name="UT">time at which the maneuver occurs. if left blank, set to 1 minute ahead of current UT</param>
         /// <param name="dv">velocity change at maneuver, in body space. set to zero if left blank</param>
-        public Maneuver(PatchedConicManager source, double UT = double.NaN, Vector2d dv = null)
+        public Maneuver(Spacecraft craft, double UT = double.NaN, Vector2d dv = null)
         {
-            sourcePatchManager = source;
-
-            resultOrbit = new(source.SrcOrbit);
+            this.craft = craft;
+            resultOrbit = new(craft.orbit);
             resultPatches = new PatchedConicManager(resultOrbit);
 
             _UT = double.IsNaN(UT) ? Universe.Instance.UT + 60 : UT;
             _Dv = dv is null ? Vector2d.zero : dv;
 
-            sourcePatchManager.FirstPatch.patchOrbit.OnStateChanged += UpdateInternalState;
+            craft.orbit.OnStateChanged += UpdateInternalState;
             UpdateInternalState();
         }
 
         ~Maneuver()
         {
-            sourcePatchManager.FirstPatch.patchOrbit.OnStateChanged -= UpdateInternalState;
+            craft.orbit.OnStateChanged -= UpdateInternalState;
         }
 
         /// <summary>
@@ -105,11 +104,11 @@ namespace Orbit
         private void UpdateInternalState()
         {
             // ensure we rule out the possibility for any unforseen transitions
-            SourcePatch = sourcePatchManager.FirstPatch;
+            SourcePatch = craft.patches.FirstPatch;
             while ((SourcePatch.HasTransition && UT >= SourcePatch.NextTransition.Time) || UT >= SourcePatch.ExpiryDate)
             {
                 while (UT >= SourcePatch.ExpiryDate)
-                    sourcePatchManager.RecalculatePatches(SourcePatch.ExpiryDate, SourcePatch.patchStep);
+                    craft.patches.RecalculatePatches(SourcePatch.ExpiryDate, SourcePatch.patchStep);
 
                 if (SourcePatch.nextPatch == null) break;
                 else SourcePatch = SourcePatch.nextPatch;

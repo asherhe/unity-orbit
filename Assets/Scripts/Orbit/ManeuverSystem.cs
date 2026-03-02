@@ -21,7 +21,7 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     public Maneuver GetManeuver()
     {
         if (!HasManeuver) { 
-            NextManeuver = new Maneuver(ActiveCraftController.Instance.craft.patches);
+            NextManeuver = new Maneuver(ActiveCraftController.Instance.craft);
             label = UI.MapLabelManager.Instance.AddManeuverLabel(NextManeuver);
         }
         return NextManeuver;
