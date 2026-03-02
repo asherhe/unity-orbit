@@ -73,6 +73,28 @@ namespace Orbit
         }
 
         /// <summary>
+        /// get the vector that points to a direction in prograde-radial space
+        /// </summary>
+        public Vector2d GetPRDirection(PRDirection mode)
+        {
+            var prograde = Velocity.Normalized;
+            var dir = orbit.h > 0 ? 1.0f : -1.0f;
+            switch (mode)
+            {
+                case PRDirection.Prograde:
+                    return prograde;
+                case PRDirection.Retrograde:
+                    return -prograde;
+                case PRDirection.RadialOut:
+                    return new(dir * prograde.y, -dir * prograde.x);
+                case PRDirection.RadialIn:
+                    return new(-dir * prograde.y, dir * prograde.x);
+                default:
+                    return Vector2d.zero;
+            }
+        }
+
+        /// <summary>
         /// determine position of obj2 relative to obj1
         /// </summary>
         /// <param name="obj1">object to compare against</param>

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
+using Orbit;
+using System;
 
 namespace UI
 {
@@ -36,7 +38,8 @@ namespace UI
         [SerializeField]
         private SpriteToggleButton _radialInHold;
 
-        public enum HoldMode { None, Prograde, Retrograde, RadialOut, RadialIn }
+        public enum HoldMode { None, Prograde, Retrograde, RadialOut, RadialIn, Maneuver }
+
         public HoldMode holdMode = HoldMode.None;
 
         private void Awake()
@@ -62,25 +65,6 @@ namespace UI
             _toggleGroup.OnActiveSwitched += OnHoldModeChanged;
         }
 
-        public float GetDirection(HoldMode mode)
-        {
-            var progradeDir = Mathf.Atan2((float)_prograde.y, (float)_prograde.x);
-            var orbitDirection = _craft.orbit.h > 0 ? 1.0f : -1.0f;
-            switch (mode)
-            {
-                case HoldMode.Prograde:
-                    return progradeDir;
-                case HoldMode.Retrograde:
-                    return progradeDir + Mathf.PI;
-                case HoldMode.RadialOut:
-                    return progradeDir - orbitDirection * 0.5f * Mathf.PI;
-                case HoldMode.RadialIn:
-                    return progradeDir + orbitDirection * 0.5f * Mathf.PI;
-                default:
-                    return _handle.Direction;
-            }
-        }
-
         private void Update()
         {
             var progradePos = _holdRadius * (Vector2)_prograde.Normalized;
@@ -92,7 +76,7 @@ namespace UI
             ((RectTransform)_radialInHold.transform).anchoredPosition = -radialOutPos;
 
             if (holdMode != HoldMode.None && (_handleTween == null || !_handleTween.IsActive()))
-                _handle.Direction = GetDirection(holdMode);
+                _handle.Direction = HoldDirection;
 
             // 0 radians on spacecraft is up
             _command.autosteerTarget = _handle.Direction - 0.5f * Mathf.PI;
@@ -129,6 +113,21 @@ namespace UI
             if (_toggleGroup.activeButton != null) _toggleGroup.activeButton.IsActive = false;
         }
 
+        public float HoldDirection
+        {
+            get
+            {
+                if (holdMode != HoldMode.None)
+{                if (holdMode <= HoldMode.RadialIn)
+                    {
+                        var dir = _craft.GetPRDirection((PRDirection)holdMode);
+                        return (float)Math.Atan2(dir.y, dir.x);
+                    }
+                }
+                return _handle.Direction;
+            }
+        }
+
         /// <summary>
         /// invoked by _toggleGroup when the active hold mode is changed
         /// </summary>
@@ -142,11 +141,11 @@ namespace UI
 
             if (holdMode != HoldMode.None)
             {
-                float targetDirection = GetDirection(holdMode);
+                // tween by closest angular distance along circle to destination
                 _handleTween = DOTween.To(
                     () => _handle.Direction,
                     v => _handle.Direction = v,
-                    Mathf.Deg2Rad * Mathf.DeltaAngle(_handle.Direction * Mathf.Rad2Deg, targetDirection * Mathf.Rad2Deg),
+                    Mathf.Deg2Rad * Mathf.DeltaAngle(_handle.Direction * Mathf.Rad2Deg, HoldDirection * Mathf.Rad2Deg),
                     0.1f
                 ).SetRelative().SetEase(Ease.OutCubic);
             }

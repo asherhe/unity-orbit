@@ -1,4 +1,3 @@
-using MathNet.Numerics.RootFinding;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -404,6 +403,11 @@ namespace Orbit
     /// describes the shape of an orbit
     /// </summary>
     public enum OrbitShape { Ellipse, Parabola, Hyperbola }
+
+    /// <summary>
+    /// available orbit directions in prograde-radial out space
+    /// </summary>
+    public enum PRDirection { Prograde = 1, Retrograde = 2, RadialOut = 3, RadialIn = 4 }
 
     /// <summary>
     /// a time, a position, and a velocity.
