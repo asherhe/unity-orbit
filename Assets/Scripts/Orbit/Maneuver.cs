@@ -63,6 +63,13 @@ namespace Orbit
         public Patch SourcePatch { get; private set; }
 
         /// <summary>
+        /// orbit state of the SourcePatch at the time this maneuver was last updated.
+        /// it is possible that SourcePatch has since changed after the last maneuver update but
+        /// this does not affect our local sourceOrbit state
+        /// </summary>
+        public readonly OrbitState sourceOrbit;
+
+        /// <summary>
         /// new orbital trajectory after burn takes place
         /// </summary>
         public readonly OrbitState resultOrbit;
@@ -88,19 +95,14 @@ namespace Orbit
         public Maneuver(Spacecraft craft, double UT = double.NaN, Vector2d dv = null)
         {
             this.craft = craft;
+            sourceOrbit = new(craft.orbit);
             resultOrbit = new(craft.orbit);
             resultPatches = new PatchedConicManager(resultOrbit);
 
             _UT = double.IsNaN(UT) ? Universe.Instance.UT + 60 : UT;
             _Dv = dv is null ? Vector2d.zero : dv;
 
-            craft.orbit.OnStateChanged += UpdateInternalState;
             UpdateInternalState();
-        }
-
-        ~Maneuver()
-        {
-            craft.orbit.OnStateChanged -= UpdateInternalState;
         }
 
         /// <summary>
@@ -124,19 +126,21 @@ namespace Orbit
                 // set _UT so we don't trigger a recursive call to UpdateInternalState
                 _UT = Math.Min(UT, SourcePatch.NextTransition.Time);
 
-            var prop = new UniversalPropagator(SourcePatch.patchOrbit);
+            sourceOrbit.CopyFrom(SourcePatch.patchOrbit);
+
+            var prop = new UniversalPropagator(sourceOrbit);
             var state = prop.GetStateVectors(UT);
             Position = state.pos; SourceVelocity = state.vel;
 
-            SourcePrograde = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.Prograde);
-            SourceRadialOut = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.RadialOut);
+            SourcePrograde = OrbitState.GetPRDirection(SourceVelocity, sourceOrbit.h, PRDirection.Prograde);
+            SourceRadialOut = OrbitState.GetPRDirection(SourceVelocity, sourceOrbit.h, PRDirection.RadialOut);
 
             // Isp * g * m0 / F * ( 1 - exp( - Dv / (Isp * g) ) )
             BurnTime =
                 craft.ActuatorProperties.isp * 9.8 * craft.Newtonian.Mass / craft.ActuatorProperties.maxThrust.Magnitude *
                 (1 - Math.Exp(-Dv.Magnitude / (craft.ActuatorProperties.isp * 9.8)));
 
-            resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, SourcePatch.patchOrbit.body);
+            resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, sourceOrbit.body);
 
             OnManeuverStateUpdate?.Invoke();
         }

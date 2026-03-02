@@ -21,7 +21,7 @@ namespace UI
         /// <summary>
         /// orbital period of current maneuver orbit
         /// </summary>
-        private float Period => (float)_planner.maneuver.SourcePatch.patchOrbit.period;
+        private float Period => (float)_planner.maneuver.sourceOrbit.period;
 
         protected override void Awake()
         {
