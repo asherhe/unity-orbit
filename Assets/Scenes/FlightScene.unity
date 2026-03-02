@@ -1773,7 +1773,7 @@ MonoBehaviour:
   _displayText: {fileID: 1035460416}
   _buttonIncrease: {fileID: 1290057892}
   _buttonDecrease: {fileID: 757313406}
-  value: 2
+  _value: 2
   increment: 1
 --- !u!1 &461308265
 GameObject:
@@ -3748,7 +3748,7 @@ MonoBehaviour:
   _displayText: {fileID: 1996554591}
   _buttonIncrease: {fileID: 255400548}
   _buttonDecrease: {fileID: 523771015}
-  value: 0
+  _value: 0
   increment: 1
 --- !u!1 &757313404
 GameObject:
@@ -3952,7 +3952,7 @@ MonoBehaviour:
   _displayText: {fileID: 183337673}
   _buttonIncrease: {fileID: 418187069}
   _buttonDecrease: {fileID: 1486641132}
-  value: 0
+  _value: 0
   increment: 1
 --- !u!1 &974707547
 GameObject:
@@ -6848,8 +6848,9 @@ MonoBehaviour:
   _displayText: {fileID: 1565764634}
   _buttonIncrease: {fileID: 1187827668}
   _buttonDecrease: {fileID: 30816169}
-  value: 0
+  _value: 0
   increment: 1
+  _planner: {fileID: 0}
   _buttonNextOrbit: {fileID: 1370452435}
   _buttonPrevOrbit: {fileID: 585657369}
 --- !u!1 &1893096480

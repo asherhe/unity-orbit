@@ -72,6 +72,8 @@ namespace Orbit
         /// </summary>
         public readonly PatchedConicManager resultPatches;
 
+        public event Action OnManeuverStateUpdate;
+
         /// <summary>
         /// construct a new maneuver
         /// </summary>
@@ -126,6 +128,8 @@ namespace Orbit
             SourceRadialOut = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.RadialOut);
 
             resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, SourcePatch.patchOrbit.body);
+
+            OnManeuverStateUpdate?.Invoke();
         }
     }
 }

@@ -17,10 +17,21 @@ namespace UI
         [SerializeField]
         private Button _buttonIncrease, _buttonDecrease;
 
+        [SerializeField]
+        private float _value = 0f;
         /// <summary>
         /// current value of field
         /// </summary>
-        public float value = 0f;
+        public float Value
+        {
+            get => _value;
+            set
+            {
+                if (value == _value) return;
+                _value = value;
+                OnValueChanged?.Invoke();
+            }
+        }
         /// <summary>
         /// amount by which the buttons change the value
         /// </summary>
@@ -32,6 +43,8 @@ namespace UI
         public Func<float, string> formatter = val => val.ToString();
 
         public event Action OnValueChanged;
+
+        protected virtual void Awake() { }
 
         protected virtual void OnEnable()
         {
@@ -47,8 +60,7 @@ namespace UI
 
         protected void IncrementBy(float inc)
         {
-            value += inc;
-            OnValueChanged?.Invoke();
+            Value += inc;
         }
 
         private void IncreaseValue() => IncrementBy(increment);
@@ -56,7 +68,7 @@ namespace UI
 
         private void Update()
         {
-            _displayText.text = formatter(value);
+            _displayText.text = formatter(Value);
         }
     }
 }

@@ -24,7 +24,8 @@ namespace UI
         private TMP_Text _dvDisplay, _burnTimeDisplay, _burnCountdownDisplay;
 
         private bool _isPlannerActive = false;
-        public bool IsPlannerActive { 
+        public bool IsPlannerActive
+        {
             get => _isPlannerActive;
             private set
             {
@@ -40,7 +41,16 @@ namespace UI
         /// <summary>
         /// maneuver that is currently being planned
         /// </summary>
-        private Orbit.Maneuver _maneuver;
+        public Orbit.Maneuver maneuver;
+
+        /// <summary>
+        /// invoked when the state of the maneuver currently being planned is updated
+        /// </summary>
+        public event Action OnManeuverStateUpdate;
+        /// <summary>
+        /// invoked when we get a different maneuver. OnManeuverStateUpdate will also be invoked after this event
+        /// </summary>
+        public event Action OnManeuverChanged;
 
         private readonly List<float> speedIncrements = new()
         {
@@ -64,7 +74,7 @@ namespace UI
 
             _closeButton.onClick.AddListener(() =>
             {
-                ManeuverSystem.Instance.RemoveManeuver(_maneuver);
+                ManeuverSystem.Instance.RemoveManeuver(maneuver);
                 IsPlannerActive = false;
             });
 
@@ -72,6 +82,9 @@ namespace UI
             _progradeField.formatter = v => "PRGD " + TextDisplay.FormatSpeed(v, showSign: true);
             _radialField.formatter = v => "RADL " + TextDisplay.FormatSpeed(v, showSign: true);
             _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
+
+            OnManeuverStateUpdate += UpdateManeuverFieldValues;
+            OnManeuverChanged += ResetManeuverFieldValues;
 
             _timeField.OnValueChanged += UpdateManeuverTime;
             _progradeField.OnValueChanged += UpdateManeuverDv;
@@ -90,13 +103,18 @@ namespace UI
 
         private void UpdateFieldIncrements()
         {
-            _incrementField.value = Math.Clamp(_incrementField.value, 0, Math.Min(speedIncrements.Count, timeIncrements.Count) - 1);
-            _timeField.increment = timeIncrements[(int)_incrementField.value];
-            _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.value];
+            _incrementField.Value = Math.Clamp(_incrementField.Value, 0, Math.Min(speedIncrements.Count, timeIncrements.Count) - 1);
+            _timeField.increment = timeIncrements[(int)_incrementField.Value];
+            _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.Value];
         }
 
-        private void UpdateManeuverTime() => _maneuver.UT = _timeField.value;
-        private void UpdateManeuverDv() => _maneuver.DvPR = new(_progradeField.value, _radialField.value);
+        private void UpdateManeuverTime()
+        {
+            maneuver.UT = _timeField.Value;
+            // we want to keep PR velocity change the same
+            UpdateManeuverDv();
+        }
+        private void UpdateManeuverDv() => maneuver.DvPR = new(_progradeField.Value, _radialField.Value);
 
         /// <summary>
         /// called when the maneuver planner changes from enabled to disabled and vice versa
@@ -106,22 +124,32 @@ namespace UI
             rectTransform.DOAnchorPos(TargetPos, 0.25f)
                 .SetEase(IsPlannerActive ? Ease.OutCubic : Ease.InCubic);
 
+            void InvokeManeuverUpdate() => OnManeuverStateUpdate?.Invoke();
+
             if (IsPlannerActive)
             {
-                _maneuver = ManeuverSystem.Instance.GetManeuver();
-                OnActiveManeuverChanged();
+                maneuver = ManeuverSystem.Instance.GetManeuver();
+                maneuver.OnManeuverStateUpdate += InvokeManeuverUpdate;
+                OnManeuverChanged.Invoke();
+                InvokeManeuverUpdate();
+            }
+            else
+            {
+                maneuver.OnManeuverStateUpdate -= InvokeManeuverUpdate;
             }
         }
 
-        /// <summary>
-        /// called when the maneuver that is currently being planned is changed to a different one
-        /// </summary>
-        private void OnActiveManeuverChanged()
+        private void UpdateManeuverFieldValues()
         {
-            _timeField.value = (float)_maneuver.UT;
-            var dvPR = _maneuver.DvPR;
-            _progradeField.value = (float)dvPR.x;
-            _radialField.value = (float)dvPR.y;
+            _timeField.Value = (float)maneuver.UT;
+        }
+
+        private void ResetManeuverFieldValues()
+        {
+            UpdateManeuverFieldValues();
+            var dvPR = maneuver.DvPR;
+            _progradeField.Value = (float)dvPR.x;
+            _radialField.Value = (float)dvPR.y;
         }
     }
 }
