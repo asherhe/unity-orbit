@@ -11,19 +11,16 @@ namespace UI
     public class MapLabelManager : SingletonBehaviour<MapLabelManager>
     {
         [SerializeField]
-        private GameObject _apsisLabelPrefab;
-        [SerializeField]
-        private GameObject _SOITransitionLabelPrefab;
-        [SerializeField]
-        private GameObject _encounterLabelGroupPrefab;
-
-        [SerializeField]
-        private GameObject _celestialBodyLabelPrefab;
-        [SerializeField]
-        private GameObject _spacecraftLabelPrefab;
+        private GameObject
+            _apsisLabelPrefab,
+            _SOITransitionLabelPrefab,
+            _encounterLabelGroupPrefab,
+            _maneuverLabelPrefab,
+            _celestialBodyLabelPrefab,
+            _spacecraftLabelPrefab;
 
         // gameobjects that each hold a label type under one object, used to establish proper draw order
-        private Transform _apsisContainer, _SOITransitionContainer, _encounterContainer, _celestialBodyContainer, _spacecraftContainer;
+        private Transform _apsisContainer, _SOITransitionContainer, _encounterContainer, _maneuverContainer, _celestialBodyContainer, _spacecraftContainer;
 
         private readonly HashSet<MapLabel> _labels = new();
 
@@ -31,7 +28,7 @@ namespace UI
         {
             base.Awake();
 
-            // spacecraft > celestial body > SOI transition > encounters > apses
+            // spacecraft > celestial body > maneuver > SOI transition > encounters > apses
             // instantiate in reverse order because draw order shows newest first
 
             _apsisContainer = new GameObject("Apsis Label Container").transform;
@@ -42,6 +39,9 @@ namespace UI
 
             _SOITransitionContainer = new GameObject("SOI Transition Label Container").transform;
             _SOITransitionContainer.SetParent(transform, worldPositionStays: false);
+
+            _maneuverContainer = new GameObject("Maneuver Label Container").transform;
+            _maneuverContainer.SetParent(transform, worldPositionStays: false);
 
             _celestialBodyContainer = new GameObject("Celestial Body Label Container").transform;
             _celestialBodyContainer.SetParent(transform, worldPositionStays: false);
@@ -88,6 +88,13 @@ namespace UI
         {
             var labelObject = Instantiate(_encounterLabelGroupPrefab, _encounterContainer);
             return labelObject.GetComponent<EncounterLabelGroup>();
+        }
+        public ManeuverLabel AddManeuverLabel(Maneuver maneuver)
+        {
+            var labelObject = Instantiate(_maneuverLabelPrefab, _maneuverContainer);
+            var maneuverLabel = labelObject.GetComponent<ManeuverLabel>();
+            maneuverLabel.Maneuver = maneuver;
+            return maneuverLabel;
         }
 
         public CelestialBodyLabel AddCelestialBody(CelestialBody body)

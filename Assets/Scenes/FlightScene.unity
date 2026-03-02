@@ -2794,6 +2794,7 @@ MonoBehaviour:
   _apsisLabelPrefab: {fileID: 5451008072283253895, guid: 623c870661506464ab7356d3e2ef0707, type: 3}
   _SOITransitionLabelPrefab: {fileID: 5451008072283253895, guid: d6a4a7020c3da104c9b5457ee75a407b, type: 3}
   _encounterLabelGroupPrefab: {fileID: 5601554297001268798, guid: 46588bd696a7d064db22d1848457b3af, type: 3}
+  _maneuverLabelPrefab: {fileID: 5451008072283253895, guid: 033855a8cce5cbb4a90dc069236afed8, type: 3}
   _celestialBodyLabelPrefab: {fileID: 5451008072283253895, guid: 642ae6ba9f16e1847bc51aeda572aac3, type: 3}
   _spacecraftLabelPrefab: {fileID: 5451008072283253895, guid: 6559770a193d6ba4bbc2a1043a06140f, type: 3}
 --- !u!1 &579806096
@@ -6850,7 +6851,7 @@ MonoBehaviour:
   _buttonDecrease: {fileID: 30816169}
   _value: 0
   increment: 1
-  _planner: {fileID: 0}
+  _planner: {fileID: 974707552}
   _buttonNextOrbit: {fileID: 1370452435}
   _buttonPrevOrbit: {fileID: 585657369}
 --- !u!1 &1893096480

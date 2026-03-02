@@ -11,6 +11,8 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     /// </summary>
     public Maneuver NextManeuver { get; private set; }
 
+    private UI.ManeuverLabel label;
+
     public bool HasManeuver => NextManeuver != null;
 
     /// <summary>
@@ -18,7 +20,10 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     /// </summary>
     public Maneuver GetManeuver()
     {
-        if (!HasManeuver) NextManeuver = new Maneuver(ActiveCraftController.Instance.craft.patches);
+        if (!HasManeuver) { 
+            NextManeuver = new Maneuver(ActiveCraftController.Instance.craft.patches);
+            label = UI.MapLabelManager.Instance.AddManeuverLabel(NextManeuver);
+        }
         return NextManeuver;
     }
 
@@ -27,7 +32,8 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     /// </summary>
     public void RemoveManeuver(Maneuver maneuver)
     {
-        // TODO: dummy parameter in anticipation for maneuver list
+        // TODO: maneuver is a dummy parameter in anticipation for maneuver list
         NextManeuver = null;
+        Destroy(label.gameObject);
     }
 }
