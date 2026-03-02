@@ -124,6 +124,8 @@ namespace Orbit
 
             SourcePrograde = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.Prograde);
             SourceRadialOut = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.RadialOut);
+
+            resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, SourcePatch.patchOrbit.body);
         }
     }
 }
