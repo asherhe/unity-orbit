@@ -16,7 +16,7 @@ namespace UI
         /// <summary>
         /// whether or not the source orbit of the maneuver has a relevant orbital period
         /// </summary>
-        private bool HasPeriod => !_planner.maneuver.SourcePatch.soiIntercept.HasTransition;
+        private bool HasPeriod => !_planner.maneuver.SourcePatch.soiEscape.HasTransition;
 
         /// <summary>
         /// orbital period of current maneuver orbit
