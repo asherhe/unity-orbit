@@ -8,13 +8,34 @@ namespace UI
     public class ManeuverTimeField : ManeuverField
     {
         [SerializeField]
+        private ManeuverPlanner _planner;
+
+        [SerializeField]
         private Button _buttonNextOrbit, _buttonPrevOrbit;
 
-        // TODO
+        /// <summary>
+        /// whether or not the source orbit of the maneuver has a relevant orbital period
+        /// </summary>
+        private bool HasPeriod => !_planner.maneuver.SourcePatch.soiIntercept.HasTransition;
+
         /// <summary>
         /// orbital period of current maneuver orbit
         /// </summary>
-        private float Period => 0f;
+        private float Period => (float)_planner.maneuver.SourcePatch.patchOrbit.period;
+
+        protected override void Awake()
+        {
+            base.Awake();
+
+            _planner.OnManeuverStateUpdate += UpdateOrbitButtonInteractability;
+        }
+
+        private void UpdateOrbitButtonInteractability()
+        {
+            var interactable = HasPeriod;
+            _buttonNextOrbit.interactable = interactable;
+            _buttonPrevOrbit.interactable = interactable;
+        }
 
         protected override void OnEnable()
         {
