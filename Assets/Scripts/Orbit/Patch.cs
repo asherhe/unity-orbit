@@ -72,7 +72,7 @@ namespace Orbit
         /// how far removed this Patch is from the original, current OrbitState.
         /// equal to zero if this Patch represents the current orbit.
         /// </summary>
-        private readonly int _patchStep;
+        public readonly int patchStep;
 
         private bool _isActive = false;
         /// <summary>
@@ -104,7 +104,7 @@ namespace Orbit
             prevPatch = null;
             rootOrbit = srcOrbit;
 
-            _patchStep = 0;
+            patchStep = 0;
 
             SetupPatch();
         }
@@ -122,7 +122,7 @@ namespace Orbit
             patch.nextPatch = this;
             rootOrbit = patch.rootOrbit;
 
-            _patchStep = patch._patchStep + 1;
+            patchStep = patch.patchStep + 1;
 
             SetupPatch();
 
@@ -141,7 +141,7 @@ namespace Orbit
             ExpiryDate = double.PositiveInfinity;
 
             trajectory = UI.TrajectoryManager.Instance.AddTrajectory(patchOrbit);
-            trajectory.name = $"Trajectory {rootOrbit.owner} (Patch {_patchStep})";
+            trajectory.name = $"Trajectory {rootOrbit.owner} (Patch {patchStep})";
 
             UI.MapLabelManager.WhenInstantiated(() =>
             {
@@ -265,7 +265,7 @@ namespace Orbit
 
         public override string ToString()
         {
-            return $"[{rootOrbit}: Patch {_patchStep + 1}]";
+            return $"[{rootOrbit}: Patch {patchStep + 1}]";
         }
     }
 }

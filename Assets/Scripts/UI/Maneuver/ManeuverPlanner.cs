@@ -73,6 +73,9 @@ namespace UI
             _radialField.formatter = v => "RADL " + TextDisplay.FormatSpeed(v, showSign: true);
             _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
 
+            _timeField.OnValueChanged += UpdateManeuverTime;
+            _progradeField.OnValueChanged += UpdateManeuverDv;
+            _radialField.OnValueChanged += UpdateManeuverDv;
             _incrementField.OnValueChanged += UpdateFieldIncrements;
             UpdateFieldIncrements();
         }
@@ -91,6 +94,9 @@ namespace UI
             _timeField.increment = timeIncrements[(int)_incrementField.value];
             _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.value];
         }
+
+        private void UpdateManeuverTime() => _maneuver.UT = _timeField.value;
+        private void UpdateManeuverDv() => _maneuver.DvPR = new(_progradeField.value, _radialField.value);
 
         /// <summary>
         /// called when the maneuver planner changes from enabled to disabled and vice versa
@@ -113,6 +119,9 @@ namespace UI
         private void OnActiveManeuverChanged()
         {
             _timeField.value = (float)_maneuver.UT;
+            var dvPR = _maneuver.DvPR;
+            _progradeField.value = (float)dvPR.x;
+            _radialField.value = (float)dvPR.y;
         }
     }
 }
