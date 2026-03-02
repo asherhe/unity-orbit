@@ -84,6 +84,7 @@ namespace UI
             _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
 
             OnManeuverStateUpdate += UpdateManeuverFieldValues;
+            OnManeuverStateUpdate += UpdateManeuverInfoDisplay;
             OnManeuverChanged += ResetManeuverFieldValues;
 
             _timeField.OnValueChanged += UpdateManeuverTime;
@@ -150,6 +151,11 @@ namespace UI
             var dvPR = maneuver.DvPR;
             _progradeField.Value = (float)dvPR.x;
             _radialField.Value = (float)dvPR.y;
+        }
+
+        private void UpdateManeuverInfoDisplay()
+        {
+            _dvDisplay.text = "<sprite name=\"dv\"> = " + TextDisplay.FormatSpeed(maneuver.Dv.Magnitude);
         }
     }
 }
