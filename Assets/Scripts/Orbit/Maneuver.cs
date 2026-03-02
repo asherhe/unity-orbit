@@ -72,6 +72,11 @@ namespace Orbit
         /// </summary>
         public readonly PatchedConicManager resultPatches;
 
+        /// <summary>
+        /// time required to complete burn on max thrust
+        /// </summary>
+        public double BurnTime { get; private set; }
+
         public event Action OnManeuverStateUpdate;
 
         /// <summary>
@@ -125,6 +130,11 @@ namespace Orbit
 
             SourcePrograde = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.Prograde);
             SourceRadialOut = OrbitState.GetPRDirection(SourceVelocity, SourcePatch.patchOrbit.h, PRDirection.RadialOut);
+
+            // Isp * g * m0 / F * ( 1 - exp( - Dv / (Isp * g) ) )
+            BurnTime =
+                craft.ActuatorProperties.isp * 9.8 * craft.Newtonian.Mass / craft.ActuatorProperties.maxThrust.Magnitude *
+                (1 - Math.Exp(-Dv.Magnitude / (craft.ActuatorProperties.isp * 9.8)));
 
             resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, SourcePatch.patchOrbit.body);
 

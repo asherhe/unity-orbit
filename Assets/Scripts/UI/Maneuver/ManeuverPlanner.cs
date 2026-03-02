@@ -66,6 +66,8 @@ namespace UI
             rectTransform = transform as RectTransform;
             activePos = rectTransform.anchoredPosition;
 
+            gameObject.SetActive(IsPlannerActive);
+
             InputReader.WhenInstantiated(() =>
             {
                 _inputActions = InputReader.Instance.Actions;
@@ -122,8 +124,11 @@ namespace UI
         /// </summary>
         private void OnActivityChanged()
         {
+            if (IsPlannerActive) gameObject.SetActive(true);
+
             rectTransform.DOAnchorPos(TargetPos, 0.25f)
-                .SetEase(IsPlannerActive ? Ease.OutCubic : Ease.InCubic);
+                .SetEase(IsPlannerActive ? Ease.OutCubic : Ease.InCubic)
+                .OnComplete(() => { if (!IsPlannerActive) gameObject.SetActive(false); });
 
             void InvokeManeuverUpdate() => OnManeuverStateUpdate?.Invoke();
 
@@ -156,6 +161,12 @@ namespace UI
         private void UpdateManeuverInfoDisplay()
         {
             _dvDisplay.text = "<sprite name=\"dv\"> = " + TextDisplay.FormatSpeed(maneuver.Dv.Magnitude);
+            _burnTimeDisplay.text = "Burn time: " + TextDisplay.FormatTime(maneuver.BurnTime, shorten: true);
+        }
+
+        private void Update()
+        {
+            _burnCountdownDisplay.text = "In T" + TextDisplay.FormatTime(Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime), showSign: true);
         }
     }
 }
