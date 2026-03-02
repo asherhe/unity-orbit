@@ -57,12 +57,12 @@ namespace UI
             return AddMetricPrefix(d) + "m";
         }
 
-        public static string FormatSpeed(double v)
+        public static string FormatSpeed(double v, bool showSign = false)
         {
-            return string.Format("{0:F1}<sprite name=\"mps\">", v);
+            return string.Format($"{{0:{(showSign ? "+0.0;-0.0;0.0" : "F1")}}}<sprite name=\"mps\">", v);
         }
 
-        public static string FormatTime(double t, bool showSign = false)
+        public static string FormatTime(double t, bool showSign = false, bool shorten = false)
         {
             string sign = "";
             if (t < 0) sign = "-";
@@ -73,6 +73,14 @@ namespace UI
             int hours = (int)((absT % 86400) / 3600);
             int mins = (int)((absT % 3600) / 60);
             int secs = (int)(absT % 60);
+
+            if (shorten)
+            {
+                if (days > 0 && hours + mins + secs == 0) return $"{days}d";
+                if (hours > 0 && days + mins + secs == 0) return $"{hours}h";
+                if (mins > 0 && days + hours + secs == 0) return $"{mins}m";
+                if (secs > 0 && days + hours + mins == 0) return $"{secs}s";
+            }
 
             string daysFormat = days > 0 ? $"{days}d " : "";
             return $"{sign}{daysFormat}{hours:D2}:{mins:D2}:{secs:D2}s";

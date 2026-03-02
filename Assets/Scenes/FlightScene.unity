@@ -6511,8 +6511,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _displayText: {fileID: 1565764634}
-  _buttonIncrease: {fileID: 30816169}
-  _buttonDecrease: {fileID: 0}
+  _buttonIncrease: {fileID: 1187827668}
+  _buttonDecrease: {fileID: 30816169}
   value: 0
   increment: 1
 --- !u!1 &1893096480

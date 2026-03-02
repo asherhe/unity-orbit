@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -21,13 +22,22 @@ namespace UI
 
         public bool IsPlannerActive { get; private set; } = false;
 
+        private Vector2 activePos, inactivePos;
+        private Vector2 TargetPos => IsPlannerActive ? activePos : inactivePos;
+
         /// <summary>
         /// maneuver that is currently being planned
         /// </summary>
         private Orbit.Maneuver _maneuver;
 
-        private Vector2 activePos, inactivePos;
-        private Vector2 TargetPos => IsPlannerActive ? activePos : inactivePos;
+        private readonly List<float> speedIncrements = new()
+        {
+            0.1f, 1, 5, 10, 50, 100, 500, 1000, 5000
+        };
+        private readonly List<float> timeIncrements = new()
+        {
+            1, 10, 60, 600, 3600, 36000, 86400, 864000, 8640000
+        };
 
         private void Awake()
         {
@@ -40,15 +50,28 @@ namespace UI
                 _inputActions.MapView.Maneuver.performed += ctx => TogglePlanner();
             });
 
-            
+            _timeField.formatter = t => "T" + TextDisplay.FormatTime(t - Universe.Instance.UT, showSign: true);
+            _progradeField.formatter = v => "PRGD " + TextDisplay.FormatSpeed(v, showSign: true);
+            _radialField.formatter = v => "RADL " + TextDisplay.FormatSpeed(v, showSign: true);
+            _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
+
+            _incrementField.OnValueChanged += OnIncrementChanged;
+            OnIncrementChanged();
         }
 
         private void OnRectTransformDimensionsChange()
         {
+            if (rectTransform == null) return;
             // wait until ContentSizeFitter does its job
-            if (rectTransform == null) rectTransform = transform as RectTransform;
             inactivePos = activePos + Vector2.up * (rectTransform.rect.height + 40f);
             rectTransform.anchoredPosition = TargetPos;
+        }
+
+        private void OnIncrementChanged()
+        {
+            _incrementField.value = Math.Clamp(_incrementField.value, 0, Math.Min(speedIncrements.Count, timeIncrements.Count) - 1);
+            _timeField.increment = timeIncrements[(int)_incrementField.value];
+            _progradeField.increment = _radialField.increment = speedIncrements[(int)_incrementField.value];
         }
 
         private void TogglePlanner()
