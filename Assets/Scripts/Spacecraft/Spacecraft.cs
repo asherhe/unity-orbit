@@ -159,6 +159,10 @@ public class Spacecraft : OrbitingObject
             parts.Add(part);
             part.craft = this;
 
+            // register part mass in newtonian system
+            // do this before LoadPartAsync so that newtonian mass is updated in real time
+            part.MassProperty.OnMassChanged += massChange => Newtonian.AddPointMass(part.craftPos, massChange);
+
             tasks.Add(LoadPartAsync(part, partConfig));
         }
 
@@ -171,24 +175,11 @@ public class Spacecraft : OrbitingObject
             tasks.Remove(finished);
             var part = finished.Result;
 
-            Newtonian.AddPointMass(part.craftPos, part.mass);
             foreach (var plugin in part.plugins)
             {
-                // update craft mass from plugin mass
-                if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
-                {
-                    var massivePlugin = (MassivePartPlugin)plugin;
-                    Newtonian.AddPointMass(part.craftPos, massivePlugin.Mass);
-                    massivePlugin.OnMassChanged += massChange =>
-                    {
-                        Newtonian.AddPointMass(part.craftPos, massChange);
-                    };
-                }
-
                 // forward resource change events
-                if (typeof(ResourceContainerPlugin).IsAssignableFrom(plugin.GetType()))
+                if (plugin is ResourceContainerPlugin resourcePlugin)
                 {
-                    var resourcePlugin = ((ResourceContainerPlugin)plugin);
                     resourcePlugin.OnResourceChanged += (type, diff) => OnResourceChanged?.Invoke(resourcePlugin, type, diff);
                 }
             }
@@ -202,18 +193,15 @@ public class Spacecraft : OrbitingObject
     }
 
     /// <summary>
-    /// recalculate <c>momentOfInertia</c>, automatically called when the craft's mass / center of mass changes
+    /// recalculate <c>momentOfInertia</c>, automatically called when the craft's mass / center of mass changes.
+    /// TODO: integrate with SpacecraftNewtonian's AddPointMass system
     /// </summary>
     public void RecalcMomentOfInertia()
     {
         Newtonian.momentOfInertia = 0.0;
         foreach (var part in parts)
         {
-            double mass = part.mass;
-            foreach (var plugin in part.plugins)
-                if (typeof(MassivePartPlugin).IsAssignableFrom(plugin.GetType()))
-                    mass += ((MassivePartPlugin)plugin).Mass;
-
+            double mass = part.MassProperty.Mass;
             Newtonian.momentOfInertia += mass * (part.craftPos - Newtonian.CenterOfMass).Magnitude;
         }
     }
@@ -229,6 +217,8 @@ public class Spacecraft : OrbitingObject
         transform.eulerAngles = new Vector3(0, 0, (float)(Newtonian.angle * 180.0 / Math.PI));
 
         _partsGameObject.transform.localPosition = -Newtonian.CenterOfMass;
+
+        Debug.Log(Newtonian.Mass);
     }
 
     public override string ToString() => $"Spacecraft {craftName}";

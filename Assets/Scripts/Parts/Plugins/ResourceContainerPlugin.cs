@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Parts
 {
-    public class ResourceContainerPlugin : MassivePartPlugin
+    public class ResourceContainerPlugin : PartPlugin, IMassive
     {
         private Config _config;
         [Serializable]
@@ -14,6 +14,8 @@ namespace Parts
             public Dictionary<string, double> amount, maxAmount;
             public Dictionary<string, int> priority;
         }
+
+        public MassProperty MassProperty { get; private set; } = new();
 
         public class Resource
         {
@@ -69,7 +71,7 @@ namespace Parts
             amt = Math.Min(res.amount, amt);
             res.amount -= amt;
 
-            Mass -= amt * ResourceManager.GetDensity(type);
+            MassProperty.Mass -= amt * ResourceManager.GetDensity(type);
 
             OnResourceChanged?.Invoke(type, -amt);
         }
@@ -93,7 +95,7 @@ namespace Parts
 
                 mass += r.amount * ResourceManager.GetDensity(r.type);
             }
-            Mass = mass;
+            MassProperty.Mass = mass;
         }
     }
 }

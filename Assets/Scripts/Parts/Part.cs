@@ -8,7 +8,7 @@ using UnityEngine.AddressableAssets;
 
 namespace Parts
 {
-    public class Part : MonoBehaviour
+    public class Part : MonoBehaviour, IMassive
     {
         /// <summary>
         /// configuration data read from the CRAFT configuration (not part definition!)
@@ -140,6 +140,8 @@ namespace Parts
         /// in parts that have crossfeed, resources with the Stage flow mode will be allowed to flow through this part.
         /// </summary>
         public bool hasCrossfeed { get; private set; }
+
+        public MassProperty MassProperty { get; private set; } = new();
 
         [Serializable]
         public class AttachmentNode
@@ -311,6 +313,8 @@ namespace Parts
             transform.localEulerAngles = new Vector3(0.0f, 0.0f, (float)(craftRot = _craftPartConfig.transform.rot));
 
             mass = _partDefinitionConfig.mass * 1000.0; // mt -> kg
+            MassProperty.Mass = mass;
+
             hasCrossfeed = _partDefinitionConfig.crossfeed;
 
             attachNodes = _partDefinitionConfig.attachmentNodes;
@@ -340,6 +344,10 @@ namespace Parts
                 if (_craftPartConfig.plugins != null && _craftPartConfig.plugins.ContainsKey(pluginName))
                     foreach (var craftKVP in _craftPartConfig.plugins[pluginName].KeyValuePairs)
                         pluginConfig[craftKVP.Key] = craftKVP.Value;
+
+                // register plugin msas property before loading
+                if (plugin is IMassive massive)
+                    MassProperty.AddMassProperty(massive.MassProperty);
 
                 plugin.OnLoad(pluginConfig);
                 pluginTasks.Add(plugin.OnLoadAsync(pluginConfig));
