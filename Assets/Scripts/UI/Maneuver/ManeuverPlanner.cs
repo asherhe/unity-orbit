@@ -77,6 +77,7 @@ namespace UI
         private void TogglePlanner()
         {
             IsPlannerActive = !IsPlannerActive;
+            
             rectTransform.DOAnchorPos(TargetPos, 0.25f)
                 .SetEase(IsPlannerActive ? Ease.OutCubic : Ease.InCubic);
         }

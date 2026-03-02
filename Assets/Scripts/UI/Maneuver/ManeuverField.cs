@@ -33,29 +33,26 @@ namespace UI
 
         public event Action OnValueChanged;
 
-        private void OnEnable()
+        protected virtual void OnEnable()
         {
-            _buttonIncrease.onClick.AddListener(ValueIncreased);
-            _buttonDecrease.onClick.AddListener(ValueDecreased);
+            _buttonIncrease.onClick.AddListener(IncreaseValue);
+            _buttonDecrease.onClick.AddListener(DecreaseValue);
         }
 
-        private void OnDisable()
+        protected virtual void OnDisable()
         {
-            _buttonIncrease.onClick.RemoveListener(ValueIncreased);
-            _buttonDecrease.onClick.RemoveListener(ValueDecreased);
+            _buttonIncrease.onClick.RemoveListener(IncreaseValue);
+            _buttonDecrease.onClick.RemoveListener(DecreaseValue);
         }
 
-        private void ValueIncreased()
+        protected void IncrementBy(float inc)
         {
-            value += increment;
+            value += inc;
             OnValueChanged?.Invoke();
         }
 
-        private void ValueDecreased()
-        {
-            value -= increment;
-            OnValueChanged?.Invoke();
-        }
+        private void IncreaseValue() => IncrementBy(increment);
+        private void DecreaseValue() => IncrementBy(-increment);
 
         private void Update()
         {
