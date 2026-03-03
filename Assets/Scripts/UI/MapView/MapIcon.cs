@@ -44,7 +44,10 @@ namespace UI
         public void SetIcon(string spriteName)
         {
             // load all subsprites in master icon spritesheet
-            Addressables.LoadAssetAsync<Sprite>($"Assets/UI/icons.png[{spriteName}]").Completed += handle =>{   SetIcon(handle.Result);};
+            Addressables.LoadAssetAsync<Sprite>($"Assets/UI/icons.png[{spriteName}]").Completed += handle =>
+            {
+                SetIcon(handle.Result);
+            };
         }
 
         public void OnPointerEnter(PointerEventData data) => OnHoverEnter?.Invoke(data);
