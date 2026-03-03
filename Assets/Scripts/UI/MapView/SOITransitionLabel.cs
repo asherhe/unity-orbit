@@ -36,6 +36,8 @@ namespace UI
 
         protected override Vector2d GetPosition()
         {
+            MatchTrajectoryColor();
+
             switch (Mode)
             {
                 case DisplayMode.Enter:
