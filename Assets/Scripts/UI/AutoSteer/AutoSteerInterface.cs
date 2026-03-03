@@ -78,7 +78,8 @@ namespace UI
         private void Update()
         {
             foreach (var holdButton in _holdButtons)
-                holdButton.button.rectTransform.anchoredPosition = _holdRadius * GetHoldDirection(holdButton.mode);
+                if (holdButton.button.gameObject.activeInHierarchy)
+                    holdButton.button.rectTransform.anchoredPosition = _holdRadius * GetHoldDirection(holdButton.mode);
 
             if (holdMode != HoldMode.None && (_handleTween == null || !_handleTween.IsActive()))
                 _handle.Direction = HoldDirection;
