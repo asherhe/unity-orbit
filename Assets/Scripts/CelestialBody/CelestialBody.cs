@@ -229,7 +229,8 @@ public class CelestialBody : OrbitingObject
         if (orbit != null)
         {
             var heliocentric = GetHeliocentricPosition();
-            sunIntensity = (float)(1.7e23 / heliocentric.Magnitude2);
+            // scale by 20 because that was how it was when i first configured the shader parameters
+            sunIntensity = 20f * (float)CelestialLightingUtils.SunIntensity(heliocentric);
             if (heliocentric.Magnitude2 > 0)
             {
                 sunDirection = -heliocentric.Normalized;

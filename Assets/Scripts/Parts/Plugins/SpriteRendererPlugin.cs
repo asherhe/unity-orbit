@@ -61,28 +61,15 @@ namespace Parts
 
             // assume position within craft has negligible effect
             var heliocentric = craft.GetHeliocentricPosition();
-            var sunIntensity = (float)(1.7e22 / heliocentric.Magnitude2); // slightly over 2 at earth orbit
+            // we scale by 2 because that makes the lighting look better
+            var sunIntensity = 2f * (float)CelestialLightingUtils.SunIntensity(heliocentric);
             var sunDirection = -heliocentric.Normalized;
             // set z to 0.3 so that parts are better illuminated
             Vector4 sunDir = new((float)sunDirection.x, (float)sunDirection.y, 0.3f, 0.0f);
             _spriteRenderer.material.SetFloat("_SunIntensity", sunIntensity);
             _spriteRenderer.material.SetVector("_SunDir", sunDir);
 
-            float shade = 1.0f;
-            if (craft.body.orbit != null)
-            {
-                // find closest point along sun ray to parent body
-                var t = Math.Max(-Vector2d.Dot(sunDirection, craft.Position), 0.0);
-                var closest = craft.Position + t * sunDirection;
-                // altitude of closest point
-                var alt = closest.Magnitude - craft.body.radius;
-                // apparent radius of the sun, if we projected it to the closest point
-                var apparentRad = CelestialBodyManager.Instance.celestialBodies["Sun"].radius / heliocentric.Magnitude * t;
-                // how much of the sun is occluded, used for soft shadows
-                // not completely physically accurate but good enough to give convincing results
-                var occlusion = 0.5 * (1.0 + alt / apparentRad);
-                shade = Mathf.Clamp01((float)occlusion);
-            }
+            float shade = (float)CelestialLightingUtils.CastBodySoftShadow(craft);
             // deal with atmospheric scattering at a later date
             _spriteRenderer.material.SetColor("_SunColor", new Color(shade, shade, shade, 1f));
         }
