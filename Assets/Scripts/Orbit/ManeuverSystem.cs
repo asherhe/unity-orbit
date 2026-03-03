@@ -52,7 +52,7 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     public void RemoveManeuver(Maneuver maneuver)
     {
         // TODO: maneuver is a dummy parameter in anticipation for maneuver list
-        NextManeuver.Dispose();
+        maneuver.Dispose();
         NextManeuver = null;
         Destroy(label.gameObject);
         OnManeuverChanged?.Invoke();
