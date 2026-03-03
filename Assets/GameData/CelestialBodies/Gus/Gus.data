@@ -39,13 +39,13 @@ atmosphere:
     properties:
       _RayleighScaleHeight:
         type: Float
-        value: 5000
+        value: 30000
       _MieScaleHeight:
         type: Float
-        value: 800
+        value: 12000
       _RayleighScatteringCoeff:
         type: Vector
-        value: [5.804542996261093e-6, 1.3562911419845635e-5, 3.026590629238531e-5, 1.2619774364741572e-5]
+        value: [4.9e-5, 1.4e-6, 7.3e-5, 1.1e-5]
       _MieScatteringCoeff:
         type: Vector
         value: [7.1e-6, 7.1e-6, 7.1e-6, 7.1e-6]
