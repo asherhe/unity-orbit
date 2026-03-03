@@ -215,7 +215,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: celestial_body
+      name: body_planet
       rect:
         serializedVersion: 2
         x: 16
@@ -236,7 +236,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: sun_body
+      name: body_sun
       rect:
         serializedVersion: 2
         x: 0
@@ -496,7 +496,7 @@ TextureImporter:
         width: 16
         height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -519,12 +519,13 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      body_planet: 1659343972
+      body_sun: -2061752127
       btn_+: -1750367304
       btn_-: 1528964062
       btn_16px: -1874926009
       btn_orbit+: -1809737720
       btn_orbit-: -957184523
-      celestial_body: 1659343972
       craft_lander: -200999148
       craft_probe: 61874634
       craft_rover: -2083264839
@@ -541,7 +542,6 @@ TextureImporter:
       poi_escape: 831127747
       poi_maneuver: -1752851142
       poi_periapsis: -1783579856
-      sun_body: -2061752127
       tag_icon: -1548797983
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

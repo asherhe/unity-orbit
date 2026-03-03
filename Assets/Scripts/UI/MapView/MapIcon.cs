@@ -1,7 +1,10 @@
+using MathNet.Numerics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -14,14 +17,15 @@ namespace UI
     public class MapIcon : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
         public RectTransform rectTransform { get; private set; }
-        
+
         [SerializeField]
         public Graphic iconGraphic;
 
         public virtual Color color
         {
             get => iconGraphic.color;
-            set {
+            set
+            {
                 iconGraphic.color = value;
                 iconGraphic.raycastTarget = color.a != 0.0f;
             }
@@ -34,6 +38,13 @@ namespace UI
         protected virtual void Awake()
         {
             rectTransform = transform as RectTransform;
+        }
+
+        public void SetIcon(Sprite sprite) { (iconGraphic as Image).sprite = sprite; }
+        public void SetIcon(string spriteName)
+        {
+            // load all subsprites in master icon spritesheet
+            Addressables.LoadAssetAsync<Sprite>($"Assets/UI/icons.png[{spriteName}]").Completed += handle =>{   SetIcon(handle.Result);};
         }
 
         public void OnPointerEnter(PointerEventData data) => OnHoverEnter?.Invoke(data);

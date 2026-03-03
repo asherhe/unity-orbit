@@ -14,7 +14,7 @@ namespace UI
         public RectTransform rectTransform { get; private set; }
 
         [SerializeField]
-        protected MapIcon icon;
+        public MapIcon icon;
         [SerializeField]
         protected TMP_Text labelText;
 

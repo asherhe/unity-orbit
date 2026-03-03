@@ -21,5 +21,7 @@ orbit: false
 # atmospheric data, set to false if no atmosphere
 atmosphere: false # TODO, figure out how sun's atmosphere works
 
+mapIcon: body_sun
+
 customDisplayPrefabs:
   - Assets/GameData/CelestialBodies/Sun/SunLensFlare.prefab

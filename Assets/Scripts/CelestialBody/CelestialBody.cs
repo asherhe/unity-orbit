@@ -84,6 +84,11 @@ public class CelestialBody : OrbitingObject
             public MaterialProperties material;
         }
 
+        /// <summary>
+        /// icon to display in map view label. name of a sprite in the master icon spritesheet
+        /// </summary>
+        public string mapIcon = null;
+
         public List<string> customDisplayPrefabs = new();
     }
 
@@ -321,6 +326,7 @@ public class CelestialBody : OrbitingObject
         UI.MapLabelManager.WhenInstantiated(() =>
         {
             _mapLabel = UI.MapLabelManager.Instance.AddCelestialBody(this);
+            if (_config.mapIcon != null) _mapLabel.icon.SetIcon(_config.mapIcon);
         });
 
         if (orbit != null)
