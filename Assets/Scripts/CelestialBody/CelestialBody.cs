@@ -87,7 +87,7 @@ public class CelestialBody : OrbitingObject
         /// <summary>
         /// configuration for planet shine
         /// </summary>
-        public PlanetShineConfig planetShine;
+        public PlanetShineConfig planetShine = new();
 
         /// <summary>
         /// icon to display in map view label. name of a sprite in the master icon spritesheet

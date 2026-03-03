@@ -109,7 +109,7 @@ public class CelestialLightingUtils
         // average source of incident reflected light to object
         var lightPos = bodyRadius * bodyObjDir.Rotate(-Math.Sign(signedSunAngle) * litAngleAvg);
         // direction from object to average light source
-        var lightDir = (lightPos-o.Position).Normalized;
+        var lightDir = (lightPos - o.Position).Normalized;
 
         // TODO: implement atmospheric effects at a later date
 
@@ -123,8 +123,16 @@ public class CelestialLightingUtils
         var lightDistanceEffect = 1 / (objScaleDistance * objScaleDistance);
         // NOTE: KSP planetshine included reinhard mapping for hdr, will this be necessary here?
 
+        // body radius, scaled down with hamswell radius = 1
+        var objectScaleRadius = bodyRadius / 3e6;
+        // cross sectional area of the body which is exposed to the sun
+        // we ignore the PI because we multiply by an adjustment factor anyways
+        var bodyCrossSection = objectScaleRadius * objectScaleRadius;
+        // effect of incident light falling on body's cross section
+        var incidentLightEffect = bodySunlight * bodyCrossSection;
+
         // combine everything for total shine intensity
-        var shineIntensity = bodySunlight * litFrac * litAngleEffect * lightDistanceEffect * body.planetShineConfig.intensity;
+        var shineIntensity = 0.5 * litFrac * incidentLightEffect * litAngleEffect * lightDistanceEffect * body.planetShineConfig.intensity;
 
         // our illumination formula uses modified diffuse reflectance, where light intensity I is
         //     I = s + (1-s) cos(theta)

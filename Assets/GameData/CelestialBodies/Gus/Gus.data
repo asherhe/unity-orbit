@@ -52,3 +52,7 @@ atmosphere:
       _MiePhaseG:
         type: Float
         value: 0.6
+
+planetShine:
+  color: "#da8bff"
+  intensity: 0.2
