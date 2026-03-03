@@ -9,6 +9,11 @@ Shader "Part"
         _SunDir ("Sun Direction", Vector) = (-1,0,0.2,0)
         _SunColor ("Sun Color", Color) = (1,1,1,1)
         _SunIntensity ("Sun Intensity", Float) = 2 // sun intensity based on distance from sun
+
+        _PlanetShineColor ("Planet Shine Color", Color) = (1,1,1,1)
+        _PlanetShineIntensity ("Planet Shine Intensity", Float) = 1
+        _PlanetShineDir ("Planet Shine Direction", Vector) = (0,-1,0,0)
+        _PlanetShineSpread ("Planet Shine Spread", Float) = 0.4
     }
     SubShader
     {
@@ -49,6 +54,11 @@ Shader "Part"
                 float4 _SunDir;
                 float4 _SunColor;
                 float _SunIntensity;
+
+                float4 _PlanetShineColor;
+                float _PlanetShineIntensity;
+                float4 _PlanetShineDir;
+                float _PlanetShineSpread;
             CBUFFER_END
 
             #if USE_SHAPE_LIGHT_TYPE_0
@@ -103,6 +113,11 @@ Shader "Part"
 
                 // sun illumination
                 color += main.rgb * LightingLambert(_SunIntensity * _SunColor.rgb, normalize(_SunDir.xyz), worldNormal);
+
+                // planet shine
+                float planetShineLambert = _PlanetShineSpread + (1-_PlanetShineSpread) * (normalize(_PlanetShineDir.xyz) * worldNormal);
+                planetShineLambert = clamp(planetShineLambert, 0, 1);
+                color += main.rgb * _PlanetShineIntensity * _PlanetShineColor.rgb * planetShineLambert;
 
                 // scene lighting
                 SurfaceData2D surfaceData;

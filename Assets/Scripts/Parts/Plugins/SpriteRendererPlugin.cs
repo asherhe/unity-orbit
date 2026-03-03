@@ -72,6 +72,12 @@ namespace Parts
             float shade = (float)CelestialLightingUtils.CastBodySoftShadow(craft);
             // deal with atmospheric scattering at a later date
             _spriteRenderer.material.SetColor("_SunColor", new Color(shade, shade, shade, 1f));
+
+            var planetShineProperties = CelestialLightingUtils.ComputePlanetShine(craft);
+            _spriteRenderer.material.SetColor("_PlanetShineColor", planetShineProperties.color);
+            _spriteRenderer.material.SetFloat("_PlanetShineIntensity", planetShineProperties.intensity);
+            _spriteRenderer.material.SetVector("_PlanetShineDir", planetShineProperties.direction);
+            _spriteRenderer.material.SetFloat("_PlanetShineSpread", planetShineProperties.spread);
         }
     }
 }

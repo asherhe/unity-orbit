@@ -85,6 +85,11 @@ public class CelestialBody : OrbitingObject
         }
 
         /// <summary>
+        /// configuration for planet shine
+        /// </summary>
+        public PlanetShineConfig planetShine;
+
+        /// <summary>
         /// icon to display in map view label. name of a sprite in the master icon spritesheet
         /// </summary>
         public string mapIcon = null;
@@ -162,6 +167,21 @@ public class CelestialBody : OrbitingObject
 
     private List<Material> _dynamicMaterials;
 
+    [Serializable]
+    public class PlanetShineConfig
+    {
+        /// <summary>
+        /// color of planet shine. default is a brownish hue
+        /// </summary>
+        public Color color = new(0.84f, 0.81f, 0.74f);
+
+        /// <summary>
+        /// additional intensity adjustment
+        /// </summary>
+        public float intensity = 1.0f;
+    }
+    public PlanetShineConfig planetShineConfig { get; private set; }
+
     public void LoadConfig(DataNode config)
     {
         /* read from config */
@@ -201,6 +221,8 @@ public class CelestialBody : OrbitingObject
             atmSeaLevelPressure = _config.atmosphere.seaLevelPressure;
             atmScaleHeight = _config.atmosphere.scaleHeight * 1000.0;
         }
+
+        planetShineConfig = _config.planetShine;
 
         _displayObject = new GameObject("Display");
         _displayObject.transform.parent = transform;

@@ -45,4 +45,101 @@ public class CelestialLightingUtils
         var diskFrac = 0.5 + (hhorizon * Math.Sqrt(1 - hhorizon * hhorizon) + Math.Asin(hhorizon)) / Math.PI;
         return diskFrac;
     }
+
+
+    public struct PlanetShineProperties
+    {
+        public Color color;
+        public float intensity;
+        public Vector4 direction;
+        public float spread;
+
+        public static PlanetShineProperties None
+        {
+            get
+            {
+                PlanetShineProperties props = new();
+                props.intensity = 0f;
+                return props;
+            }
+        }
+    }
+    public static PlanetShineProperties ComputePlanetShine(OrbitingObject o)
+    {
+        // adapted from KSP PlanetShine mod by Valerian
+        // https://github.com/PapaJoesSoup/ksp-planetshine/blob/master/PlanetShine/PlanetShine.cs#L186
+        var body = o.orbit.body;
+        // sun does not need planet shine
+        if (body.orbit == null) return PlanetShineProperties.None;
+
+        // shrink body slightly to avoid numerical issues
+        var bodyRadius = body.radius * 0.999;
+
+        var bodyHeliocentric = body.GetHeliocentricPosition();
+        // direction from body center to sun
+        var bodySunDir = -bodyHeliocentric.Normalized;
+        var bodySunlight = SunIntensity(bodyHeliocentric);
+
+        // direction from body to object
+        var bodyObjDir = o.Position.Normalized;
+        // distance to body center
+        var objBodyDistance = o.Position.Magnitude;
+        // altitude above body surface
+        var objAlt = Math.Max(objBodyDistance - bodyRadius, 1); // we don't like low altitudes because it messes math up
+
+        // visible body surface as seen from object, as a fraction of body radius
+        // uses similar triangles instead of tangents so it's a little off, but still good enough
+        var visibleSurface = objAlt / objBodyDistance;
+        // angles from the sun at which no and all visible area is illuminated from the pov of the object
+        var litAngleMax = Math.PI / 2 + (1 + visibleSurface);
+        var litAngleMin = Math.PI / 2 + (1 - visibleSurface);
+        // angle from sun to object relative to body center
+        var signedSunAngle = Vector2d.Angle(bodySunDir, bodyObjDir);
+        var sunAngle = Math.Abs(signedSunAngle);
+        // fraction of visible surface that is illuminated
+        var litFrac = (litAngleMax - sunAngle) / (litAngleMax - litAngleMin);
+        litFrac = Math.Clamp(litFrac, 0, 1);
+
+        // angle between the vessel and the average center of illuminated surface
+        var litAngleAvg = (Math.PI / 2 * visibleSurface) * (1 - (litFrac * (1 - sunAngle / Math.PI)));
+        // light intensity reduction as a result of body surface's "diffuse" reflection
+        // boost it to make it look better (0.3 term)
+        var litAngleEffect = Math.Clamp(0.3 + 1 - (sunAngle - litAngleAvg) / (Math.PI / 2), 0, 1);
+
+        // average source of incident reflected light to object
+        var lightPos = bodyRadius * bodyObjDir.Rotate(-Math.Sign(signedSunAngle) * litAngleAvg);
+        // direction from object to average light source
+        var lightDir = (lightPos-o.Position).Normalized;
+
+        // TODO: implement atmospheric effects at a later date
+
+        // apparent angular size of whole body
+        var bodyAngularSize = Math.Acos(Math.Sqrt(Math.Max(objBodyDistance * objBodyDistance - bodyRadius * bodyRadius, 1)) / objBodyDistance);
+        // apparent angular size of light source
+        var lightAngularSize = bodyAngularSize * Math.Min(Math.PI / 4, (litFrac * (1 - sunAngle / Math.PI)));
+        // light falloff based on distance
+        var objScaleDistance = objBodyDistance / bodyRadius;
+        // inverse square law
+        var lightDistanceEffect = 1 / (objScaleDistance * objScaleDistance);
+        // NOTE: KSP planetshine included reinhard mapping for hdr, will this be necessary here?
+
+        // combine everything for total shine intensity
+        var shineIntensity = bodySunlight * litFrac * litAngleEffect * lightDistanceEffect * body.planetShineConfig.intensity;
+
+        // our illumination formula uses modified diffuse reflectance, where light intensity I is
+        //     I = s + (1-s) cos(theta)
+        // where theta is the angle from the light to the normal. we want I = 0 when theta is at
+        // right angles with lightAngularSize, or theta = PI/2 + lightAngularSize. in this case,
+        // cos(theta) is equivalent to -sin(lightAngularSize). solving for s yields
+        //     s = sin(lightAngularSize) / ( sin(lightAngularSize) + 1 )
+        var sineLightAngularSize = Math.Sin(lightAngularSize);
+        var shineSpread = sineLightAngularSize / (sineLightAngularSize + 1);
+
+        PlanetShineProperties props = new();
+        props.color = body.planetShineConfig.color;
+        props.intensity = (float)shineIntensity;
+        props.direction = lightDir;
+        props.spread = (float)shineSpread;
+        return props;
+    }
 }

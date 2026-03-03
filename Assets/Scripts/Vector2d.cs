@@ -18,7 +18,8 @@ public class Vector2d
 
     /* operations on vectors */
 
-    public static bool operator ==(Vector2d v, Vector2d w) {
+    public static bool operator ==(Vector2d v, Vector2d w)
+    {
         if (v is null || w is null) return v is null && w is null;
         return v.x == w.x && v.y == w.y;
     }
@@ -70,6 +71,18 @@ public class Vector2d
             x * c - y * s,
             x * s + y * c
         );
+    }
+
+    /// <summary>
+    /// angle of rotation from v to w
+    /// </summary>
+    /// <returns>radian angle from v to w, guarenteed to be in (-PI, PI]</returns>
+    public static double Angle(Vector2d v, Vector2d w)
+    {
+        double angv = Math.Atan2(v.y, v.x), angw = Math.Atan2(w.y, w.x);
+        var dang = MathUtils.Mod(angw - angv, 2 * Math.PI);
+        if (dang > Math.PI) dang -= 2 * Math.PI;
+        return dang;
     }
 
 
