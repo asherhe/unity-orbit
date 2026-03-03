@@ -260,9 +260,17 @@ namespace UI
 
             if (clipToCurrent)
             {
-                // set lower time bound to orbit position
-                var pos = _prop.GetPosition(Universe.Instance.UT);
-                var nuPos = Orbit.CalcNu(pos);
+                double nuPos = Orbit.nu0;
+                
+                // only clip to current after we have passed orbit's epoch time?
+                // this is a safeguard to make sure future patches and planned maneuver don't get clipped funny
+                // since we assume that epoch is the initial time any object will ever enter the orbit, this should not change anything else
+                if (Universe.Instance.UT >= Orbit.t0)
+                {
+                    // set lower time bound to current orbit position
+                    var pos = _prop.GetPosition(Universe.Instance.UT);
+                    nuPos = Orbit.CalcNu(pos);
+                }
                 SetNuMin(nuPos);
             }
 
