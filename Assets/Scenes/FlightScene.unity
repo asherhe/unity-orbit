@@ -773,7 +773,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: PRGD +1000.0<sprite name="mps">
+  m_text: <color=#76D535>PRGD</color> +1000.0<sprite name="mps">
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -1649,7 +1649,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 92, y: -104}
+  m_AnchoredPosition: {x: 92, y: -105}
   m_SizeDelta: {x: 184, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &452729640
@@ -1684,7 +1684,7 @@ MonoBehaviour:
     m_Top: 4
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: 1
+  m_Spacing: 2
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -5890,7 +5890,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite name="dv"> left:0000.0/0000.0<sprite name="mps">
+  m_text: '<sprite name="dv"> left: <color=grey>0000.0</color>/0000.0<sprite name="mps">'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -7540,7 +7540,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: RADL +1000.0<sprite name="mps">
+  m_text: <color=#639BFF>RADL</color> +1000.0<sprite name="mps">
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}

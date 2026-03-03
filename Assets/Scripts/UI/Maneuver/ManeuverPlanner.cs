@@ -85,8 +85,8 @@ namespace UI
             });
 
             _timeField.formatter = t => "T" + TextDisplay.FormatTime(t - Universe.Instance.UT, showSign: true);
-            _progradeField.formatter = v => "PRGD " + TextDisplay.FormatSpeed(v, showSign: true);
-            _radialField.formatter = v => "RADL " + TextDisplay.FormatSpeed(v, showSign: true);
+            _progradeField.formatter = v => "<color=#76D535>PRGD</color> " + TextDisplay.FormatSpeed(v, showSign: true);
+            _radialField.formatter = v => "<color=#639BFF>RADL</color> " + TextDisplay.FormatSpeed(v, showSign: true);
             _incrementField.formatter = i => $"<sprite name=\"pm\">{TextDisplay.FormatSpeed(speedIncrements[(int)i])};<sprite name=\"pm\">{TextDisplay.FormatTime(timeIncrements[(int)i], shorten: true)}";
 
             OnManeuverStateUpdate += UpdateManeuverFieldValues;
@@ -171,7 +171,10 @@ namespace UI
 
         private void Update()
         {
-            _dvDisplay.text = $"<sprite name=\"dv\"> left:{TextDisplay.FormatSpeed(maneuver.DvRemaining.Magnitude, showUnits: false)}/{TextDisplay.FormatSpeed(maneuver.Dv.Magnitude)}";
+            var dvRemaining = maneuver.DvRemaining.Magnitude;
+            var dvTotal = maneuver.Dv.Magnitude;
+            var remainingColor = dvRemaining < Math.Min(1.0, 0.1 * dvTotal) ? "green" : "grey";
+            _dvDisplay.text = $"<sprite name=\"dv\"> left: <color={remainingColor}>{TextDisplay.FormatSpeed(dvRemaining, showUnits: false)}</color>/{TextDisplay.FormatSpeed(dvTotal)}";
             _burnCountdownDisplay.text = "In T" + TextDisplay.FormatTime(Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime), showSign: true);
         }
     }
