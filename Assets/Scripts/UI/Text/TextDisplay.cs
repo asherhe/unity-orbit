@@ -57,9 +57,15 @@ namespace UI
             return AddMetricPrefix(d) + "m";
         }
 
-        public static string FormatSpeed(double v, bool showSign = false)
+        public static string FormatSpeed(double v, bool showSign = false, bool showUnits = true)
         {
-            return string.Format($"{{0:{(showSign ? "+0.0;-0.0;0.0" : "F1")}}}<sprite name=\"mps\">", v);
+            var fmt = "F1";
+            if (showSign) fmt = "+0.0;-0.0;0.0";
+
+            var numeric = string.Format($"{{0:{fmt}}}", v);
+
+            if (showUnits) return numeric + "<sprite name=\"mps\">";
+            else return numeric;
         }
 
         public static string FormatTime(double t, bool showSign = false, bool shorten = false)

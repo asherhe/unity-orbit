@@ -161,12 +161,12 @@ namespace UI
 
         private void UpdateManeuverInfoDisplay()
         {
-            _dvDisplay.text = "<sprite name=\"dv\"> = " + TextDisplay.FormatSpeed(maneuver.Dv.Magnitude);
             _burnTimeDisplay.text = "Burn time: " + TextDisplay.FormatTime(maneuver.BurnTime, shorten: true);
         }
 
         private void Update()
         {
+            _dvDisplay.text = $"<sprite name=\"dv\"> left:{TextDisplay.FormatSpeed(maneuver.DvRemaining.Magnitude, showUnits:false)}/{TextDisplay.FormatSpeed(maneuver.Dv.Magnitude)}";
             _burnCountdownDisplay.text = "In T" + TextDisplay.FormatTime(Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime), showSign: true);
         }
     }

@@ -84,6 +84,15 @@ namespace Orbit
         /// </summary>
         public double BurnTime { get; private set; }
 
+        /// <summary>
+        /// how much of the planned burn has already been executed; based on observed velocity change at the time of maneuver
+        /// </summary>
+        public Vector2d DvProgress { get; private set; }
+        /// <summary>
+        /// the delta-v we need to apply to get us to the correct velocity
+        /// </summary>
+        public Vector2d DvRemaining { get; private set; }
+
         public event Action OnManeuverStateUpdate;
 
         /// <summary>
@@ -129,6 +138,10 @@ namespace Orbit
         /// </summary>
         private void UpdateInternalState()
         {
+            // unbind dv progress calculation
+            if (SourcePatch != null)
+                SourcePatch.patchOrbit.OnStateChanged -= CalcDvProgress;
+
             // ensure we rule out the possibility for any unforseen transitions
             SourcePatch = craft.patches.FirstPatch;
             while ((SourcePatch.HasTransition && UT >= SourcePatch.NextTransition.Time) || UT >= SourcePatch.ExpiryDate)
@@ -159,9 +172,21 @@ namespace Orbit
                 craft.ActuatorProperties.isp * 9.8 * craft.Newtonian.Mass / craft.ActuatorProperties.maxThrust.Magnitude *
                 (1 - Math.Exp(-Dv.Magnitude / (craft.ActuatorProperties.isp * 9.8)));
 
+            SourcePatch.patchOrbit.OnStateChanged += CalcDvProgress;
+            CalcDvProgress();
+
             resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, sourceOrbit.body);
 
             OnManeuverStateUpdate?.Invoke();
+        }
+
+        private void CalcDvProgress()
+        {
+            // find velocity at maneuver time with source orbit's current state
+            var sourceProp = new UniversalPropagator(SourcePatch.patchOrbit);
+            var currSourceVel = sourceProp.GetVelocity(UT);
+            DvProgress = currSourceVel - SourceVelocity;
+            DvRemaining = Dv - DvProgress;
         }
     }
 }
