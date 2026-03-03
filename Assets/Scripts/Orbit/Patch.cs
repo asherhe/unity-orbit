@@ -165,6 +165,28 @@ namespace Orbit
             OnTransitionUpdate += UpdateTrajectoryPrefs;
         }
 
+        private bool _disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    var displayComponents = new MonoBehaviour[] { trajectory, periapsisLabel, apoapsisLabel, soiEnterLabel, soiExitLabel };
+                    foreach (var comp in displayComponents) 
+                        UnityEngine.Object.Destroy(comp.gameObject);
+                }
+                _disposed = true;
+            }
+        }
+
+        ~Patch() { Dispose(false); }
+
         public void CheckTransitions() => CheckTransitions(Universe.Instance.UT);
 
         /// <summary>

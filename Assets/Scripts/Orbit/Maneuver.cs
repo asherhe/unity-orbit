@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Orbit
 {
-    public class Maneuver
+    public class Maneuver : IDisposable
     {
         private double _UT;
         /// <summary>
@@ -104,6 +104,25 @@ namespace Orbit
 
             UpdateInternalState();
         }
+
+        private bool _disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    resultPatches.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+        ~Maneuver() { Dispose(false); }
 
         /// <summary>
         /// update internal state after orbit time changes

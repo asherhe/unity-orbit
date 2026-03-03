@@ -9,7 +9,7 @@ namespace Orbit
     /// <summary>
     /// manages patched conic trajectory state and trajectory
     /// </summary>
-    public class PatchedConicManager
+    public class PatchedConicManager : IDisposable
     {
         /// <summary>
         /// internally stored orbit state of the orbiting object we are managing
@@ -75,6 +75,26 @@ namespace Orbit
 
             RecalculatePatches();
         }
+
+        private bool _disposed = false;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    foreach (var patch in _patches)
+                        patch.Dispose();
+                }
+                _disposed = true;
+            }
+        }
+        ~PatchedConicManager() { Dispose(false); }
 
         /// <summary>
         /// recalculate all future trajectory path predictions at the current UT.

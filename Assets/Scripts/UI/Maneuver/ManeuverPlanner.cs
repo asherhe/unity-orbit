@@ -48,7 +48,7 @@ namespace UI
         /// </summary>
         public event Action OnManeuverStateUpdate;
         /// <summary>
-        /// invoked when we get a different maneuver. OnManeuverStateUpdate will also be invoked after this event
+        /// invoked when we get a different maneuver to plan. OnManeuverStateUpdate will also be invoked after this event
         /// </summary>
         public event Action OnManeuverChanged;
 
@@ -148,14 +148,15 @@ namespace UI
         private void UpdateManeuverFieldValues()
         {
             _timeField.Value = (float)maneuver.UT;
+            // we don't change velocity fields because we don't want the prograde/radial out values to change when we shift the orbit phase
         }
 
         private void ResetManeuverFieldValues()
         {
-            UpdateManeuverFieldValues();
+            _timeField.SetValueSilent((float)maneuver.UT);
             var dvPR = maneuver.DvPR;
-            _progradeField.Value = (float)dvPR.x;
-            _radialField.Value = (float)dvPR.y;
+            _progradeField.SetValueSilent((float)dvPR.x);
+            _radialField.SetValueSilent((float)dvPR.y);
         }
 
         private void UpdateManeuverInfoDisplay()

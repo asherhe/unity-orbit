@@ -66,6 +66,11 @@ namespace UI
         private void IncreaseValue() => IncrementBy(increment);
         private void DecreaseValue() => IncrementBy(-increment);
 
+        /// <summary>
+        /// set the Value property without triggering an OnValueChanged event
+        /// </summary>
+        public void SetValueSilent(float value) { _value = value; }
+
         private void Update()
         {
             _displayText.text = formatter(Value);
