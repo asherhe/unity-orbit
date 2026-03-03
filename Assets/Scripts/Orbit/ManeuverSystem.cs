@@ -6,6 +6,9 @@ using UnityEngine;
 
 public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
 {
+    [SerializeField]
+    private Color _maneuverTrajectoryColor = Color.white;
+
     /// <summary>
     /// next pending maneuver
     /// TODO: i'd like to add multiple maneuvers at some point
@@ -26,11 +29,20 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
     /// </summary>
     public Maneuver GetManeuver()
     {
-        if (!HasManeuver) { 
-            NextManeuver = new Maneuver(ActiveCraftController.Instance.craft);
-            label = UI.MapLabelManager.Instance.AddManeuverLabel(NextManeuver);
-            OnManeuverChanged?.Invoke();
+        if (!HasManeuver) return NewManeuver();
+        return NextManeuver;
+    }
+
+    private Maneuver NewManeuver()
+    {
+        NextManeuver = new Maneuver(ActiveCraftController.Instance.craft);
+        label = UI.MapLabelManager.Instance.AddManeuverLabel(NextManeuver);
+        foreach (var patch in NextManeuver.resultPatches.AllPatches)
+        {
+            patch.trajectory.Color = _maneuverTrajectoryColor;
         }
+
+        OnManeuverChanged?.Invoke();
         return NextManeuver;
     }
 

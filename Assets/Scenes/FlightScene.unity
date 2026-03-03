@@ -1649,8 +1649,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 80, y: -104}
-  m_SizeDelta: {x: 160, y: 0}
+  m_AnchoredPosition: {x: 92, y: -104}
+  m_SizeDelta: {x: 184, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &452729640
 MonoBehaviour:
@@ -3656,6 +3656,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2bf36744772504388ef39cfec66110, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _maneuverTrajectoryColor: {r: 0.9098039, g: 0.73333335, b: 0.27450982, a: 1}
 --- !u!114 &673478620
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5858,7 +5859,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 128, y: 10}
+  m_SizeDelta: {x: 184, y: 10}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1518523602
 MonoBehaviour:
@@ -5880,7 +5881,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: <sprite name="dv"> = 0000.0<sprite name="mps">
+  m_text: <sprite name="dv"> left:0000.0/0000.0<sprite name="mps">
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
   m_sharedMaterial: {fileID: 7338991256358743493, guid: 0aaa06cf5a495a143bc19c97029352c4, type: 2}
@@ -5923,7 +5924,7 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
