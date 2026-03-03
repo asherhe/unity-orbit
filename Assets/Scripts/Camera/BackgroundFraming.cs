@@ -36,9 +36,8 @@ public class BackgroundFraming : MonoBehaviour
     private void LateUpdate()
     {
         var size = _camera.orthographicSize;
-        var fitCamera = 2 * size* Mathf.Max(_camera.aspect, 1.0f);
-        var zoom = _backgroundZoomMinMax.x + (Mathf.Log10(size) - _logCameraSizeMinMax.x) * _zoomPerLogSize;
+        var fitCamera = 2 * size * Mathf.Max(_camera.aspect, 1.0f);
+        var zoom = _backgroundZoomMinMax.x + (Mathf.Log10(Mathf.Max(size, 1.0f)) - _logCameraSizeMinMax.x) * _zoomPerLogSize;
         transform.localScale = Vector3.one * (fitCamera * zoom);
-        //_spriteRenderer.size = Vector2.one / zoom;
     }
 }
