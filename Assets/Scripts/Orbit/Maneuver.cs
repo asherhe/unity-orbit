@@ -112,6 +112,17 @@ namespace Orbit
             _Dv = dv is null ? Vector2d.zero : dv;
 
             UpdateInternalState();
+
+            craft.patches.OnTransition += () =>
+            {
+                UnbindSourcePatchListeners();
+                if (SourcePatch.prevPatch == null) ManeuverSystem.Instance.RemoveManeuver(this);
+                else
+                {
+                    SourcePatch = SourcePatch.prevPatch;
+                    BindSourcePatchListeners();
+                }
+            };
         }
 
         private bool _disposed = false;
@@ -138,9 +149,7 @@ namespace Orbit
         /// </summary>
         private void UpdateInternalState()
         {
-            // unbind dv progress calculation
-            if (SourcePatch != null)
-                SourcePatch.patchOrbit.OnStateChanged -= CalcDvProgress;
+            UnbindSourcePatchListeners();
 
             // ensure we rule out the possibility for any unforseen transitions
             SourcePatch = craft.patches.FirstPatch;
@@ -159,6 +168,7 @@ namespace Orbit
                 _UT = Math.Min(UT, SourcePatch.NextTransition.Time);
 
             sourceOrbit.CopyFrom(SourcePatch.patchOrbit);
+            BindSourcePatchListeners();
 
             var prop = new UniversalPropagator(sourceOrbit);
             var state = prop.GetStateVectors(UT);
@@ -172,12 +182,21 @@ namespace Orbit
                 craft.ActuatorProperties.isp * 9.8 * craft.Newtonian.Mass / craft.ActuatorProperties.maxThrust.Magnitude *
                 (1 - Math.Exp(-Dv.Magnitude / (craft.ActuatorProperties.isp * 9.8)));
 
-            SourcePatch.patchOrbit.OnStateChanged += CalcDvProgress;
             CalcDvProgress();
 
             resultOrbit.UpdateFromStateVectors(Position, SourceVelocity + Dv, UT, sourceOrbit.body);
 
             OnManeuverStateUpdate?.Invoke();
+        }
+
+        private void BindSourcePatchListeners()
+        {
+            SourcePatch.patchOrbit.OnStateChanged += CalcDvProgress;
+        }
+        private void UnbindSourcePatchListeners()
+        {
+            if (SourcePatch != null)
+                SourcePatch.patchOrbit.OnStateChanged -= CalcDvProgress;
         }
 
         private void CalcDvProgress()
