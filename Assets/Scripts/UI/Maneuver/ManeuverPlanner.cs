@@ -51,6 +51,10 @@ namespace UI
         /// invoked when we get a different maneuver to plan. OnManeuverStateUpdate will also be invoked after this event
         /// </summary>
         public event Action OnManeuverChanged;
+        /// <summary>
+        /// invoked when this planner is turned on or off
+        /// </summary>
+        public event Action OnPlannerToggled;
 
         private readonly List<float> speedIncrements = new()
         {
@@ -141,8 +145,9 @@ namespace UI
             }
             else
             {
-                maneuver.OnManeuverStateUpdate -= InvokeManeuverUpdate;
+                if (maneuver != null) maneuver.OnManeuverStateUpdate -= InvokeManeuverUpdate;
             }
+            OnPlannerToggled?.Invoke();
         }
 
         private void UpdateManeuverFieldValues()
@@ -166,7 +171,7 @@ namespace UI
 
         private void Update()
         {
-            _dvDisplay.text = $"<sprite name=\"dv\"> left:{TextDisplay.FormatSpeed(maneuver.DvRemaining.Magnitude, showUnits:false)}/{TextDisplay.FormatSpeed(maneuver.Dv.Magnitude)}";
+            _dvDisplay.text = $"<sprite name=\"dv\"> left:{TextDisplay.FormatSpeed(maneuver.DvRemaining.Magnitude, showUnits: false)}/{TextDisplay.FormatSpeed(maneuver.Dv.Magnitude)}";
             _burnCountdownDisplay.text = "In T" + TextDisplay.FormatTime(Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime), showSign: true);
         }
     }

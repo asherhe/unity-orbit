@@ -16,11 +16,6 @@ namespace UI
 
         private ToggleButtonGroup _toggleGroup;
 
-        /// <summary>
-        /// prograde vector, or craft velocity
-        /// </summary>
-        private Vector2d _prograde = Vector2d.zero;
-
         [SerializeField]
         private float _holdRadius = 40.0f;
 
@@ -28,19 +23,26 @@ namespace UI
         private AutoSteerHandle _handle;
 
         private Tweener _handleTween;
-
-        [SerializeField]
-        private SpriteToggleButton _progradeHold;
-        [SerializeField]
-        private SpriteToggleButton _retrogradeHold;
-        [SerializeField]
-        private SpriteToggleButton _radialOutHold;
-        [SerializeField]
-        private SpriteToggleButton _radialInHold;
-
         public enum HoldMode { None, Prograde, Retrograde, RadialOut, RadialIn, Maneuver }
 
         public HoldMode holdMode = HoldMode.None;
+
+        [Serializable]
+        public struct HoldButtons
+        {
+            public HoldMode mode;
+            public SpriteToggleButton button;
+        }
+        [SerializeField]
+        private List<HoldButtons> _holdButtons = new();
+
+        private SpriteToggleButton _maneuverButton;
+
+        /// <summary>
+        /// maneuver planner that we want the maneuver hold mode to refer to
+        /// </summary>
+        [SerializeField]
+        private ManeuverPlanner _maneuverPlanner;
 
         private void Awake()
         {
@@ -50,6 +52,14 @@ namespace UI
             _toggleGroup = GetComponent<ToggleButtonGroup>();
 
             gameObject.SetActive(false);
+            _maneuverButton = _holdButtons.Find(holdButton => holdButton.mode == HoldMode.Maneuver).button;
+            _maneuverPlanner.OnPlannerToggled += () =>
+            {
+                _maneuverButton.gameObject.SetActive(_maneuverPlanner.IsPlannerActive);
+                if (holdMode == HoldMode.Maneuver && !_maneuverPlanner.IsPlannerActive)
+                    holdMode = HoldMode.None;
+            };
+            _maneuverButton.gameObject.SetActive(_maneuverPlanner.IsPlannerActive);
 
             ActiveCraftController.WhenInstantiated(() =>
             {
@@ -67,24 +77,14 @@ namespace UI
 
         private void Update()
         {
-            var progradePos = _holdRadius * (Vector2)_prograde.Normalized;
-            var radialOutPos = Mathf.Sign((float)_craft.orbit.h) * new Vector2(progradePos.y, -progradePos.x);
-
-            ((RectTransform)_progradeHold.transform).anchoredPosition = progradePos;
-            ((RectTransform)_retrogradeHold.transform).anchoredPosition = -progradePos;
-            ((RectTransform)_radialOutHold.transform).anchoredPosition = radialOutPos;
-            ((RectTransform)_radialInHold.transform).anchoredPosition = -radialOutPos;
+            foreach (var holdButton in _holdButtons)
+                holdButton.button.rectTransform.anchoredPosition = _holdRadius * GetHoldDirection(holdButton.mode);
 
             if (holdMode != HoldMode.None && (_handleTween == null || !_handleTween.IsActive()))
                 _handle.Direction = HoldDirection;
 
             // 0 radians on spacecraft is up
             _command.autosteerTarget = _handle.Direction - 0.5f * Mathf.PI;
-        }
-
-        private void FixedUpdate()
-        {
-            _prograde = _craft.Velocity;
         }
 
         private void ToggleInterface()
@@ -113,18 +113,23 @@ namespace UI
             if (_toggleGroup.activeButton != null) _toggleGroup.activeButton.IsActive = false;
         }
 
+        public Vector2d GetHoldDirection(HoldMode mode)
+        {
+            if (mode != HoldMode.None)
+            {
+                if (mode <= HoldMode.RadialIn)
+                    return _craft.GetPRDirection((PRDirection)mode);
+                if (mode == HoldMode.Maneuver)
+                    return ManeuverSystem.Instance.HasManeuver ? ManeuverSystem.Instance.NextManeuver.DvRemaining.Normalized : Vector2d.zero;
+            }
+            return Vector2d.right.Rotate(_handle.Direction);
+        }
         public float HoldDirection
         {
             get
             {
-                if (holdMode != HoldMode.None)
-{                if (holdMode <= HoldMode.RadialIn)
-                    {
-                        var dir = _craft.GetPRDirection((PRDirection)holdMode);
-                        return (float)Math.Atan2(dir.y, dir.x);
-                    }
-                }
-                return _handle.Direction;
+                var dir = GetHoldDirection(holdMode);
+                return (float)Math.Atan2(dir.y, dir.x);
             }
         }
 
@@ -134,10 +139,15 @@ namespace UI
         private void OnHoldModeChanged()
         {
             if (_toggleGroup.activeButton == null) holdMode = HoldMode.None;
-            if (_toggleGroup.activeButton == _progradeHold) holdMode = HoldMode.Prograde;
-            if (_toggleGroup.activeButton == _retrogradeHold) holdMode = HoldMode.Retrograde;
-            if (_toggleGroup.activeButton == _radialOutHold) holdMode = HoldMode.RadialOut;
-            if (_toggleGroup.activeButton == _radialInHold) holdMode = HoldMode.RadialIn;
+
+            foreach (var holdButton in _holdButtons)
+            {
+                if (_toggleGroup.activeButton == holdButton.button)
+                {
+                    holdMode = holdButton.mode;
+                    break;
+                }
+            }
 
             if (holdMode != HoldMode.None)
             {

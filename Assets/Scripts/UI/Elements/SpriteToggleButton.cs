@@ -11,7 +11,7 @@ namespace UI
     [RequireComponent(typeof(RectTransform), typeof(Image))]
     public class SpriteToggleButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
     {
-        private RectTransform _rectTransform;
+        public RectTransform rectTransform { get; private set; }
         private Image _image;
 
         [SerializeField]
@@ -43,7 +43,7 @@ namespace UI
 
         private void Awake()
         {
-            _rectTransform = transform as RectTransform;
+            rectTransform = transform as RectTransform;
             _image = GetComponent<Image>();
 
             OnToggled += UpdateVisuals;
@@ -52,12 +52,12 @@ namespace UI
 
         public void OnPointerEnter(PointerEventData data)
         {
-            _rectTransform.DOScale(_hoverScale, _hoverTransitionTime)
+            rectTransform.DOScale(_hoverScale, _hoverTransitionTime)
                 .SetEase(Ease.OutCubic);
         }
         public void OnPointerExit(PointerEventData data)
         {
-            _rectTransform.DOScale(1.0f, _hoverTransitionTime)
+            rectTransform.DOScale(1.0f, _hoverTransitionTime)
                 .SetEase(Ease.OutCubic);
         }
 
