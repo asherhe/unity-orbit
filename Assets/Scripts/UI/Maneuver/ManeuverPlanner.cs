@@ -175,7 +175,10 @@ namespace UI
             var dvTotal = maneuver.Dv.Magnitude;
             var remainingColor = dvRemaining < Math.Min(1.0, 0.1 * dvTotal) ? "green" : "grey";
             _dvDisplay.text = $"<sprite name=\"dv\"> left: <color={remainingColor}>{TextDisplay.FormatSpeed(dvRemaining, showUnits: false)}</color>/{TextDisplay.FormatSpeed(dvTotal)}";
-            _burnCountdownDisplay.text = "In T" + TextDisplay.FormatTime(Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime), showSign: true);
+
+            var countdown = Universe.Instance.UT - (maneuver.UT - 0.5 * maneuver.BurnTime);
+            var countdownColor = countdown > 0 ? "red" : "white";
+            _burnCountdownDisplay.text = $"In <color={countdownColor}>T{TextDisplay.FormatTime(countdown, showSign: true)}</color>";
         }
     }
 }
