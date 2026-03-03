@@ -20,8 +20,8 @@ orbit:
   parent: Gus
   semimajorAxis: 6.350e5 # km
   eccentricity: 0.012
-  longitudePeriapsis: 0.0 # deg
-  epochMeanAnom: 0.0 # deg
+  longitudePeriapsis: 86.0 # deg
+  epochMeanAnom: 117.0 # deg
   epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere

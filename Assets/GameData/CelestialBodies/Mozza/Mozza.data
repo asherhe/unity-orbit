@@ -26,8 +26,8 @@ orbit:
   parent: Hamswell
   semimajorAxis: 1.88e5 # km
   eccentricity: 0.062
-  longitudePeriapsis: 0.0 # deg
-  epochMeanAnom: 0.0 # deg
+  longitudePeriapsis: 126.0 # deg
+  epochMeanAnom: 102.0 # deg
   epochTime: 0.0 # s
 
 # atmospheric data, set to false if no atmosphere
