@@ -9,11 +9,11 @@ surfaceGravity: 34.6 # m/s^2
 dayLength: 9.0 # hours
 
 surfaceMaterial:
-  path: Assets/GameData/CelestialBodies/SurfaceBlank.mat
+  path: Assets/GameData/CelestialBodies/Surface.mat
   properties:
-    _Color:
-      type: Color
-      value: "#181717"
+    _MainTex:
+      type: Texture2D
+      value: Assets/GameData/CelestialBodies/Gus/Gus.png
 
 # orbital info, set to false if there is no orbit (i.e. the Sun)
 orbit:
