@@ -2327,9 +2327,9 @@ MonoBehaviour:
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 1
-  m_Antialiasing: 1
-  m_AntialiasingQuality: 2
-  m_StopNaN: 0
+  m_Antialiasing: 2
+  m_AntialiasingQuality: 1
+  m_StopNaN: 1
   m_Dithering: 0
   m_ClearDepth: 1
   m_AllowXRRendering: 1
@@ -4090,6 +4090,26 @@ MonoBehaviour:
   _dvDisplay: {fileID: 1518523602}
   _burnTimeDisplay: {fileID: 9635382}
   _burnCountdownDisplay: {fileID: 1925692442}
+  speedIncrements:
+  - 0.10000000149011612
+  - 1
+  - 5
+  - 10
+  - 50
+  - 100
+  - 500
+  - 1000
+  - 5000
+  timeIncrements:
+  - 1
+  - 10
+  - 60
+  - 600
+  - 3600
+  - 36000
+  - 86400
+  - 864000
+  - 8640000
 --- !u!1 &1035460414
 GameObject:
   m_ObjectHideFlags: 0
