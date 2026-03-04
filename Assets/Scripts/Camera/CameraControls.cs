@@ -120,6 +120,9 @@ public class CameraControls : MonoBehaviour, ISerializationCallbackReceiver
             _prevFocus = CameraFocus.Instance.Focus;
             CameraFocus.Instance.OnFocusChanged += () =>
             {
+                // block when switching to map view
+                if (isTweening) return;
+
                 isTweening = true;
 
                 var focus = CameraFocus.Instance.Focus;
