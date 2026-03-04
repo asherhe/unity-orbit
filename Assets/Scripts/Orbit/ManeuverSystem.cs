@@ -54,7 +54,8 @@ public class ManeuverSystem : SingletonBehaviour<ManeuverSystem>
         // TODO: maneuver is a dummy parameter in anticipation for maneuver list
         maneuver.Dispose();
         NextManeuver = null;
-        Destroy(label.gameObject);
+        if (label is not null)
+            Destroy(label.gameObject);
         OnManeuverChanged?.Invoke();
     }
 }

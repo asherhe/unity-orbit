@@ -56,11 +56,13 @@ namespace UI
         /// </summary>
         public event Action OnPlannerToggled;
 
-        private readonly List<float> speedIncrements = new()
+        [SerializeField]
+        private List<double> speedIncrements = new()
         {
             0.1f, 1, 5, 10, 50, 100, 500, 1000, 5000
         };
-        private readonly List<float> timeIncrements = new()
+        [SerializeField]
+        private List<double> timeIncrements = new()
         {
             1, 10, 60, 600, 3600, 36000, 86400, 864000, 8640000
         };
@@ -152,16 +154,16 @@ namespace UI
 
         private void UpdateManeuverFieldValues()
         {
-            _timeField.Value = (float)maneuver.UT;
+            _timeField.Value = maneuver.UT;
             // we don't change velocity fields because we don't want the prograde/radial out values to change when we shift the orbit phase
         }
 
         private void ResetManeuverFieldValues()
         {
-            _timeField.SetValueSilent((float)maneuver.UT);
+            _timeField.SetValueSilent(maneuver.UT);
             var dvPR = maneuver.DvPR;
-            _progradeField.SetValueSilent((float)dvPR.x);
-            _radialField.SetValueSilent((float)dvPR.y);
+            _progradeField.SetValueSilent(dvPR.x);
+            _radialField.SetValueSilent(dvPR.y);
         }
 
         private void UpdateManeuverInfoDisplay()

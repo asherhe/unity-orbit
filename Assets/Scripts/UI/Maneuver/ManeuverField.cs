@@ -18,11 +18,11 @@ namespace UI
         private Button _buttonIncrease, _buttonDecrease;
 
         [SerializeField]
-        private float _value = 0f;
+        private double _value = 0;
         /// <summary>
         /// current value of field
         /// </summary>
-        public float Value
+        public double Value
         {
             get => _value;
             set
@@ -35,12 +35,12 @@ namespace UI
         /// <summary>
         /// amount by which the buttons change the value
         /// </summary>
-        public float increment = 1f;
+        public double increment = 1.0;
 
         /// <summary>
         /// value -> text formatter for generating text display
         /// </summary>
-        public Func<float, string> formatter = val => val.ToString();
+        public Func<double, string> formatter = val => val.ToString();
 
         public event Action OnValueChanged;
 
@@ -58,7 +58,7 @@ namespace UI
             _buttonDecrease.onClick.RemoveListener(DecreaseValue);
         }
 
-        protected void IncrementBy(float inc)
+        protected void IncrementBy(double inc)
         {
             Value += inc;
         }
@@ -69,7 +69,7 @@ namespace UI
         /// <summary>
         /// set the Value property without triggering an OnValueChanged event
         /// </summary>
-        public void SetValueSilent(float value) { _value = value; }
+        public void SetValueSilent(double value) { _value = value; }
 
         private void Update()
         {
