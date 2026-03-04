@@ -13,11 +13,16 @@ public class FollowWorldTransform : MonoBehaviour
     public bool shouldFollowPosition = true;
     public bool shouldFollowRotation = false;
 
+    public bool keepZPosition = false;
+
     private void LateUpdate()
     {
         if (follow != null)
         {
-            if (shouldFollowPosition) transform.position = follow.position;
+            if (shouldFollowPosition) {
+                if (keepZPosition) transform.position = new(follow.position.x, follow.position.y, transform.position.z);
+                else transform.position = follow.position;
+            }
             if (shouldFollowRotation) transform.rotation = follow.rotation;
         }
     }
